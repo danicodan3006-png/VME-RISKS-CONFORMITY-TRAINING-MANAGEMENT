@@ -135,6 +135,17 @@ const ExecutiveSummary = () => {
             overflow: 'hidden' // Mission Control non-scroll preference
         }}>
 
+
+            {/* Page Header - Internal Branding */}
+            <div style={{ marginBottom: '16px', flexShrink: 0 }}>
+                <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', letterSpacing: '1px', lineHeight: 1 }}>
+                    VME EXECUTIVE SUMMARY
+                </h1>
+                <p style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
+                    2026 Risk Management & Digital Safety Suite
+                </p>
+            </div>
+
             {/* Top Banner Row - High Density */}
             <div style={{
                 display: 'grid',

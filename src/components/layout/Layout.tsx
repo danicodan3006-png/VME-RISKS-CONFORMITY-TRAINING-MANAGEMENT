@@ -137,16 +137,16 @@ const Layout = () => {
                     {!sidebarCollapsed ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>JD</span>
+                                <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>DK</span>
                             </div>
                             <div style={{ overflow: 'hidden' }}>
-                                <p style={{ fontSize: '13px', fontWeight: '500', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>John Doe</p>
-                                <p style={{ fontSize: '11px', color: '#94a3b8' }}>Admin</p>
+                                <p style={{ fontSize: '13px', fontWeight: '500', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Dan Kahilu</p>
+                                <p style={{ fontSize: '11px', color: '#94a3b8' }}>Lead Data Architect</p>
                             </div>
                         </div>
                     ) : (
                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
-                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>JD</span>
+                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>DK</span>
                         </div>
                     )}
                 </div>

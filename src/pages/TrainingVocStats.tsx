@@ -1,256 +1,200 @@
 
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { CheckCircle, AlertOctagon, Target, RefreshCw, ChevronRight } from 'lucide-react';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
+} from 'recharts';
+import {
+    Zap
+} from 'lucide-react';
 
 // --- Data ---
+const gapData = [
+    { name: 'MMG', theory: 98, practical: 45, gap: 53 },
+    { name: 'MEXCO', theory: 92, practical: 60, gap: 32 },
+    { name: 'ALTINAY', theory: 88, practical: 35, gap: 53 },
+    { name: 'TRANSCO', theory: 95, practical: 78, gap: 17 },
+];
+
+const participationData = [
+    { name: 'MMG', attended: 85, absent: 15 },
+    { name: 'MEXCO', attended: 70, absent: 30 },
+    { name: 'ALTINAY', attended: 60, absent: 40 },
+    { name: 'TRANSCO', attended: 90, absent: 10 },
+];
+
 const pipelineData = [
-    { name: 'Competent (Ready for Practical)', value: 161, color: '#22c55e' },
-    { name: 'Not Yet Competent (Re-eval)', value: 19, color: '#ef4444' },
+    { name: 'NYC Queue', value: 19 },
+    { name: 'Practical Done', value: 0 },
 ];
-
-const gapAnalysisData = [
-    { name: 'ILUNGA M.', theory: 95, practice: 90 },
-    { name: 'KABWE J.', theory: 88, practice: 85 },
-    { name: 'BANZA WA ILUNGA', theory: 100, practice: 70 }, // Gap Highlight
-    { name: 'TSHILOMBO A.', theory: 92, practice: 88 },
-    { name: 'MUKALAY D.', theory: 85, practice: 60 }, // Another potential gap
-];
-
-const nycList = [
-    { id: 'NYC-01', name: 'KASONGO E.', score: 65, module: 'Defensive Driving' },
-    { id: 'NYC-02', name: 'MULUNDA P.', score: 58, module: 'Signage Recognition' },
-    { id: 'NYC-03', name: 'TSHIBANGU G.', score: 68, module: 'Hazard Perception' },
-];
-
-const TARGET_TRAINING = 2200;
-const CURRENT_COMPETENCIES = 0; // Starts at 0 as requested
 
 // --- Components ---
-
-const DarkCard = ({ children, className = '', style = {} }: { children: React.ReactNode, className?: string, style?: React.CSSProperties }) => (
+const NeonCard = ({ title, children, alert, borderColor = '#333' }: { title: string, children: React.ReactNode, alert?: string, borderColor?: string }) => (
     <div style={{
         backgroundColor: '#1E1E1E',
-        border: '1px solid #333',
+        border: `1px solid ${borderColor}`,
         borderRadius: '8px',
         padding: '24px',
-        ...style
-    }} className={className}>
-        {children}
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        position: 'relative',
+        boxShadow: alert ? `0 0 15px ${borderColor}40` : 'none',
+        overflow: 'hidden'
+    }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ color: 'white', fontSize: '16px', fontWeight: 'bold', letterSpacing: '0.5px', textTransform: 'uppercase' }}>{title}</h3>
+            {alert && (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '4px 8px',
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    border: '1px solid #ef4444',
+                    borderRadius: '4px'
+                }}>
+                    <Zap size={12} color="#ef4444" fill="#ef4444" />
+                    <span style={{ color: '#fca5a5', fontSize: '10px', fontWeight: 'bold' }}>{alert}</span>
+                </div>
+            )}
+        </div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+            {children}
+        </div>
     </div>
 );
-
-const ProgressBar = ({ value, total, color }: { value: number, total: number, color: string }) => {
-    const percentage = (value / total) * 100;
-    return (
-        <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: color, transition: 'width 0.5s ease' }}></div>
-        </div>
-    );
-};
 
 const TrainingVocStats = () => {
     return (
         <div style={{
             backgroundColor: '#121212',
-            minHeight: '100vh',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
             color: 'white',
-            padding: '32px',
-            fontFamily: '"Inter", sans-serif'
+            padding: '24px',
+            fontFamily: '"Inter", sans-serif',
+            overflow: 'hidden'
         }}>
-            <div style={{ marginBottom: '40px' }}>
-                <h1 style={{ fontSize: '32px', fontWeight: '800', color: 'white', letterSpacing: '-1px', marginBottom: '8px' }}>
-                    TRAINING & VOC <span style={{ color: '#3b82f6' }}>STATS</span>
+
+            {/* Header */}
+            <div style={{ marginBottom: '24px', flexShrink: 0 }}>
+                <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3b82f6', letterSpacing: '1px', lineHeight: 1 }}>
+                    TRAINING & COMPETENCY DIAGNOSTICS
                 </h1>
-                <p style={{ color: '#64748b' }}>Pipeline Certification & Gap Analysis 2026</p>
+                <p style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
+                    Vocational Evaluation & Practical Gap Analysis
+                </p>
             </div>
 
-            {/* Top Row: Pipeline & Objectives */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+            {/* Main Grid */}
+            <div style={{
+                flex: 1,
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: '24px',
+                minHeight: 0
+            }}>
 
-                {/* VOC Theory Pipeline */}
-                <DarkCard>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                        <div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>VOC Theory Pipeline</h3>
-                            <p style={{ fontSize: '14px', color: '#64748b' }}>February 2026 Intake</p>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '36px', fontWeight: '800', color: 'white', lineHeight: 1 }}>180</div>
-                            <div style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase' }}>Evaluations</div>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                        <div style={{ width: '160px', height: '160px' }}>
-                            <ResponsiveContainer>
-                                <PieChart>
-                                    <Pie
-                                        data={pipelineData}
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {pipelineData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip contentStyle={{ backgroundColor: '#1E1E1E', borderColor: '#333', color: 'white' }} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ marginBottom: '16px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{ color: '#22c55e', fontWeight: '600' }}>Competent (89%)</span>
-                                    <span style={{ color: 'white' }}>161</span>
-                                </div>
-                                <p style={{ fontSize: '12px', color: '#64748b' }}>En attente de test pratique</p>
-                            </div>
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                    <span style={{ color: '#ef4444', fontWeight: '600' }}>Not Yet Competent (11%)</span>
-                                    <span style={{ color: 'white' }}>19</span>
-                                </div>
-                                <p style={{ fontSize: '12px', color: '#64748b' }}>Programmé pour réévaluation</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style={{ marginTop: '24px', padding: '12px', backgroundColor: '#1e293b', borderRadius: '8px', display: 'flex', gap: '12px', alignItems: 'start' }}>
-                        <CheckCircle size={20} color="#3b82f6" style={{ flexShrink: 0 }} />
-                        <p style={{ fontSize: '13px', color: '#94a3b8' }}>
-                            <span style={{ fontWeight: 'bold', color: '#3b82f6' }}>Insight QA/QC:</span> 89% des candidats sont prêts pour l'étape finale de validation terrain. Le pipeline est sain.
-                        </p>
-                    </div>
-                </DarkCard>
-
-                {/* 2026 Objective Tracking */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <DarkCard>
-                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Target size={20} color="#f59e0b" />
-                            Objectifs 2026
-                        </h3>
-                        <div style={{ marginBottom: '32px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                <span style={{ color: '#94a3b8' }}>Training Volume Target</span>
-                                <span style={{ color: 'white', fontWeight: 'bold' }}>0 / {TARGET_TRAINING}</span>
-                            </div>
-                            <ProgressBar value={CURRENT_COMPETENCIES} total={TARGET_TRAINING} color="#f59e0b" />
-                            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>Validated Competencies tracking starts post-practical phase.</p>
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', backgroundColor: '#333', borderRadius: '8px' }}>
-                            <div>
-                                <div style={{ fontSize: '32px', fontWeight: '800', color: 'white' }}>{CURRENT_COMPETENCIES}</div>
-                                <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase' }}>Compétences Validées</div>
-                            </div>
-                            <RefreshCw size={24} color="#64748b" />
-                        </div>
-                    </DarkCard>
-                </div>
-            </div>
-
-            {/* Middle Row: Gap Analysis */}
-            <DarkCard style={{ marginBottom: '32px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                    <div>
-                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>Theory vs Practice Analysis (Gap Analysis)</h3>
-                        <p style={{ fontSize: '14px', color: '#64748b' }}>Identifying Coaching Needs - Attendance List Data</p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '12px', height: '12px', backgroundColor: '#3b82f6', borderRadius: '2px' }}></div>
-                            <span style={{ fontSize: '12px', color: '#94a3b8' }}>Theory</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '12px', height: '12px', backgroundColor: '#10b981', borderRadius: '2px' }}></div>
-                            <span style={{ fontSize: '12px', color: '#94a3b8' }}>Practice</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ height: '350px', width: '100%' }}>
-                    <ResponsiveContainer>
-                        <BarChart data={gapAnalysisData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
-                            <XAxis type="number" domain={[0, 100]} stroke="#64748b" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} />
-                            <YAxis dataKey="name" type="category" stroke="#64748b" tick={{ fill: '#e2e8f0', fontSize: 13 }} width={120} axisLine={false} tickLine={false} />
+                {/* 1. Gap Analysis (Left) */}
+                <NeonCard title="Theory vs Practice Gap" borderColor={gapData.some(d => d.gap > 20) ? '#f59e0b' : '#333'} alert="HIGH COACHING PRIORITY">
+                    <p style={{ color: '#94a3b8', fontSize: '12px', marginBottom: '16px' }}>
+                        Comparison of Theory Attendance (Blue) vs Practical Competency (Cyan). Gaps indicating <span style={{ color: '#f59e0b' }}>Theory-only focus.</span>
+                    </p>
+                    <ResponsiveContainer width="100%" height="90%">
+                        <BarChart data={gapData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                            <XAxis dataKey="name" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
+                            <YAxis stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
                             <Tooltip
-                                cursor={{ fill: '#333', opacity: 0.4 }}
+                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                                 contentStyle={{ backgroundColor: '#1E1E1E', borderColor: '#333', color: 'white' }}
                             />
-                            <Bar dataKey="theory" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={12} />
-                            <Bar dataKey="practice" fill="#10b981" radius={[0, 4, 4, 0]} barSize={12} />
-                            {/* Alert Reference for BANZA WA ILUNGA */}
-                            {/* Visual cue simulated via data rendering is generic, but tooltip helps. 
-                                We can add a custom note below the chart.
-                            */}
+                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                            <Bar dataKey="theory" name="Theory Attendance" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="practical" name="Practical Competency" fill="#06b6d4" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
-                </div>
-                <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <AlertOctagon size={20} color="#ef4444" />
-                    <p style={{ fontSize: '13px', color: '#fca5a5' }}>
-                        <span style={{ fontWeight: 'bold' }}>Gap Alert:</span> BAMZA WA ILUNGA shows 100% Theory but only 70% Practice. Immediate coaching required before final validation.
+                </NeonCard>
+
+                {/* 2. Pipeline Stagnancy (Center - Hero) */}
+                <NeonCard title="NYC Re-evaluation Pipeline" borderColor="#06b6d4" alert="PIPELINE STAGNANT">
+                    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        {/* Glowing Text */}
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', zIndex: 10 }}>
+                            <div style={{
+                                fontSize: '80px',
+                                fontWeight: '900',
+                                color: '#000',
+                                textShadow: '0 0 5px #06b6d4, 0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 40px #06b6d4',
+                                WebkitTextStroke: '2px #06b6d4',
+                                lineHeight: 1
+                            }}>
+                                0
+                            </div>
+                            <div style={{ fontSize: '14px', color: '#06b6d4', textTransform: 'uppercase', fontWeight: 'bold', marginTop: '16px', letterSpacing: '2px' }}>
+                                Practical <br /> Completed
+                            </div>
+                        </div>
+
+                        <ResponsiveContainer width="100%" height="80%">
+                            <PieChart>
+                                <Pie
+                                    data={pipelineData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={90}
+                                    outerRadius={110}
+                                    fill="#8884d8"
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    {pipelineData.map((_entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={index === 0 ? '#333' : '#06b6d4'} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </ResponsiveContainer>
+
+                        <div style={{ textAlign: 'center', marginTop: '-20px' }}>
+                            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ef4444' }}>19</div>
+                            <div style={{ fontSize: '12px', color: '#94a3b8' }}>Candidates in NYC Queue</div>
+                        </div>
+                    </div>
+                </NeonCard>
+
+                {/* 3. Participation Heatmap (Right) */}
+                <NeonCard title="Attendance List Intelligence">
+                    <p style={{ color: '#94a3b8', fontSize: '12px', marginBottom: '16px' }}>
+                        Participation Rate % per Company. Low attendance indicates <span style={{ color: '#ef4444' }}>systemic disengagement.</span>
                     </p>
-                </div>
-            </DarkCard>
+                    <ResponsiveContainer width="100%" height="90%">
+                        <BarChart data={participationData} layout="vertical" margin={{ top: 20, right: 30, left: 40, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={true} vertical={false} />
+                            <XAxis type="number" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+                            <YAxis dataKey="name" type="category" stroke="#64748b" tick={{ fill: 'white', fontSize: 12, fontWeight: 'bold' }} axisLine={false} tickLine={false} width={80} />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#1E1E1E', borderColor: '#333', color: 'white' }}
+                            />
+                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                            <Bar dataKey="attended" name="Attended" stackId="a" fill="#22c55e" radius={[0, 4, 4, 0]} barSize={32} />
+                            <Bar dataKey="absent" name="Absent" stackId="a" fill="#333" radius={[0, 4, 4, 0]} barSize={32} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </NeonCard>
 
-            {/* Bottom: NYC Re-evaluation Module */}
-            <DarkCard>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', marginBottom: '24px' }}>
-                    NYC Re-evaluation Queue (19 Candidates)
-                </h3>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', color: '#e2e8f0', fontSize: '14px' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #333', color: '#64748b', textTransform: 'uppercase', fontSize: '12px' }}>
-                                <th style={{ textAlign: 'left', padding: '16px' }}>Candidate ID</th>
-                                <th style={{ textAlign: 'left', padding: '16px' }}>Name</th>
-                                <th style={{ textAlign: 'center', padding: '16px' }}>Current Score</th>
-                                <th style={{ textAlign: 'left', padding: '16px' }}>Failed Module</th>
-                                <th style={{ textAlign: 'right', padding: '16px' }}>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {nycList.map((candidate) => (
-                                <tr key={candidate.id} style={{ borderBottom: '1px solid #333' }}>
-                                    <td style={{ padding: '16px', color: '#94a3b8' }}>{candidate.id}</td>
-                                    <td style={{ padding: '16px', fontWeight: '600' }}>{candidate.name}</td>
-                                    <td style={{ padding: '16px', textAlign: 'center' }}>
-                                        <span style={{ padding: '4px 8px', borderRadius: '4px', backgroundColor: '#333', color: '#ef4444', fontWeight: 'bold' }}>
-                                            {candidate.score}%
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '16px' }}>{candidate.module}</td>
-                                    <td style={{ padding: '16px', textAlign: 'right' }}>
-                                        <button style={{
-                                            padding: '8px 16px',
-                                            backgroundColor: '#3b82f6',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '6px',
-                                            cursor: 'pointer',
-                                            fontSize: '13px',
-                                            fontWeight: '600',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '6px'
-                                        }}>
-                                            Schedule Re-eval <ChevronRight size={16} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </DarkCard>
-
+            </div>
         </div>
     );
 };
