@@ -1,0 +1,62 @@
+:root {
+  /* MMG Style - Light Mode */
+  --bg-color: #f1f5f9;
+  /* Light gray background */
+  --surface-color: #ffffff;
+  /* White surface */
+  --primary-color: #d32f2f;
+  /* MMG Red */
+  --text-primary: #1e293b;
+  /* Dark slate text */
+  --text-secondary: #64748b;
+  /* Medium gray text */
+  --text-on-primary: #ffffff;
+  --danger-color: #ef4444;
+  --success-color: #22c55e;
+  --border-color: #e2e8f0;
+  /* Light border */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  borderRadius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
