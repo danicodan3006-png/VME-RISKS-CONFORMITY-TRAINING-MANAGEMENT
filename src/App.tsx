@@ -1,31 +1,34 @@
+
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import RiskManagement from './pages/RiskManagement';
-import VmeStrategy from './pages/VmeStrategy';
+
+// New Strategic Pages
 import ExecutiveSummary from './pages/ExecutiveSummary';
 import TrainingVocStats from './pages/TrainingVocStats';
 import SafetyAwareness from './pages/SafetyAwareness';
-import PeopleTraining from './pages/PeopleTraining';
-import Machinery from './pages/Machinery';
-import UpdatesDocuments from './pages/UpdatesDocuments';
+import FleetCompliance from './pages/FleetCompliance';
+import DocumentationStatus from './pages/DocumentationStatus';
+import RedListLeaderboard from './pages/RedListLeaderboard';
+import StrategicRoadmap from './pages/StrategicRoadmap';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<ExecutiveSummary />} />
+          <Route index element={<Navigate to="/executive-summary" replace />} />
+
+          {/* 7 Strategic Pillars */}
+          <Route path="executive-summary" element={<ExecutiveSummary />} />
           <Route path="training-stats" element={<TrainingVocStats />} />
           <Route path="safety-awareness" element={<SafetyAwareness />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="risk" element={<RiskManagement />} />
-          <Route path="strategy" element={<VmeStrategy />} />
-          <Route path="people" element={<PeopleTraining />} />
-          <Route path="machinery" element={<Machinery />} />
-          <Route path="updates" element={<UpdatesDocuments />} />
+          <Route path="fleet-compliance" element={<FleetCompliance />} />
+          <Route path="documentation-status" element={<DocumentationStatus />} />
+          <Route path="red-list-leaderboard" element={<RedListLeaderboard />} />
+          <Route path="roadmap" element={<StrategicRoadmap />} />
 
+          <Route path="*" element={<Navigate to="/executive-summary" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
