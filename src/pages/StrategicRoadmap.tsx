@@ -173,59 +173,60 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                     right: 0,
                     bottom: 0,
                     left: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    backdropFilter: 'blur(8px)',
+                    // Slightly darker backdrop for focus
+                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
                     opacity: isOpen ? 1 : 0,
                     transition: 'opacity 0.3s ease'
                 }}
             />
 
-            {/* Panel */}
+            {/* Panel - 25% Width + Glassmorphism */}
             <div style={{
                 position: 'absolute',
                 top: 0,
                 right: 0,
                 bottom: 0,
-                width: '100%',
-                maxWidth: '500px',
-                backgroundColor: '#1E1E1E',
+                width: '25%', // Strict 25% width
+                minWidth: '320px', // Safety for very small screens
+                backgroundColor: 'rgba(30, 30, 30, 0.85)', // Semi-transparent dark
+                backdropFilter: 'blur(16px)', // Glassmorphism
                 boxShadow: '-4px 0 24px rgba(0,0,0,0.5)',
                 transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-                transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                 display: 'flex',
                 flexDirection: 'column',
-                borderLeft: '1px solid #333'
+                borderLeft: '1px solid rgba(255,255,255,0.1)'
             }}>
                 {/* Header */}
-                <div style={{ padding: '24px', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
-                        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Lightbulb size={28} color="#ffd700" /> Strategic Vision
+                        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Lightbulb size={24} color="#ffd700" /> Strategic Vision
                         </h2>
-                        <p style={{ color: '#94a3b8', fontSize: '14px', marginTop: '4px' }}>The Mindset - VME 10 Strategic Pillars</p>
+                        <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>The Mindset - VME 10 Strategic Pillars</p>
                     </div>
-                    <button onClick={onClose} style={{ color: '#64748b', background: 'transparent', padding: '8px', cursor: 'pointer' }}>
+                    <button onClick={onClose} style={{ color: '#64748b', background: 'transparent', padding: '8px', cursor: 'pointer', border: 'none' }}>
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {commandments.map((item, index) => (
                             <div key={index} style={{
                                 display: 'flex',
-                                gap: '16px',
-                                padding: '16px',
-                                backgroundColor: '#121212',
-                                borderRadius: '12px',
-                                border: '1px solid #333',
+                                gap: '12px',
+                                padding: '12px',
+                                backgroundColor: 'rgba(0,0,0,0.2)',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255,255,255,0.05)',
                                 transition: 'transform 0.2s',
                             }}>
                                 <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '8px',
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '6px',
                                     backgroundColor: `${item.color}15`,
                                     display: 'flex',
                                     alignItems: 'center',
@@ -233,11 +234,11 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                                     border: `1px solid ${item.color}40`,
                                     flexShrink: 0
                                 }}>
-                                    <item.icon size={20} color={item.color} />
+                                    <item.icon size={16} color={item.color} />
                                 </div>
                                 <div>
-                                    <h4 style={{ color: 'white', fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }}>{item.title}</h4>
-                                    <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.4' }}>{item.desc}</p>
+                                    <h4 style={{ color: 'white', fontWeight: 'bold', fontSize: '14px', marginBottom: '2px' }}>{item.title}</h4>
+                                    <p style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.3' }}>{item.desc}</p>
                                 </div>
                             </div>
                         ))}
@@ -245,17 +246,19 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                 </div>
 
                 {/* Footer */}
-                <div style={{ padding: '24px', borderTop: '1px solid #333', backgroundColor: '#121212' }}>
+                <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <button
                         onClick={onClose}
                         style={{
                             width: '100%',
-                            padding: '12px',
+                            padding: '10px',
                             backgroundColor: '#3b82f6',
                             color: 'white',
                             fontWeight: 'bold',
                             borderRadius: '8px',
-                            transition: 'background-color 0.2s'
+                            transition: 'background-color 0.2s',
+                            border: 'none',
+                            cursor: 'pointer'
                         }}
                     >
                         Close Panel

@@ -26,8 +26,10 @@ const SidebarItem = ({ to, icon: Icon, label, active, collapsed }: { to: string,
             borderLeft: active ? '4px solid #ef4444' : '4px solid transparent',
             marginBottom: '4px',
             transition: 'all 0.2s ease',
-            textDecoration: 'none'
+            textDecoration: 'none',
+            justifyContent: collapsed ? 'center' : 'flex-start'
         }}
+        title={collapsed ? label : ''}
     >
         <Icon size={20} color={active ? '#ef4444' : '#94a3b8'} />
         {!collapsed && <span style={{ fontWeight: 500, fontSize: '14px', whiteSpace: 'nowrap' }}>{label}</span>}
@@ -35,6 +37,7 @@ const SidebarItem = ({ to, icon: Icon, label, active, collapsed }: { to: string,
 );
 
 const Layout = () => {
+    // Default collapsed for "Mission Control" focus, user can expand
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const location = useLocation();
 
@@ -43,25 +46,26 @@ const Layout = () => {
 
             {/* Sidebar */}
             <aside style={{
-                width: sidebarCollapsed ? '80px' : '280px',
+                width: sidebarCollapsed ? '64px' : '260px', // Minimized width
                 backgroundColor: '#1E1E1E',
                 borderRight: '1px solid #333',
                 display: 'flex',
                 flexDirection: 'column',
-                transition: 'width 0.3s ease',
-                flexShrink: 0
+                transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                flexShrink: 0,
+                zIndex: 20
             }}>
                 {/* Logo Area */}
-                <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', borderBottom: '1px solid #333' }}>
+                <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'space-between', padding: sidebarCollapsed ? '0' : '0 20px', borderBottom: '1px solid #333' }}>
                     {!sidebarCollapsed && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '32px', height: '32px', backgroundColor: '#ef4444', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: 'white' }}>V</div>
-                            <span style={{ fontWeight: 'bold', fontSize: '18px', color: 'white' }}>VME 2026</span>
+                            <div style={{ width: '28px', height: '28px', backgroundColor: '#ef4444', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: 'white', fontSize: '14px' }}>V</div>
+                            <span style={{ fontWeight: 'bold', fontSize: '16px', color: 'white' }}>VME 2026</span>
                         </div>
                     )}
                     <button
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        style={{ padding: '8px', background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}
+                        style={{ padding: '8px', background: 'transparent', color: '#94a3b8', cursor: 'pointer', border: 'none' }}
                     >
                         <Menu size={20} />
                     </button>
@@ -130,15 +134,19 @@ const Layout = () => {
 
                 {/* Sidebar Footer */}
                 <div style={{ padding: '16px', borderTop: '1px solid #333' }}>
-                    {!sidebarCollapsed && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    {!sidebarCollapsed ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>JD</span>
                             </div>
                             <div style={{ overflow: 'hidden' }}>
-                                <p style={{ fontSize: '14px', fontWeight: '500', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>John Doe</p>
-                                <p style={{ fontSize: '12px', color: '#94a3b8' }}>Admin</p>
+                                <p style={{ fontSize: '13px', fontWeight: '500', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>John Doe</p>
+                                <p style={{ fontSize: '11px', color: '#94a3b8' }}>Admin</p>
                             </div>
+                        </div>
+                    ) : (
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>JD</span>
                         </div>
                     )}
                 </div>
@@ -147,15 +155,19 @@ const Layout = () => {
             {/* Main Content */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
 
-                {/* Header */}
-                <header style={{ height: '64px', backgroundColor: '#1E1E1E', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
-                    <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>
+                {/* Header - Slim for Mission Control */}
+                <header style={{ height: '56px', backgroundColor: '#1E1E1E', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', flexShrink: 0 }}>
+                    <h1 style={{ fontSize: '16px', fontWeight: 'bold', color: 'white', letterSpacing: '0.5px' }}>
                         VME 2026 - Digital Safety Suite
                     </h1>
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        {/* Optional top actions could go here */}
+                        <span style={{ fontSize: '12px', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', boxShadow: '0 0 8px #ef4444' }}></span> LIVE</span>
+                    </div>
                 </header>
 
-                {/* Page Content */}
-                <main style={{ flex: 1, overflowY: 'auto', backgroundColor: '#121212', padding: '0' }}>
+                {/* Page Content - fills remaining space */}
+                <main style={{ flex: 1, overflowY: 'auto', backgroundColor: '#121212', padding: '0', position: 'relative' }}>
                     <Outlet />
                 </main>
 
