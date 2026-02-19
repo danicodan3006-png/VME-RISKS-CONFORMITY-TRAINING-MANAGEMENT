@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, AlertTriangle, Users, Menu, ChevronDown, Filter, GraduationCap, Truck } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, Menu, ChevronDown, Filter, GraduationCap, Truck, Shield } from 'lucide-react';
 
 const SidebarItem = ({ to, icon: Icon, label, active, collapsed }: { to: string, icon: any, label: string, active: boolean, collapsed: boolean }) => (
     <Link
@@ -105,6 +105,20 @@ const Layout = () => {
                             icon={LayoutDashboard}
                             label="Executive Summary"
                             active={location.pathname === '/'}
+                            collapsed={sidebarCollapsed}
+                        />
+                        <SidebarItem
+                            to="/training-stats"
+                            icon={GraduationCap}
+                            label="Training & VOC"
+                            active={location.pathname === '/training-stats'}
+                            collapsed={sidebarCollapsed}
+                        />
+                        <SidebarItem
+                            to="/safety-awareness"
+                            icon={Shield}
+                            label="Safety Awareness"
+                            active={location.pathname === '/safety-awareness'}
                             collapsed={sidebarCollapsed}
                         />
                         <SidebarItem

@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard';
 import RiskManagement from './pages/RiskManagement';
 import VmeStrategy from './pages/VmeStrategy';
 import ExecutiveSummary from './pages/ExecutiveSummary';
+import TrainingVocStats from './pages/TrainingVocStats';
+import SafetyAwareness from './pages/SafetyAwareness';
 import PeopleTraining from './pages/PeopleTraining';
 import Machinery from './pages/Machinery';
 import UpdatesDocuments from './pages/UpdatesDocuments';
@@ -15,6 +17,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<ExecutiveSummary />} />
+          <Route path="training-stats" element={<TrainingVocStats />} />
+          <Route path="safety-awareness" element={<SafetyAwareness />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="risk" element={<RiskManagement />} />
           <Route path="strategy" element={<VmeStrategy />} />
