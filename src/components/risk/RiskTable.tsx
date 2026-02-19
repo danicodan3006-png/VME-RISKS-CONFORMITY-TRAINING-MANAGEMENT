@@ -1,5 +1,5 @@
 
-import React from 'react';
+
 import { AlertTriangle, CheckCircle, Clock, ShieldAlert } from 'lucide-react';
 
 const RiskTable = () => {

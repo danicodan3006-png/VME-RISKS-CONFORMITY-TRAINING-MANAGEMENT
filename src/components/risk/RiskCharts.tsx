@@ -1,5 +1,5 @@
 
-import React from 'react';
+
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 const COLORS = ['#d32f2f', '#f57c00', '#fbc02d', '#388e3c'];
@@ -18,7 +18,7 @@ const RiskPieChart = ({ data }: { data: any[] }) => {
                     paddingAngle={5}
                     dataKey="value"
                 >
-                    {data.map((entry, index) => (
+                    {data.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                 </Pie>

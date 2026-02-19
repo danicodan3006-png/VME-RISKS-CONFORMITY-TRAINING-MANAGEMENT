@@ -1,5 +1,5 @@
 
-import React from 'react';
+
 import { ShieldCheck, AlertTriangle, TrendingDown, CheckSquare } from 'lucide-react';
 import { RiskPieChart, RiskTrendChart } from '../components/risk/RiskCharts';
 import RiskTable from '../components/risk/RiskTable';

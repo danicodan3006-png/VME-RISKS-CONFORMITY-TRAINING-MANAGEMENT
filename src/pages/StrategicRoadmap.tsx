@@ -74,16 +74,16 @@ const healthData = [
 ];
 
 const commandments = [
-    { icon: Gavel, title: "Discipline", desc: "Pression indirecte et gestion des sanctions.", color: "#3b82f6" },
-    { icon: Award, title: "Excellence", desc: "Motivation via la progression L1 à L5.", color: "#ffd700" },
-    { icon: UserCheck, title: "Sélection", desc: "Seuls les meilleurs au volant grâce au nouveau VOC.", color: "#3b82f6" },
-    { icon: Target, title: "Focus", desc: "Diminution des interactions inutiles pour plus de concentration.", color: "#ffd700" },
-    { icon: Shield, title: "Proximité HSSEC", desc: "Sensibilisation terrain pour un HSSEC présent et accessible.", color: "#3b82f6" },
-    { icon: Zap, title: "Coaching", desc: "Monitoring continu et orienté performance.", color: "#ffd700" },
-    { icon: Briefcase, title: "Rigueur", desc: "Conformité totale des équipements.", color: "#3b82f6" },
-    { icon: Database, title: "Data-Driven", desc: "Digitalisation et automatisation des alertes.", color: "#ffd700" },
-    { icon: MessageSquare, title: "Communication", desc: "Feedbacks bidirectionnels lors des sessions.", color: "#3b82f6" },
-    { icon: Eye, title: "Vigilance", desc: "'Nous vous observons' - Culture de la responsabilité.", color: "#ef4444" }, // Red for impact
+    { icon: Gavel, title: "Discipline", desc: "Indirect pressure via strict sanction protocols.", color: "#3b82f6" },
+    { icon: Award, title: "Excellence", desc: "High motivation through L1 to L5 rank progression.", color: "#ffd700" },
+    { icon: UserCheck, title: "Selection", desc: "VOC rigorous filtering - Only the best behind the wheel.", color: "#3b82f6" },
+    { icon: Target, title: "Focus", desc: "Reducing non-essential interactions for maximum concentration.", color: "#ffd700" },
+    { icon: Shield, title: "HSE Proximity", desc: "On-field awareness - Bringing safety closer to operators.", color: "#3b82f6" },
+    { icon: Zap, title: "Coaching", desc: "Continuous monitoring and performance-oriented guidance.", color: "#ffd700" },
+    { icon: Briefcase, title: "Rigor", desc: "100% equipment compliance and pre-op inspections.", color: "#3b82f6" },
+    { icon: Database, title: "Digitalization", desc: "Automated alerts and data-driven decision making.", color: "#ffd700" },
+    { icon: MessageSquare, title: "Communication", desc: "Two-way feedback loops during awareness sessions.", color: "#3b82f6" },
+    { icon: Eye, title: "Vigilance", desc: "'We are watching' - Building a culture of accountability.", color: "#ef4444" },
 ];
 
 // --- Components ---
@@ -200,9 +200,9 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                 <div style={{ padding: '24px', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
                         <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Lightbulb size={28} color="#ffd700" /> Vision Stratégique
+                            <Lightbulb size={28} color="#ffd700" /> Strategic Vision
                         </h2>
-                        <p style={{ color: '#94a3b8', fontSize: '14px', marginTop: '4px' }}>Impacter le Mindset - Les 10 Commandements VME</p>
+                        <p style={{ color: '#94a3b8', fontSize: '14px', marginTop: '4px' }}>The Mindset - VME 10 Strategic Pillars</p>
                     </div>
                     <button onClick={onClose} style={{ color: '#64748b', background: 'transparent', padding: '8px', cursor: 'pointer' }}>
                         <X size={24} />
@@ -258,7 +258,7 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
                             transition: 'background-color 0.2s'
                         }}
                     >
-                        Compris, retour à la Roadmap
+                        Close Panel
                     </button>
                 </div>
             </div>
@@ -313,7 +313,7 @@ const StrategicRoadmap = () => {
                         onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
                     >
                         <Lightbulb size={20} color="#ffd700" />
-                        Notre Vision Stratégique : Impacter le Mindset
+                        Strategic Vision: Impacting the Mindset
                     </button>
                 </div>
 

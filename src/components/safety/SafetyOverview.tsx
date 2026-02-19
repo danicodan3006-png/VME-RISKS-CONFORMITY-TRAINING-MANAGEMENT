@@ -1,5 +1,5 @@
 
-import React from 'react';
+
 import { ClipboardCheck, CheckCircle, AlertOctagon } from 'lucide-react';
 
 const SafetyOverview = () => {

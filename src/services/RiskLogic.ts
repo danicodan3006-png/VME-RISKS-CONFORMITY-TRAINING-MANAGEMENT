@@ -1,5 +1,5 @@
 
-import { DriverProfile, DriverClassification, CompanyCompliance, KPIReport } from '../types/vme';
+import type { DriverProfile, DriverClassification, CompanyCompliance, KPIReport } from '../types/vme';
 
 /**
  * Service Implementing VME 2026 Risk Logic

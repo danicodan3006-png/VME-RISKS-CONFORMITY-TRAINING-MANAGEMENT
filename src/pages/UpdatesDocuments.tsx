@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileText, Download, Calendar, ArrowRight } from 'lucide-react';
 
 const UpdatesView = () => (

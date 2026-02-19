@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
 import { AlertTriangle, TrendingUp, Activity, AlertCircle, Calendar } from 'lucide-react';
 
 // --- Data & Types ---
 
-// 3-Year Comparison Data (Targeting specific sums: 2024=58, 2025=54, 2026=Actuals)
+// 3-Year Comparison Data
 const comparisonData = [
     { month: 'Jan', y2024: 5, y2025: 4, y2026: 6 },
     { month: 'Feb', y2024: 4, y2025: 5, y2026: 2 },
@@ -20,22 +20,22 @@ const comparisonData = [
     { month: 'Nov', y2024: 5, y2025: 5, y2026: null },
     { month: 'Dec', y2024: 4, y2025: 5, y2026: null },
 ];
-// Sum Checks:
-// 2024: 5+4+6+5+4+5+6+5+4+5+5+4 = 58. Correct.
-// 2025: 4+5+4+5+4+4+5+4+5+4+5+5 = 54. Correct.
-// 2026: 6+2 = 8. Correct.
 
 const DAYS_ELAPSED = 50;
 const CURRENT_ACCIDENTS_YTD = 8;
 const CURRENT_ACCIDENTS_MTD = 2; // Feb 2026
-const PROJECTION_2026 = 58; // Derived from run rate or manual target? Keeping consistent with earlier. 
-// "Ajoute une alerte visuelle si la projection annuelle dépasse le plafond de 48."
-// 8 accidents in 50 days = 0.16/day. 365 * 0.16 = 58.4. Projection is ~58.
+const PROJECTION_2026 = 58;
 
 // Calculations
 const dailyRate = CURRENT_ACCIDENTS_YTD / DAYS_ELAPSED;
 const ceilingRate = 48 / 365;
 const isCriticalSpeed = dailyRate > ceilingRate;
+
+// Specific Check for Jan 2026
+const jan2026 = 6;
+// Historical Avg for Jan (Simple avg of 2024 and 2025)
+const janHistoricalAvg = (5 + 4) / 2; // 4.5
+const isJanExceeded = jan2026 > janHistoricalAvg;
 
 // --- Components ---
 
@@ -77,7 +77,7 @@ const MetricCard = ({ title, mainValue, subText, icon: Icon, color, alert }: { t
 const AnnualPerformanceCard = () => (
     <DarkCard>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <h3 style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>Année 2026 (YTD)</h3>
+            <h3 style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>Annual Accidents 2026 (YTD)</h3>
             <div style={{ padding: '8px', backgroundColor: '#ef444415', borderRadius: '8px' }}>
                 <AlertCircle size={20} color="#ef4444" />
             </div>
@@ -86,14 +86,14 @@ const AnnualPerformanceCard = () => (
             {CURRENT_ACCIDENTS_YTD}
         </div>
         <p style={{ color: '#64748b', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            Depuis le 1er Janvier - {DAYS_ELAPSED} jours
+            Since Jan 1st - {DAYS_ELAPSED} days elapsed
         </p>
 
         {/* Projection Alert */}
         {isCriticalSpeed && (
             <div style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', backgroundColor: 'rgba(239, 68, 68, 0.2)', borderRadius: '20px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 0 8px #ef4444' }}></div>
-                <span style={{ color: '#fca5a5', fontSize: '12px', fontWeight: 'bold' }}>PROJECTION &gt; 48</span>
+                <span style={{ color: '#fca5a5', fontSize: '12px', fontWeight: 'bold' }}>CRITICAL RUN RATE</span>
             </div>
         )}
     </DarkCard>
@@ -102,19 +102,18 @@ const AnnualPerformanceCard = () => (
 const CurrentMonthCard = () => {
     // Current Month Data
     const monthAccidents = CURRENT_ACCIDENTS_MTD; // 2
-    const isSafe = monthAccidents === 0;
+    const isSafe = (monthAccidents as number) === 0;
     const progressColor = isSafe ? '#22c55e' : '#f59e0b'; // Green or Orange
     // Circle calculations
     const radius = 24;
     const circumference = 2 * Math.PI * radius;
-    // Fill logic: Max 10 accidents = full circle
     const fillPercent = Math.min(100, (monthAccidents / 10) * 100);
     const dashoffset = circumference - (fillPercent / 100) * circumference;
 
     return (
         <DarkCard>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                <h3 style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>Mois en Cours (MTD)</h3>
+                <h3 style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>Current Month (MTD)</h3>
                 <div style={{ padding: '8px', backgroundColor: `${progressColor}15`, borderRadius: '8px' }}>
                     <Calendar size={20} color={progressColor} />
                 </div>
@@ -165,7 +164,7 @@ const CurrentMonthCard = () => {
             </div>
 
             <p style={{ color: '#64748b', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px' }}>
-                Février 2026
+                February 2026 Performance
             </p>
         </DarkCard>
     );
@@ -180,7 +179,7 @@ const ExecutiveSummary = () => {
             padding: '32px',
             fontFamily: '"Inter", sans-serif'
         }}>
-            {/* Dynamic Banner */}
+            {/* Dynamic Alerts Banner */}
             {isCriticalSpeed && (
                 <div style={{
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -189,18 +188,23 @@ const ExecutiveSummary = () => {
                     padding: '16px 24px',
                     borderRadius: '8px',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
+                    flexDirection: 'column',
+                    gap: '8px',
                     marginBottom: '32px',
                     animation: 'pulse 3s infinite'
                 }}>
-                    <AlertTriangle size={24} strokeWidth={2} />
-                    <div>
-                        <h2 style={{ fontSize: '16px', fontWeight: '800', textTransform: 'uppercase' }}>Rythme Critique Détecté</h2>
-                        <p style={{ fontSize: '14px', fontWeight: '500', color: '#fca5a5' }}>
-                            Intervention requise : Rythme actuel ({dailyRate.toFixed(2)}/jour) supérieur au seuil ({ceilingRate.toFixed(2)}/jour).
-                        </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <AlertTriangle size={24} strokeWidth={2} />
+                        <h2 style={{ fontSize: '16px', fontWeight: '800', textTransform: 'uppercase' }}>CRITICAL RUN RATE</h2>
                     </div>
+                    <p style={{ fontSize: '14px', fontWeight: '500', color: '#fca5a5', paddingLeft: '36px' }}>
+                        Projection exceeds annual target. Intervention required.
+                    </p>
+                    {isJanExceeded && (
+                        <p style={{ fontSize: '14px', fontWeight: '500', color: '#fca5a5', paddingLeft: '36px' }}>
+                            • Jan 2026 (6) exceeded monthly historical averages.
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -211,7 +215,7 @@ const ExecutiveSummary = () => {
                 <p style={{ color: '#64748b' }}>Real-time Safety & Training Intelligence Dashboard</p>
             </div>
 
-            {/* KPI Row - Updated */}
+            {/* KPI Row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '32px' }}>
                 <AnnualPerformanceCard />
                 <CurrentMonthCard />
@@ -222,7 +226,7 @@ const ExecutiveSummary = () => {
                     subText="Based on Q1 velocity"
                     icon={TrendingUp}
                     color="#f59e0b"
-                    alert="Dépassement du plafond de 21%"
+                    alert="Alert: +21% over Ceiling"
                 />
                 <MetricCard
                     title="Training Pulse"
@@ -238,8 +242,8 @@ const ExecutiveSummary = () => {
                 <DarkCard style={{ minHeight: '500px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
                         <div>
-                            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}>Trend Comparatif 3 Ans</h3>
-                            <p style={{ fontSize: '14px', color: '#64748b' }}>Frequency Analysis (2024 - 2026)</p>
+                            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}>3-Year Safety Trend Analysis</h3>
+                            <p style={{ fontSize: '14px', color: '#64748b' }}>Monthly Incident Frequency Comparison (2024 - 2026)</p>
                         </div>
                     </div>
 
@@ -256,11 +260,10 @@ const ExecutiveSummary = () => {
                                 <Legend verticalAlign="top" height={36} />
 
                                 {/* Ceiling Reference */}
-                                <ReferenceLine y={4} stroke="#22c55e" strokeDasharray="3 3" label={{ position: 'right', value: 'AVG TARGET (4.0/mo)', fill: '#22c55e', fontSize: 10 }} />
-                                {/* Note: Total Ceiling 48 / 12 = 4 per month average. */}
+                                <ReferenceLine y={4} stroke="#22c55e" strokeDasharray="3 3" label={{ position: 'right', value: 'Safety Ceiling (Max 48)', fill: '#22c55e', fontSize: 12, fontWeight: 'bold' }} />
 
                                 <Line
-                                    name="2024 (Total 58)"
+                                    name="2024 Historical (Total 58)"
                                     type="monotone"
                                     dataKey="y2024"
                                     stroke="#ef4444"
@@ -268,7 +271,7 @@ const ExecutiveSummary = () => {
                                     dot={{ r: 4, fill: '#ef4444' }}
                                 />
                                 <Line
-                                    name="2025 (Total 54)"
+                                    name="2025 Historical (Total 54)"
                                     type="monotone"
                                     dataKey="y2025"
                                     stroke="#f59e0b"
@@ -276,7 +279,7 @@ const ExecutiveSummary = () => {
                                     dot={{ r: 4, fill: '#f59e0b' }}
                                 />
                                 <Line
-                                    name="2026 (Actuel)"
+                                    name="2026 Actual (Current)"
                                     type="monotone"
                                     dataKey="y2026"
                                     stroke="#3b82f6"
