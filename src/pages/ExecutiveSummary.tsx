@@ -1,7 +1,7 @@
 
-import React from 'react';
+
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import { AlertTriangle, TrendingUp, Activity, AlertCircle, Calendar } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Activity, AlertCircle } from 'lucide-react';
 
 // --- Data & Types ---
 
