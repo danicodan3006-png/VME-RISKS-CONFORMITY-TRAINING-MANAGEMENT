@@ -1,6 +1,25 @@
 
-import React from 'react';
-import { Rocket, CheckCircle, Clock, Calendar, Shield, Loader, FileSpreadsheet, Database } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+    Rocket,
+    CheckCircle,
+    Clock,
+    Calendar,
+    Shield,
+    Loader,
+    FileSpreadsheet,
+    Database,
+    Eye,
+    MessageSquare,
+    Zap,
+    Target,
+    UserCheck,
+    Award,
+    Gavel,
+    Briefcase,
+    X,
+    Lightbulb
+} from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
 
 // --- Data ---
@@ -19,7 +38,7 @@ const timelineData = [
         status: 'IN PROGRESS',
         desc: 'Transition from Excel to Dynamic Reporting (Power BI Logic).',
         color: '#3b82f6',
-        icon: Loader // Using Loader as a proxy for "In Progress" spinner
+        icon: Loader
     },
     {
         quarter: 'Q3',
@@ -43,15 +62,28 @@ const healthData = [
     { month: 'Jan', accidents: 58, target: 56 },
     { month: 'Feb', accidents: 55, target: 55 },
     { month: 'Mar', accidents: 53, target: 54 },
-    { month: 'Apr', accidents: 52, target: 53 }, // Projected starts
+    { month: 'Apr', accidents: 52, target: 53 },
     { month: 'May', accidents: 51, target: 52 },
     { month: 'Jun', accidents: 50, target: 51 },
     { month: 'Jul', accidents: 49, target: 50 },
     { month: 'Aug', accidents: 49, target: 50 },
     { month: 'Sep', accidents: 48, target: 49 },
-    { month: 'Oct', accidents: 48, target: 48 }, // Ceiling reached
+    { month: 'Oct', accidents: 48, target: 48 },
     { month: 'Nov', accidents: 48, target: 48 },
     { month: 'Dec', accidents: 48, target: 48 },
+];
+
+const commandments = [
+    { icon: Gavel, title: "Discipline", desc: "Pression indirecte et gestion des sanctions.", color: "#3b82f6" },
+    { icon: Award, title: "Excellence", desc: "Motivation via la progression L1 à L5.", color: "#ffd700" },
+    { icon: UserCheck, title: "Sélection", desc: "Seuls les meilleurs au volant grâce au nouveau VOC.", color: "#3b82f6" },
+    { icon: Target, title: "Focus", desc: "Diminution des interactions inutiles pour plus de concentration.", color: "#ffd700" },
+    { icon: Shield, title: "Proximité HSSEC", desc: "Sensibilisation terrain pour un HSSEC présent et accessible.", color: "#3b82f6" },
+    { icon: Zap, title: "Coaching", desc: "Monitoring continu et orienté performance.", color: "#ffd700" },
+    { icon: Briefcase, title: "Rigueur", desc: "Conformité totale des équipements.", color: "#3b82f6" },
+    { icon: Database, title: "Data-Driven", desc: "Digitalisation et automatisation des alertes.", color: "#ffd700" },
+    { icon: MessageSquare, title: "Communication", desc: "Feedbacks bidirectionnels lors des sessions.", color: "#3b82f6" },
+    { icon: Eye, title: "Vigilance", desc: "'Nous vous observons' - Culture de la responsabilité.", color: "#ef4444" }, // Red for impact
 ];
 
 // --- Components ---
@@ -120,25 +152,169 @@ const TimelineItem = ({ data, index }: { data: any, index: number }) => (
     </div>
 );
 
+const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+    return (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 50,
+            visibility: isOpen ? 'visible' : 'hidden',
+            transition: 'visibility 0.3s ease'
+        }}>
+            {/* Backdrop with Blur */}
+            <div
+                onClick={onClose}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    backdropFilter: 'blur(8px)',
+                    opacity: isOpen ? 1 : 0,
+                    transition: 'opacity 0.3s ease'
+                }}
+            />
+
+            {/* Panel */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                maxWidth: '500px',
+                backgroundColor: '#1E1E1E',
+                boxShadow: '-4px 0 24px rgba(0,0,0,0.5)',
+                transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+                transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: 'flex',
+                flexDirection: 'column',
+                borderLeft: '1px solid #333'
+            }}>
+                {/* Header */}
+                <div style={{ padding: '24px', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Lightbulb size={28} color="#ffd700" /> Vision Stratégique
+                        </h2>
+                        <p style={{ color: '#94a3b8', fontSize: '14px', marginTop: '4px' }}>Impacter le Mindset - Les 10 Commandements VME</p>
+                    </div>
+                    <button onClick={onClose} style={{ color: '#64748b', background: 'transparent', padding: '8px', cursor: 'pointer' }}>
+                        <X size={24} />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {commandments.map((item, index) => (
+                            <div key={index} style={{
+                                display: 'flex',
+                                gap: '16px',
+                                padding: '16px',
+                                backgroundColor: '#121212',
+                                borderRadius: '12px',
+                                border: '1px solid #333',
+                                transition: 'transform 0.2s',
+                            }}>
+                                <div style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '8px',
+                                    backgroundColor: `${item.color}15`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: `1px solid ${item.color}40`,
+                                    flexShrink: 0
+                                }}>
+                                    <item.icon size={20} color={item.color} />
+                                </div>
+                                <div>
+                                    <h4 style={{ color: 'white', fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }}>{item.title}</h4>
+                                    <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.4' }}>{item.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div style={{ padding: '24px', borderTop: '1px solid #333', backgroundColor: '#121212' }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            width: '100%',
+                            padding: '12px',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            borderRadius: '8px',
+                            transition: 'background-color 0.2s'
+                        }}
+                    >
+                        Compris, retour à la Roadmap
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const StrategicRoadmap = () => {
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+
     return (
         <div style={{
             background: 'linear-gradient(180deg, #0f172a 0%, #064e3b 100%)', // Dark blue to green gradient
             minHeight: '100vh',
             color: 'white',
             padding: '40px',
-            fontFamily: '"Inter", sans-serif'
+            fontFamily: '"Inter", sans-serif',
+            position: 'relative',
+            overflowX: 'hidden'
         }}>
+
+            <SlideOverPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
+
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
                 {/* Header */}
-                <div style={{ marginBottom: '60px', textAlign: 'center' }}>
+                <div style={{ marginBottom: '60px', textAlign: 'center', position: 'relative' }}>
                     <h1 style={{ fontSize: '48px', fontWeight: '900', color: 'white', letterSpacing: '-2px', marginBottom: '16px', textShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
                         2026 STRATEGIC <span style={{ color: '#4ade80' }}>ROADMAP</span>
                     </h1>
-                    <p style={{ color: '#cbd5e1', fontSize: '18px', maxWidth: '700px', margin: '0 auto' }}>
+                    <p style={{ color: '#cbd5e1', fontSize: '18px', maxWidth: '700px', margin: '0 auto 32px' }}>
                         Transforming VME's safety culture through digitalization, automation, and competency-based leadership.
                     </p>
+
+                    <button
+                        onClick={() => setIsPanelOpen(true)}
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '12px 24px',
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '50px',
+                            color: 'white',
+                            fontWeight: '600',
+                            backdropFilter: 'blur(4px)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                    >
+                        <Lightbulb size={20} color="#ffd700" />
+                        Notre Vision Stratégique : Impacter le Mindset
+                    </button>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>

@@ -150,7 +150,7 @@ const Layout = () => {
                 {/* Header */}
                 <header style={{ height: '64px', backgroundColor: '#1E1E1E', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
                     <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>
-                        VME 2026 RISK MANAGEMENT
+                        VME 2026 - Digital Safety Suite
                     </h1>
                 </header>
 
