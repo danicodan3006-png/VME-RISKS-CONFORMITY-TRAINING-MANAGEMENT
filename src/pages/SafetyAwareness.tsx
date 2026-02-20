@@ -1,234 +1,308 @@
 
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { FileText, Calendar, Shield, AlertTriangle, ChevronRight, Mic } from 'lucide-react';
+import { useState } from 'react';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
+} from 'recharts';
+import { Target, Users, Zap, Circle, X, PlayCircle } from 'lucide-react';
 
-// --- Data ---
-const sensitizationData = [
-    { name: 'Mining', drivers: 120, nonDrivers: 45 },
-    { name: 'Logistics', drivers: 80, nonDrivers: 20 },
-    { name: 'Maintenance', drivers: 60, nonDrivers: 90 },
-    { name: 'Admin', drivers: 5, nonDrivers: 50 },
-    { name: 'Security', drivers: 90, nonDrivers: 10 },
+// --- Data Engine ---
+const departmentalData = [
+    { name: 'Mining', sensitized: 112, total: 1398 },
+    { name: 'Transport', sensitized: 67, total: 195 },
+    { name: 'SSHEC', sensitized: 34, total: 157 },
+    { name: 'Exploration', sensitized: 0, total: 57 },
+    { name: 'Supply Chain', sensitized: 0, total: 69 },
+    { name: 'Finance', sensitized: 0, total: 6 },
+    { name: 'Hydromet', sensitized: 0, total: 53 },
+    { name: 'Tailings', sensitized: 0, total: 78 },
+    { name: 'Sulphite', sensitized: 0, total: 167 },
+    { name: 'HR & Medical', sensitized: 0, total: 26 },
+    { name: 'Compliance', sensitized: 0, total: 8 },
+    { name: 'Stakeholder', sensitized: 0, total: 5 },
+    { name: 'People Svcs', sensitized: 0, total: 5 },
+    { name: 'Project Del', sensitized: 0, total: 29 },
+    { name: 'Civil Svcs', sensitized: 0, total: 227 },
+    { name: 'Lean Prod', sensitized: 0, total: 167 },
+    { name: 'Farm & Camp', sensitized: 0, total: 56 },
+    { name: 'Debottlenecking', sensitized: 0, total: 17 },
+    { name: 'Central Lab', sensitized: 0, total: 39 },
 ];
 
-const totalSensitized = sensitizationData.reduce((acc, curr) => acc + curr.drivers + curr.nonDrivers, 0);
+const topicSpeeches: Record<number, { title: string, content: string }> = {
+    1: {
+        title: "Your Permit, Your Responsibility, Our Commitment",
+        content: "Vision 2026 – Your Permit, Your Responsibility, Our Commitment. Safety is not a choice; it is a prerequisite for every task. Your permit is your license to operate safely. It represents the professional standard we demand at VME. When you sign that permit, you are making a binding commitment to your family and your colleagues that you have assessed every risk and implemented every barrier. We do not work for stickers or bonuses; we work to return home whole."
+    },
+    2: {
+        title: "Why Do You Break the Rules?",
+        content: "Why Do You Break the Rules? In the field, we often find shortcuts convenient, but in our industry, a shortcut is a high-speed path to disaster. Rules aren't there to slow you down; they are the distilled wisdom of every accident that came before us. Breaking a rule is a vote of no confidence in your own future. We are investigating the human factor: Is it pressure? Is it habit? Whatever the cause, the rule remains the only shield between you and a life-altering event."
+    },
+    3: {
+        title: "Zero Exposure",
+        content: "Zero Exposure – Do we really need a disaster to happen before we change? Prevention is the only cure. Zero exposure means eliminating risks at the source, not just managing them when they appear. It requires a proactive eye and the courage to stop the job. If you see an exposed hazard, you are the final barrier. We are shifting from reactive management to absolute elimination. No exposure, no accident. It is that simple."
+    },
+    4: {
+        title: "Excellence",
+        content: "Excellence – What makes a TRULY safe operation? It's the culture of care. Excellence is not a destination but a continuous habit of checking and re-checking. It is the obsessive attention to detail that separates the survivors from the statistics. A safe operator doesn't just do the job; they do the job perfectly, every single time. Excellence is the professional pride only found in those who master their craft and their environment."
+    },
+    5: {
+        title: "The Domino Effect",
+        content: "The Domino Effect – Who really pays the price for a mistake? It's not just the company; it's the families waiting at home. One small error starts the chain that leads to a catastrophic outcome. When one tile falls—a missed check, a tired eye, a bypassed sensor—the rest follow inevitably. You aren't just one person on a machine; you are a critical link in a massive chain of safety. If you break, the whole system collapses."
+    }
+};
 
-const documents = [
-    { name: 'VME Inspection Form', status: 'PUBLISHED', date: '2026-01-15' },
-    { name: 'VOC Register', status: 'PUBLISHED', date: '2026-01-20' },
-    { name: 'VOC Request Form V1.0', status: 'PUBLISHED', date: '2026-02-01' },
-    { name: 'Safety Interaction Guide', status: 'DEVELOPED', date: '2026-02-10' },
-    { name: 'Toolbox Talk Template', status: 'IN DRAFT', date: '2026-02-18' },
-];
-
-const zeroSensitizationDepts = ['Procurement', 'IT Support', 'Visitors Center'];
-
-const upcomingToolbox = [
-    { topic: 'Blind Spots Awareness', date: 'Feb 22, 06:00 AM' },
-    { topic: 'Fatigue Management', date: 'Feb 24, 06:00 AM' },
-    { topic: 'Emergency Stop Procedures', date: 'Feb 27, 06:00 AM' },
+const roadmap = [
+    { id: 1, month: 'MONTH 1', topic: 'Your Permit, Your Responsibility', status: 'IN PROGRESS', active: true },
+    { id: 2, month: 'MONTH 2', topic: 'Why Do You Break the Rules?', status: 'PLANNED', active: false },
+    { id: 3, month: 'MONTH 3', topic: 'Zero Exposure', status: 'PLANNED', active: false },
+    { id: 4, month: 'MONTH 4', topic: 'Excellence', status: 'PLANNED', active: false },
+    { id: 5, month: 'MONTH 5', topic: 'The Domino Effect', status: 'PLANNED', active: false },
 ];
 
 // --- Components ---
-
-const DarkCard = ({ children, className = '', style = {} }: { children: React.ReactNode, className?: string, style?: React.CSSProperties }) => (
+const KPIBox = ({ title, value, subtext, icon: Icon, color }: any) => (
     <div style={{
         backgroundColor: '#1E1E1E',
-        border: '1px solid #333',
-        borderRadius: '8px',
+        border: `1px solid ${color}33`,
+        borderRadius: '12px',
         padding: '24px',
-        ...style
-    }} className={className}>
-        {children}
+        display: 'flex',
+        alignItems: 'center',
+        gap: '24px',
+        flex: 1,
+        height: '100%'
+    }}>
+        <div style={{ padding: '16px', backgroundColor: `${color}1A`, borderRadius: '12px' }}>
+            <Icon size={32} color={color} />
+        </div>
+        <div>
+            <h3 style={{ fontSize: '13px', fontWeight: 'bold', color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{title}</h3>
+            <div style={{ fontSize: '28px', fontWeight: '900', color: 'white', lineHeight: '1' }}>{value}</div>
+            <p style={{ fontSize: '14px', color: '#64748b', marginTop: '8px' }}>{subtext}</p>
+        </div>
     </div>
 );
 
-const StatusBadge = ({ status }: { status: string }) => {
-    let color = '#94a3b8';
-    let bg = '#333';
-
-    if (status === 'PUBLISHED') {
-        color = '#22c55e';
-        bg = 'rgba(34, 197, 94, 0.15)';
-    } else if (status === 'DEVELOPED') {
-        color = '#3b82f6';
-        bg = 'rgba(59, 130, 246, 0.15)';
-    } else if (status === 'IN DRAFT') {
-        color = '#f59e0b';
-        bg = 'rgba(245, 158, 11, 0.15)';
-    }
+const TopicModal = ({ isOpen, onClose, topicId }: { isOpen: boolean, onClose: () => void, topicId: number | null }) => {
+    if (!isOpen || topicId === null) return null;
+    const topic = topicSpeeches[topicId];
 
     return (
-        <span style={{
-            padding: '4px 8px',
-            borderRadius: '4px',
-            backgroundColor: bg,
-            color: color,
-            fontSize: '11px',
-            fontWeight: 'bold',
-            letterSpacing: '0.5px'
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '40px'
         }}>
-            {status}
-        </span>
+            <div style={{
+                backgroundColor: '#1E1E1E',
+                width: '100%',
+                maxWidth: '800px',
+                borderRadius: '16px',
+                border: '1px solid #333',
+                overflow: 'hidden',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}>
+                <div style={{ padding: '24px 32px', backgroundColor: '#252525', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '2px' }}>MONTH {topicId} STRATEGY</span>
+                        <h2 style={{ fontSize: '24px', fontWeight: '900', color: 'white', marginTop: '4px' }}>{topic.title}</h2>
+                    </div>
+                    <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', outline: 'none' }}>
+                        <X size={24} />
+                    </button>
+                </div>
+                <div style={{ padding: '40px 32px' }}>
+                    <p style={{ fontSize: '18px', color: '#cbd5e1', lineHeight: '1.8', whiteSpace: 'pre-line' }}>{topic.content}</p>
+                </div>
+                <div style={{ padding: '24px 32px', borderTop: '1px solid #333', textAlign: 'right' }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                        }}
+                    >
+                        Close Strategy
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 };
 
 const SafetyAwareness = () => {
+    const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = (id: number) => {
+        setSelectedTopic(id);
+        setIsModalOpen(true);
+    };
+
     return (
         <div style={{
             backgroundColor: '#121212',
-            minHeight: '100vh',
+            height: '100vh',
+            width: '100%',
             color: 'white',
             padding: '32px',
-            fontFamily: '"Inter", sans-serif'
+            fontFamily: '"Inter", sans-serif',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
         }}>
-            <div style={{ marginBottom: '40px' }}>
-                <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#FFD700', letterSpacing: '-1px', marginBottom: '8px' }}>
-                    SAFETY AWARENESS <span style={{ color: 'white' }}>& TOOLBOX</span>
-                </h1>
-                <p style={{ color: '#64748b' }}>Strategic Communication & Prevention Campaign</p>
+            {/* 1. TOP ROW: KPI GRILLS (15% APPROX) */}
+            <div style={{ height: '15vh', display: 'flex', gap: '24px', flexShrink: 0 }}>
+                <KPIBox
+                    title="ANNUAL STRATEGIC ROLLOUT"
+                    value="TOPIC 1 / 10"
+                    subtext="Your Permit, Your Responsibility, Our Commitment"
+                    icon={Target}
+                    color="#3b82f6"
+                />
+                <KPIBox
+                    title="GLOBAL COMPLETION"
+                    value="213 / 2,642"
+                    subtext="8.06% Reach for Topic #1"
+                    icon={Users}
+                    color="#22c55e"
+                />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '24px' }}>
-
-                {/* Left Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-                    {/* Sensitization Stats */}
-                    <DarkCard>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                            <div>
-                                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>Sensitization Statistics 2026</h3>
-                                <p style={{ fontSize: '14px', color: '#64748b' }}>Drivers vs Non-Drivers Engagement</p>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '36px', fontWeight: '800', color: '#FFD700' }}>{totalSensitized}</div>
-                                <div style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase' }}>Total People Sensitized</div>
-                            </div>
+            {/* 2. MIDDLE ROW: MAIN CHART ENGINE (70% APPROX) */}
+            <div style={{
+                flex: 1,
+                width: '100%',
+                backgroundColor: '#1E1E1E',
+                borderRadius: '12px',
+                border: '1px solid #333',
+                padding: '32px',
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '600px' // FORCE RENDER CONSTRAINT
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                    <div>
+                        <h2 style={{ fontSize: '20px', fontWeight: '900', color: 'white', textTransform: 'uppercase' }}>Departmental Breakdown - Topic #1 Sensitization</h2>
+                        <p style={{ fontSize: '14px', color: '#64748b' }}>Total Drivers (Grey) vs. Sensitized Personnel (Neon Blue)</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '12px', height: '12px', backgroundColor: '#334155', borderRadius: '2px' }}></div>
+                            <span style={{ fontSize: '12px', color: '#94a3b8' }}>Total Drivers</span>
                         </div>
-
-                        <div style={{ height: '350px', width: '100%' }}>
-                            <ResponsiveContainer>
-                                <BarChart data={sensitizationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#64748b" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} />
-                                    <YAxis stroke="#64748b" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} />
-                                    <Tooltip
-                                        cursor={{ fill: '#333', opacity: 0.4 }}
-                                        contentStyle={{ backgroundColor: '#1E1E1E', borderColor: '#333', color: 'white' }}
-                                    />
-                                    <Legend />
-                                    <Bar dataKey="drivers" name="Drivers" stackId="a" fill="#FFD700" radius={[0, 0, 4, 4]} />
-                                    <Bar dataKey="nonDrivers" name="Non-Drivers" stackId="a" fill="#333" radius={[4, 4, 0, 0]} stroke="#FFD700" strokeWidth={1} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '12px', height: '12px', backgroundColor: '#3b82f6', borderRadius: '2px' }}></div>
+                            <span style={{ fontSize: '12px', color: '#3b82f6', fontWeight: 'bold' }}>Sensitized</span>
                         </div>
-                    </DarkCard>
+                    </div>
+                </div>
 
-                    {/* Documentation Status List */}
-                    <DarkCard>
-                        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <FileText size={20} color="#FFD700" />
-                            Strategic Documentation Status
-                        </h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {documents.map((doc, i) => (
-                                <div key={i} style={{
+                <div style={{ flex: 1, width: '100%', minHeight: '0' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={departmentalData} margin={{ top: 10, right: 10, left: 10, bottom: 80 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                            <XAxis
+                                dataKey="name"
+                                stroke="#64748b"
+                                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                                axisLine={false}
+                                tickLine={false}
+                                angle={-45}
+                                textAnchor="end"
+                                interval={0}
+                            />
+                            <YAxis
+                                stroke="#64748b"
+                                tick={{ fill: '#64748b', fontSize: 12 }}
+                                axisLine={false}
+                                tickLine={false}
+                                domain={[0, 1400]}
+                            />
+                            <Tooltip
+                                cursor={{ fill: '#333', opacity: 0.2 }}
+                                contentStyle={{ backgroundColor: '#1E1E1E', borderColor: '#333', color: 'white' }}
+                            />
+                            <Bar dataKey="total" name="Total Drivers" fill="#334155" radius={[4, 4, 0, 0]} barSize={24} />
+                            <Bar dataKey="sensitized" name="Sensitized" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={24} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* 3. BOTTOM ROW: STRATEGIC ROADMAP (15% APPROX) */}
+            <div style={{ height: '12vh', display: 'flex', gap: '16px', flexShrink: 0 }}>
+                {roadmap.map((item, i) => (
+                    <div key={i} style={{
+                        flex: 1,
+                        backgroundColor: item.active ? 'rgba(59, 130, 246, 0.1)' : '#1E1E1E',
+                        border: item.active ? '1px solid #3b82f6' : '1px solid #333',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        position: 'relative'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 'bold', color: item.active ? '#3b82f6' : '#64748b' }}>{item.month}</span>
+                            {item.active ? <Zap size={12} color="#3b82f6" /> : <Circle size={10} color="#333" />}
+                        </div>
+                        <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: 'white', lineHeight: '1.2' }}>{item.topic}</h4>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                            <span style={{ fontSize: '9px', color: item.active ? '#3b82f6' : '#475569', textTransform: 'uppercase', fontWeight: '900' }}>{item.status}</span>
+                            <button
+                                onClick={() => handleOpenModal(item.id)}
+                                style={{
                                     display: 'flex',
-                                    justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    padding: '16px',
-                                    backgroundColor: '#1a1a1a',
-                                    borderRadius: '6px',
-                                    border: '1px solid #333',
+                                    gap: '4px',
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    color: '#3b82f6',
+                                    fontSize: '11px',
+                                    fontWeight: 'bold',
                                     cursor: 'pointer',
-                                    transition: 'background-color 0.2s'
+                                    padding: 0
                                 }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#252525')}
-                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#1a1a1a')}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#FFD700' }}></div>
-                                        <div>
-                                            <p style={{ fontWeight: '600', color: '#e2e8f0', fontSize: '14px' }}>{doc.name}</p>
-                                            <p style={{ fontSize: '12px', color: '#64748b' }}>Last revision: {doc.date}</p>
-                                        </div>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <StatusBadge status={doc.status} />
-                                        <ChevronRight size={16} color="#475569" />
-                                    </div>
-                                </div>
-                            ))}
+                            >
+                                <PlayCircle size={14} /> Full Content
+                            </button>
                         </div>
-                    </DarkCard>
-
-                </div>
-
-                {/* Right Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-                    {/* Interaction Principle Widget */}
-                    <DarkCard>
-                        <div style={{ margin: '-24px -24px 24px -24px', padding: '24px', backgroundColor: 'rgba(255, 215, 0, 0.1)', borderBottom: '1px solid rgba(255, 215, 0, 0.2)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                <Shield size={24} color="#FFD700" />
-                                <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#FFD700', textTransform: 'uppercase' }}>Philosophy</h3>
-                            </div>
-                            <p style={{ fontSize: '16px', color: 'white', fontStyle: 'italic', fontWeight: '500' }}>"Zero Accidents via Constant Interaction"</p>
-                        </div>
-
-                        <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#94a3b8', marginBottom: '16px', textTransform: 'uppercase' }}>Upcoming Toolbox Talks</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            {upcomingToolbox.map((talk, i) => (
-                                <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                    <div style={{ padding: '10px', backgroundColor: '#333', borderRadius: '8px', color: '#FFD700' }}>
-                                        <Mic size={20} />
-                                    </div>
-                                    <div>
-                                        <p style={{ fontWeight: '600', color: 'white', fontSize: '14px' }}>{talk.topic}</p>
-                                        <p style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <Calendar size={12} /> {talk.date}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </DarkCard>
-
-                    {/* QA/QC Gap Analysis */}
-                    <DarkCard style={{ border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', alignItems: 'start' }}>
-                            <AlertTriangle size={24} color="#ef4444" />
-                            <div>
-                                <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#ef4444' }}>QA/QC Gap Analysis</h3>
-                                <p style={{ fontSize: '13px', color: '#fca5a5' }}>Zero Sensitization Detected</p>
-                            </div>
-                        </div>
-                        <p style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '16px', lineHeight: '1.5' }}>
-                            The following departments have recorded <strong>0% engagement</strong> in 2026. Immediate scheduling required.
-                        </p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            {zeroSensitizationDepts.map((dept, i) => (
-                                <span key={i} style={{
-                                    padding: '6px 12px',
-                                    borderRadius: '20px',
-                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                                    color: '#fca5a5',
-                                    fontSize: '12px',
-                                    fontWeight: '600'
-                                }}>
-                                    {dept}
-                                </span>
-                            ))}
-                        </div>
-                    </DarkCard>
-
-                </div>
-
+                    </div>
+                ))}
             </div>
+
+            {/* Modal Engine */}
+            <TopicModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                topicId={selectedTopic}
+            />
         </div>
     );
 };

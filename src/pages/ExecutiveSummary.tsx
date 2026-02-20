@@ -1,14 +1,14 @@
 
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import { AlertTriangle, TrendingUp, Activity, AlertCircle } from 'lucide-react';
+import { AlertTriangle, TrendingUp, AlertCircle, Shield } from 'lucide-react';
 
 // --- Data & Types ---
 
 // 3-Year Comparison Data
 const comparisonData = [
-    { month: 'Jan', y2024: 5, y2025: 4, y2026: 6 },
-    { month: 'Feb', y2024: 4, y2025: 5, y2026: 2 },
+    { month: 'Jan', y2024: 5, y2025: 4, y2026: 4 },
+    { month: 'Feb', y2024: 4, y2025: 5, y2026: 3 },
     { month: 'Mar', y2024: 6, y2025: 4, y2026: null },
     { month: 'Apr', y2024: 5, y2025: 5, y2026: null },
     { month: 'May', y2024: 4, y2025: 4, y2026: null },
@@ -22,9 +22,9 @@ const comparisonData = [
 ];
 
 const DAYS_ELAPSED = 50;
-const CURRENT_ACCIDENTS_YTD = 8;
-const CURRENT_ACCIDENTS_MTD = 2; // Feb 2026
-const PROJECTION_2026 = 58;
+const CURRENT_ACCIDENTS_YTD = 7;
+const CURRENT_ACCIDENTS_MTD = 3; // Feb 2026
+const PROJECTION_2026 = Math.round((7 / 50) * 365); // Dynamic calculation based on user data 7 YTD / 50 days
 
 // Calculations
 const dailyRate = CURRENT_ACCIDENTS_YTD / DAYS_ELAPSED;
@@ -122,6 +122,41 @@ const MtdSlimCard = () => {
     )
 }
 
+const SafetyClockCard = () => (
+    <div style={{
+        backgroundColor: '#1E1E1E',
+        border: '1px solid #333',
+        borderRadius: '6px',
+        padding: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        position: 'relative',
+        textAlign: 'center'
+    }}>
+        <div style={{ position: 'absolute', top: '12px', right: '12px', padding: '6px', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: '6px' }}>
+            <Shield size={16} color="#22c55e" />
+        </div>
+        <h3 style={{ color: '#94a3b8', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+            DAYS WITHOUT INCIDENT
+        </h3>
+        <div style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            color: '#22c55e',
+            lineHeight: 1,
+            textShadow: '0 0 15px rgba(34, 197, 94, 0.4)'
+        }}>
+            3
+        </div>
+        <p style={{ color: '#64748b', fontSize: '10px', marginTop: '10px' }}>
+            Since last recorded incident (Feb 17, 2026)
+        </p>
+    </div>
+);
+
 const ExecutiveSummary = () => {
     return (
         <div style={{
@@ -172,13 +207,7 @@ const ExecutiveSummary = () => {
                     color="#f59e0b"
                     alert="+21% > Ceiling"
                 />
-                <SlimCard
-                    title="Training Pulse"
-                    mainValue="2,976"
-                    subText="Active Competencies"
-                    icon={Activity}
-                    color="#3b82f6"
-                />
+                <SafetyClockCard />
             </div>
 
             {/* Central Chart Area - Maximized */}
