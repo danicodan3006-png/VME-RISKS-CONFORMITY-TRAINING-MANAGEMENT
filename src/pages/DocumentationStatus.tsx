@@ -1,441 +1,591 @@
 
-import React, { useState } from 'react';
-import { FileText, Download, Eye, X, ShieldCheck, Lock, Activity, User, Star, QrCode, Search, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import {
+    FolderOpen, FileText, Download, Eye, Shield, Award,
+    CheckCircle, Circle, AlertTriangle, Gauge, BadgeCheck, BookOpen,
+    ClipboardCheck, GraduationCap, Truck
+} from 'lucide-react';
 
-// --- Types ---
-interface Document {
-    id: string;
-    title: string;
-    status: 'PUBLISHED' | 'DRAFT' | 'REVIEW';
-    impactNote: string;
-    consequences: string;
-    implementationProgress: number;
-    icon: any;
-    color: string;
-}
+// ═══════════════════════════════════════════════
+// RESOURCE & GOVERNANCE CENTER — VME 2026
+// File Manager Style · 2,976 Operators · 30 Equipment Units
+// ═══════════════════════════════════════════════
+const TOTAL_OPERATORS = 2976;
 
-// --- Data ---
-const strategicDocs: Document[] = [
-    {
-        id: 'DOC-001',
-        title: 'VOC Request Form V1.0',
-        status: 'PUBLISHED',
-        impactNote: 'Strict control of equipment access.',
-        consequences: 'Refusal of access to site for unauthorized operators. Immediate supervisor sanction.',
-        implementationProgress: 75,
-        icon: Lock,
-        color: '#22c55e'
-    },
-    {
-        id: 'DOC-002',
-        title: 'VME Safety Inspection Form',
-        status: 'PUBLISHED',
-        impactNote: 'Standardization of pre-operational checks.',
-        consequences: 'Operating unsafe equipment leads to L5 disciplinary action.',
-        implementationProgress: 90,
-        icon: ShieldCheck,
-        color: '#3b82f6'
-    },
-    {
-        id: 'DOC-003',
-        title: 'VOC Attendance Register',
-        status: 'PUBLISHED',
-        impactNote: 'Proof of Theory/Practice Competence.',
-        consequences: 'Missing records invalidate certification. Retraining required.',
-        implementationProgress: 100,
-        icon: Activity,
-        color: '#f59e0b'
-    }
+// ── FOLDER A: Governance & SOPs ──
+const FOLDER_A = {
+    label: 'Governance & SOPs',
+    icon: BookOpen,
+    color: '#00F2FF',
+    items: [
+        { type: 'SOP', title: 'HSSEC Inspection', version: 'V3.2', pages: 42, size: '2.4 MB' },
+        { type: 'Guideline', title: 'VOC Management', version: 'V2.1', pages: 28, size: '1.8 MB' },
+    ]
+};
+
+// ── FOLDER B: Smart Forms (New Standards) ──
+const FOLDER_B = {
+    label: 'Smart Forms (New Standards)',
+    icon: FileText,
+    color: '#3b82f6',
+    items: [
+        { type: 'NEW', title: 'VME Safety Inspection Form', subtitle: 'Fleet Health & Accident Prevention', version: 'V1.0', size: '850 KB' },
+        { type: 'NEW', title: 'VOC Attendance Register', subtitle: 'Driver-Equipment Risk Traceability', version: 'V1.0', size: '620 KB' },
+        { type: 'STD', title: 'VOC Request Form V1.0', subtitle: 'Exposure Control: Competence > Quantity', version: 'V1.0', size: '480 KB' },
+    ]
+};
+
+// ── FOLDER C: Theory Academy ──
+const FOLDER_C = {
+    label: 'Theoretical Academy',
+    icon: GraduationCap,
+    color: '#f59e0b',
+    items: [
+        { type: 'BANK', title: 'Master Question Bank', subtitle: '250+ questions per unit · 30 categories', version: '2026', size: '4.2 MB' },
+    ]
+};
+
+// ── FOLDER D: Practical Evaluations ──
+const FOLDER_D = {
+    label: 'Practical Evaluations',
+    icon: ClipboardCheck,
+    color: '#22c55e',
+    items: [
+        { type: 'FORM', title: 'Attitude-Based Field Assessment Forms', subtitle: 'Mindset over Tech · 5 evaluation criteria', version: 'V2.0', size: '1.1 MB' },
+    ]
+};
+
+const ALL_FOLDERS = [FOLDER_A, FOLDER_B, FOLDER_C, FOLDER_D];
+
+// ── 30 EQUIPMENT MATRIX (The VME LIST) ──
+const EQUIPMENT: { id: number, name: string, sop: boolean, theory: boolean, practice: boolean }[] = [
+    { id: 1, name: 'ADT (Articulated Dump)', sop: true, theory: true, practice: true },
+    { id: 2, name: 'Rigid Truck 100T', sop: true, theory: true, practice: false },
+    { id: 3, name: 'Excavator CAT 390F', sop: true, theory: true, practice: true },
+    { id: 4, name: 'Wheel Loader CAT 966', sop: true, theory: true, practice: false },
+    { id: 5, name: 'Motor Grader CAT 14M', sop: true, theory: true, practice: false },
+    { id: 6, name: 'Truck Dozer CAT D8', sop: true, theory: true, practice: false },
+    { id: 7, name: 'Bulldozer CAT D6', sop: true, theory: true, practice: false },
+    { id: 8, name: 'Backhoe Loader', sop: true, theory: true, practice: true },
+    { id: 9, name: 'Tipper HOWO 35T', sop: true, theory: true, practice: true },
+    { id: 10, name: 'Site Driver LV', sop: true, theory: true, practice: true },
+    { id: 11, name: 'Mobile Crane 50T', sop: true, theory: true, practice: true },
+    { id: 12, name: 'Boom Truck', sop: true, theory: true, practice: false },
+    { id: 13, name: 'Forklift 5T', sop: true, theory: true, practice: true },
+    { id: 14, name: 'Telehandler JCB 540', sop: true, theory: true, practice: false },
+    { id: 15, name: 'Aerial Work Platform', sop: true, theory: true, practice: true },
+    { id: 16, name: 'Skid Steer Loader', sop: true, theory: true, practice: false },
+    { id: 17, name: 'Mini Excavator 8T', sop: true, theory: true, practice: true },
+    { id: 18, name: 'Compactor Roller', sop: true, theory: false, practice: false },
+    { id: 19, name: 'Water Bowser 20KL', sop: true, theory: false, practice: false },
+    { id: 20, name: 'Fuel Bowser', sop: true, theory: false, practice: false },
+    { id: 21, name: 'Service Truck', sop: true, theory: true, practice: true },
+    { id: 22, name: 'Ambulance (Site)', sop: true, theory: true, practice: true },
+    { id: 23, name: 'Personnel Carrier', sop: true, theory: true, practice: true },
+    { id: 24, name: 'Flatbed Trailer', sop: true, theory: true, practice: false },
+    { id: 25, name: 'Lowbed Trailer 60T', sop: true, theory: false, practice: false },
+    { id: 26, name: 'Concrete Mixer', sop: true, theory: false, practice: false },
+    { id: 27, name: 'Drill Rig (Blast)', sop: true, theory: false, practice: false },
+    { id: 28, name: 'Shotcrete Machine', sop: false, theory: false, practice: false },
+    { id: 29, name: 'Underground Loader', sop: false, theory: false, practice: false },
+    { id: 30, name: 'Integrated Tool Carrier', sop: true, theory: false, practice: false },
 ];
 
-// --- Components ---
+const STATS = {
+    sopReady: EQUIPMENT.filter(e => e.sop).length,
+    theoryReady: EQUIPMENT.filter(e => e.theory).length,
+    practiceReady: EQUIPMENT.filter(e => e.practice).length,
+    fullReady: EQUIPMENT.filter(e => e.sop && e.theory && e.practice).length,
+};
 
-// Animation Styles
-const animationStyles = `
-  @keyframes float {
-    0% { transform: translateY(0px); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
-    50% { transform: translateY(-10px); box-shadow: 0 20px 30px rgba(6, 182, 212, 0.4); }
-    100% { transform: translateY(0px); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
-  }
-`;
-
-const VmeCompetencyCard = () => (
-    <div style={{
-        width: '100%',
-        maxWidth: '450px',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
-        position: 'relative',
-        fontFamily: 'Arial, sans-serif',
-        animation: 'float 6s ease-in-out infinite'
-    }}>
-        {/* Background Texture */}
+// ═══════════════════════════════════════════════
+// DOC ROW COMPONENT — Clean list view with Download/Preview
+// ═══════════════════════════════════════════════
+const DocRow = ({ item, folderColor, isLast }: {
+    item: { type: string, title: string, subtitle?: string, version: string, size?: string, pages?: number },
+    folderColor: string,
+    isLast: boolean
+}) => {
+    const isNew = item.type === 'NEW';
+    return (
         <div style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: '#1a1d21',
-            backgroundImage: `
-                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 20%),
-                linear-gradient(135deg, #1e242b 0%, #111 100%)
-            `,
-            zIndex: -1
-        }}></div>
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '7px 10px',
+            borderBottom: isLast ? 'none' : '1px solid #1e1e1e',
+            transition: 'background 0.15s',
+            cursor: 'default'
+        }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+        >
+            {/* Type badge */}
+            <div style={{
+                padding: '2px 6px', borderRadius: '3px',
+                backgroundColor: isNew ? 'rgba(59,130,246,0.12)' : `${folderColor}10`,
+                border: `1px solid ${isNew ? 'rgba(59,130,246,0.25)' : `${folderColor}20`}`,
+                fontSize: '7px', fontWeight: '900',
+                color: isNew ? '#3b82f6' : folderColor,
+                letterSpacing: '1px', flexShrink: 0,
+                minWidth: '32px', textAlign: 'center'
+            }}>{item.type}</div>
 
-        {/* Glow Effect Overlay */}
-        <div style={{
-            position: 'absolute',
-            inset: 0,
-            boxShadow: 'inset 0 0 20px rgba(6, 182, 212, 0.2)',
-            pointerEvents: 'none',
-            borderRadius: '16px',
-            zIndex: 10
-        }}></div>
-
-        {/* --- Header --- */}
-        <div style={{ padding: '16px 20px 8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
-                {/* VME Logo Placeholder */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Title & subtitle */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                    fontSize: '10px', fontWeight: '800', color: 'white',
+                    textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                }}>{item.title}</div>
+                {item.subtitle && (
                     <div style={{
-                        fontSize: '24px',
-                        fontWeight: '900',
-                        lineHeight: '1',
-                        fontStyle: 'italic'
-                    }}>
-                        <span style={{ color: '#0ea5e9' }}>V</span>
-                        <span style={{ color: '#f97316' }}>E</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
-                        <Star size={8} fill="#f97316" color="#f97316" />
-                        <Star size={8} fill="#f97316" color="#f97316" />
-                        <Star size={8} fill="#f97316" color="#f97316" />
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '0.5px' }}>KINSEVIRE VME COMPETENCY CARD</h2>
-                    <span style={{ fontSize: '10px', color: '#cbd5e1', fontWeight: '600', letterSpacing: '0.5px' }}>OPERATOR LICENSE & SKILL MATRIX</span>
-                </div>
+                        fontSize: '8px', fontWeight: '600', color: '#64748b',
+                        marginTop: '1px',
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                    }}>{item.subtitle}</div>
+                )}
             </div>
 
-            {/* MMG Logo */}
-            <div style={{ backgroundColor: '#dc2626', padding: '4px 8px', borderRadius: '2px' }}>
-                <span style={{ color: 'white', fontWeight: '900', fontSize: '14px', letterSpacing: '1px' }}>MMG</span>
+            {/* Version */}
+            <span style={{
+                fontSize: '8px', fontWeight: '700', color: '#475569',
+                flexShrink: 0
+            }}>{item.version}</span>
+
+            {/* Size */}
+            {item.size && (
+                <span style={{
+                    fontSize: '8px', fontWeight: '700', color: '#334155',
+                    flexShrink: 0, width: '42px', textAlign: 'right'
+                }}>{item.size}</span>
+            )}
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                <div style={{
+                    padding: '4px', borderRadius: '4px', cursor: 'pointer',
+                    backgroundColor: 'rgba(255,255,255,0.03)',
+                    border: '1px solid #1e1e1e',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${folderColor}40`; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e1e'; }}
+                >
+                    <Eye size={10} color="#64748b" />
+                </div>
+                <div style={{
+                    padding: '4px', borderRadius: '4px', cursor: 'pointer',
+                    backgroundColor: 'rgba(255,255,255,0.03)',
+                    border: '1px solid #1e1e1e',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${folderColor}40`; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e1e'; }}
+                >
+                    <Download size={10} color="#64748b" />
+                </div>
             </div>
         </div>
+    );
+};
 
-        {/* --- Main Content (Photo + Info + QR) --- */}
-        <div style={{ padding: '8px 20px 16px 20px', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative' }}>
-
-            {/* Tech Decoration Lines */}
-            <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0', height: '2px', background: 'linear-gradient(90deg, transparent 0%, #0ea5e9 20%, #f97316 80%, transparent 100%)', zIndex: 0 }}></div>
-
-            {/* Photo */}
-            <div style={{
-                width: '90px',
-                height: '110px',
-                backgroundColor: '#e2e8f0',
-                borderRadius: '4px',
-                border: '2px solid white',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                zIndex: 1,
-                position: 'relative'
-            }}>
-                <User size={60} color="#334155" />
-                {/* Helmet hint */}
-                <div style={{ position: 'absolute', top: 0, width: '100%', height: '30%', backgroundColor: 'white', borderBottom: '2px solid #cbd5e1' }}></div>
-            </div>
-
-            {/* Text Info */}
-            <div style={{ flex: 1, zIndex: 1, paddingTop: '10px' }}>
-                <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: 'white', letterSpacing: '0.5px' }}>LOUIS LUMBALA</h1>
-                <div style={{ fontSize: '14px', color: '#cbd5e1', fontWeight: '500', marginTop: '2px' }}>ID: 096</div>
-                <div style={{ fontSize: '14px', color: '#cbd5e1', fontWeight: '500' }}>ITM</div>
-            </div>
-
-            {/* QR Code */}
-            <div style={{
-                width: '80px',
-                height: '80px',
-                backgroundColor: 'white',
-                borderRadius: '4px',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1
-            }}>
-                <QrCode size={70} color="black" />
-            </div>
-        </div>
-
-        {/* --- Skills Matrix Table --- */}
-        <div style={{ backgroundColor: '#e2e8f0', padding: '0px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', fontFamily: 'monospace' }}>
-                <thead>
-                    <tr style={{ backgroundColor: '#1e293b', color: 'white' }}>
-                        <th style={{ textAlign: 'left', padding: '8px 12px', textTransform: 'uppercase' }}>CERTIFIED CATEGORY</th>
-                        <th style={{ textAlign: 'right', padding: '8px 12px', textTransform: 'uppercase' }}>EXPIRES ON</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {[
-                        { name: 'SITE DRIVER LV (MT)', exp: '15/02/2028', highlight: false },
-                        { name: 'TIPPER TRUCK HOWO 35T', exp: '18/02/2028', highlight: false },
-                        { name: 'TRUCK DOZER CAT D8', exp: '25/01/2028', highlight: false },
-                        { name: 'TRACTOR LOADER BACKHOE', exp: '12/12/2027', highlight: true },
-                    ].map((row, i) => (
-                        <tr key={i} style={{ backgroundColor: i % 2 === 0 ? 'white' : '#f1f5f9', color: 'black', borderBottom: '1px solid #cbd5e1' }}>
-                            <td style={{ padding: '8px 12px', fontWeight: 'bold' }}>{row.name}</td>
-                            <td style={{
-                                padding: '8px 12px',
-                                textAlign: 'right',
-                                backgroundColor: row.highlight ? '#f97316' : 'transparent',
-                                color: row.highlight ? 'white' : '#334155',
-                                fontWeight: row.highlight ? 'bold' : 'normal'
-                            }}>{row.exp}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-
-        {/* Footer */}
-        <div style={{ backgroundColor: '#1e293b', padding: '4px 8px', textAlign: 'center' }}>
-            <p style={{ margin: 0, fontSize: '9px', color: '#94a3b8' }}>HSSEC Department - Valid for 24 months - Biometric Secure</p>
-        </div>
-    </div>
-);
-
-const DarkCard = ({ children, className = '', style = {}, onClick }: { children: React.ReactNode, className?: string, style?: React.CSSProperties, onClick?: () => void }) => (
-    <div
-        onClick={onClick}
-        style={{
-            backgroundColor: '#1E1E1E',
-            border: '1px solid #333',
-            borderRadius: '8px',
-            padding: '24px',
-            cursor: onClick ? 'pointer' : 'default',
-            transition: 'transform 0.2s, background-color 0.2s',
-            ...style
-        }}
-        className={className}
-        onMouseEnter={(e) => {
-            if (onClick) {
-                e.currentTarget.style.backgroundColor = '#252525';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-            }
-        }}
-        onMouseLeave={(e) => {
-            if (onClick) {
-                e.currentTarget.style.backgroundColor = '#1E1E1E';
-                e.currentTarget.style.transform = 'translateY(0)';
-            }
-        }}
-    >
-        {children}
-    </div>
-);
-
-const ProgressBar = ({ value, color }: { value: number, color: string }) => (
-    <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px', overflow: 'hidden' }}>
-        <div style={{ width: `${value}%`, height: '100%', backgroundColor: color, transition: 'width 0.5s ease' }}></div>
-    </div>
-);
-
-const DetailModal = ({ doc, onClose }: { doc: Document, onClose: () => void }) => (
-    <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-        backdropFilter: 'blur(4px)'
-    }}>
-        <div style={{
-            backgroundColor: '#1E1E1E',
-            border: `1px solid ${doc.color}`,
-            borderRadius: '12px',
-            width: '600px',
-            maxWidth: '90%',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            overflow: 'hidden'
-        }}>
-            {/* Modal Header */}
-            <div style={{ padding: '24px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: `${doc.color}20` }}>
-                        <doc.icon size={24} color={doc.color} />
-                    </div>
-                    <div>
-                        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', margin: 0 }}>{doc.title}</h2>
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: doc.color, textTransform: 'uppercase', letterSpacing: '1px' }}>{doc.status}</span>
-                    </div>
-                </div>
-                <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
-                    <X size={24} />
-                </button>
-            </div>
-
-            {/* Modal Content */}
-            <div style={{ padding: '32px' }}>
-                <div style={{ marginBottom: '32px' }}>
-                    <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>QA/QC Impact Note</h4>
-                    <p style={{ fontSize: '16px', color: 'white', lineHeight: '1.6' }}>{doc.impactNote}</p>
-                </div>
-
-                <div style={{ marginBottom: '32px', padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', borderLeft: '4px solid #ef4444' }}>
-                    <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#fca5a5', textTransform: 'uppercase', marginBottom: '4px' }}>Consequences of Non-Compliance</h4>
-                    <p style={{ fontSize: '14px', color: '#fca5a5' }}>{doc.consequences}</p>
-                </div>
-
-                <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#94a3b8', textTransform: 'uppercase' }}>Site Implementation Progress</h4>
-                        <span style={{ color: 'white', fontWeight: 'bold' }}>{doc.implementationProgress}%</span>
-                    </div>
-                    <ProgressBar value={doc.implementationProgress} color={doc.color} />
-                    <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>Percentage of departments currently utilizing this standard.</p>
-                </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div style={{ padding: '24px', borderTop: '1px solid #333', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-                <button style={{ padding: '10px 20px', backgroundColor: '#333', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '600' }}>
-                    Preview PDF
-                </button>
-                <button style={{ padding: '10px 20px', backgroundColor: doc.color, color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Download size={16} /> Download
-                </button>
-            </div>
-        </div>
-    </div>
-);
-
+// ═══════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════
 const DocumentationStatus = () => {
-    const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+    const [hoveredEquip, setHoveredEquip] = useState<{
+        equip: typeof EQUIPMENT[0], x: number, y: number, isBottom: boolean
+    } | null>(null);
+    const [scanPos, setScanPos] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setScanPos(prev => (prev >= 100 ? 0 : prev + 0.4));
+        }, 30);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <div style={{
             backgroundColor: '#121212',
-            minHeight: '100vh',
+            height: '100%', width: '100%',
             color: 'white',
-            padding: '32px',
-            fontFamily: '"Inter", sans-serif'
+            padding: '14px 18px',
+            fontFamily: '"Inter", sans-serif',
+            display: 'flex', flexDirection: 'column',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            position: 'relative'
         }}>
-            <style>{animationStyles}</style>
-            <div style={{ marginBottom: '40px' }}>
-                <h1 style={{ fontSize: '32px', fontWeight: '800', color: 'white', letterSpacing: '-1px', marginBottom: '8px' }}>
-                    DOCUMENTATION <span style={{ color: '#22c55e' }}>STATUS</span>
-                </h1>
-                <p style={{ color: '#64748b' }}>Strategic Document Control & Implementation Tracking</p>
-            </div>
-
-            {/* Search & Filter */}
-            <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
-                <div style={{ position: 'relative', flex: 1 }}>
-                    <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                    <input
-                        type="text"
-                        placeholder="Search documents..."
-                        style={{
-                            width: '100%',
-                            backgroundColor: '#1E1E1E',
-                            border: '1px solid #333',
-                            borderRadius: '8px',
-                            padding: '12px 12px 12px 40px',
-                            color: 'white',
-                            outline: 'none'
-                        }}
-                    />
-                </div>
-                <button style={{ padding: '12px', backgroundColor: '#1E1E1E', border: '1px solid #333', borderRadius: '8px', color: '#94a3b8', cursor: 'pointer' }}>
-                    <Filter size={18} />
-                </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px', alignItems: 'start' }}>
-
-                {/* Left Column: Documentation List */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px', alignContent: 'start' }}>
-                    {strategicDocs.map((doc) => (
-                        <DarkCard key={doc.id} onClick={() => setSelectedDoc(doc)} style={{ borderLeft: `4px solid ${doc.color}`, height: '100%' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '24px' }}>
-                                <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: `${doc.color}15` }}>
-                                    <doc.icon size={24} color={doc.color} />
-                                </div>
-                                <span style={{ padding: '4px 8px', borderRadius: '4px', backgroundColor: `${doc.color}15`, color: doc.color, fontSize: '11px', fontWeight: 'bold' }}>
-                                    {doc.status}
-                                </span>
-                            </div>
-
-                            <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', marginBottom: '12px', lineHeight: '1.4' }}>{doc.title}</h3>
-                            <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '24px', lineHeight: '1.5' }}>
-                                {doc.impactNote}
-                            </p>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#3b82f6', fontSize: '13px', fontWeight: '600' }}>
-                                <Eye size={16} /> Quick View
-                            </div>
-                        </DarkCard>
-                    ))}
-
-                    {/* Placeholder for "Upcoming" */}
-                    <DarkCard style={{ border: '1px dashed #333', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '200px' }}>
-                        <FileText size={32} color="#333" style={{ marginBottom: '16px' }} />
-                        <p style={{ color: '#64748b', textAlign: 'center' }}>More strategic documents<br />in drafted pipeline...</p>
-                    </DarkCard>
-                </div>
-
-                {/* Right Column: Digital Twin & Strategic Info */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-
-                    {/* Competency Card Spotlight */}
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ marginBottom: '24px', textAlign: 'center' }}>
-                            <h3 style={{ color: '#06b6d4', fontWeight: 'bold', fontSize: '14px', letterSpacing: '1px', marginBottom: '8px' }}>DIGITAL TWIN VERIFICATION</h3>
-                            <p style={{ color: '#94a3b8', fontSize: '12px' }}>2026 Biometric Digital License<br />Real-time Verification Readiness</p>
-                        </div>
-                        <VmeCompetencyCard />
+            {/* ══════ COMMAND BAR ══════ */}
+            <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '10px', flexShrink: 0
+            }}>
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Shield size={16} color="#00F2FF" />
+                        <h1 style={{
+                            fontSize: '15px', fontWeight: '900', letterSpacing: '3px',
+                            textTransform: 'uppercase', color: 'white',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,242,255,0.2)'
+                        }}>RESOURCE & GOVERNANCE CENTER</h1>
                     </div>
-
-                    {/* Sidebar: Strategy of Barrier */}
-                    <DarkCard style={{ background: 'linear-gradient(135deg, #1E1E1E 0%, #111 100%)', border: '1px solid #333' }}>
-                        <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                            <div style={{ padding: '16px', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '50%', marginBottom: '16px' }}>
-                                <ShieldCheck size={40} color="#fff" />
-                            </div>
-                            <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'white', textTransform: 'uppercase', letterSpacing: '1px' }}>Strategy of Barrier</h3>
-                            <div style={{ width: '40px', height: '4px', backgroundColor: '#22c55e', margin: '16px auto', borderRadius: '2px' }}></div>
-                        </div>
-
-                        <p style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: '1.6', textAlign: 'center', marginBottom: '24px' }}>
-                            The combination of these 3 documents creates a <strong style={{ color: 'white' }}>"Zero Tolerance"</strong> ecosystem against incompetence and unsafe acts.
-                        </p>
-
-                        <div style={{ padding: '16px', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
-                            <p style={{ fontSize: '12px', color: '#86efac', textAlign: 'center', fontWeight: '600' }}>
-                                VME INTEGRATED BARRIER SYSTEM
-                            </p>
-                        </div>
-                    </DarkCard>
+                    <p style={{
+                        fontSize: '10px', color: '#475569', marginTop: '2px',
+                        fontWeight: '600', letterSpacing: '0.5px'
+                    }}>Single Source of Truth · {TOTAL_OPERATORS.toLocaleString()} Operators · {EQUIPMENT.length} Equipment Categories</p>
                 </div>
-
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+                        <span style={{
+                            fontSize: '9px', fontWeight: '800', color: '#94a3b8',
+                            letterSpacing: '1px',
+                            textShadow: '0 1px 3px rgba(0,0,0,0.9)'
+                        }}>ADMIN: DAN KAHILU</span>
+                        <div style={{
+                            padding: '2px 6px', borderRadius: '4px',
+                            backgroundColor: 'rgba(0,242,255,0.06)',
+                            border: '1px solid rgba(0,242,255,0.15)',
+                            display: 'flex', alignItems: 'center', gap: '3px'
+                        }}>
+                            <BadgeCheck size={9} color="#00F2FF" />
+                            <span style={{ fontSize: '7px', fontWeight: '800', color: '#00F2FF', letterSpacing: '1px' }}>GOVERNANCE ADMIN</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Modal */}
-            {selectedDoc && <DetailModal doc={selectedDoc} onClose={() => setSelectedDoc(null)} />}
+            {/* ══════ 4 DOCUMENT REPOSITORIES (Bento Grid) ══════ */}
+            <div style={{
+                display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '8px', marginBottom: '10px', flexShrink: 0
+            }}>
+                {ALL_FOLDERS.map((folder, fi) => (
+                    <div key={fi} style={{
+                        background: 'linear-gradient(145deg, rgba(26,26,26,0.95), rgba(16,16,16,0.98))',
+                        border: `1px solid ${folder.color}18`,
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        position: 'relative'
+                    }}>
+                        {/* Scan laser */}
+                        <div style={{
+                            position: 'absolute', left: 0, right: 0,
+                            top: `${(scanPos + fi * 25) % 100}%`,
+                            height: '1px',
+                            background: `linear-gradient(90deg, transparent, ${folder.color}40, transparent)`,
+                            pointerEvents: 'none', zIndex: 5
+                        }} />
+
+                        {/* Folder Header */}
+                        <div style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '8px 12px',
+                            backgroundColor: `${folder.color}06`,
+                            borderBottom: `1px solid ${folder.color}12`
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FolderOpen size={13} color={folder.color} />
+                                <span style={{
+                                    fontSize: '9px', fontWeight: '900', color: 'white',
+                                    letterSpacing: '1px',
+                                    textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.6)'
+                                }}>{folder.label.toUpperCase()}</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {/* Special badge for Theory Academy */}
+                                {fi === 2 && (
+                                    <div style={{
+                                        display: 'flex', alignItems: 'center', gap: '4px',
+                                        padding: '2px 8px', borderRadius: '4px',
+                                        background: 'linear-gradient(135deg, rgba(0,242,255,0.12), rgba(0,242,255,0.04))',
+                                        border: '1px solid rgba(0,242,255,0.3)',
+                                        boxShadow: '0 0 8px rgba(0,242,255,0.15)'
+                                    }}>
+                                        <Award size={9} color="#00F2FF" />
+                                        <span style={{
+                                            fontSize: '8px', fontWeight: '900', color: '#00F2FF',
+                                            fontFamily: '"Roboto Mono", monospace',
+                                            textShadow: '0 0 6px rgba(0,242,255,0.4)',
+                                            letterSpacing: '0.5px'
+                                        }}>90% PASSING GRADE REQUIRED</span>
+                                    </div>
+                                )}
+                                <div style={{
+                                    fontSize: '8px', fontWeight: '800', color: folder.color,
+                                    fontFamily: '"Roboto Mono", monospace'
+                                }}>{folder.items.length} {folder.items.length === 1 ? 'item' : 'items'}</div>
+                            </div>
+                        </div>
+
+                        {/* Document List */}
+                        <div>
+                            {folder.items.map((item, ii) => (
+                                <DocRow
+                                    key={ii}
+                                    item={item}
+                                    folderColor={folder.color}
+                                    isLast={ii === folder.items.length - 1}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* ══════ 30 EQUIPMENT MATRIX ══════ */}
+            <div style={{
+                flex: 1, display: 'flex', flexDirection: 'column',
+                background: 'rgba(26,26,26,0.6)',
+                border: '1px solid #2a2a2a',
+                borderRadius: '10px',
+                padding: '10px 12px',
+                minHeight: 0, position: 'relative', overflow: 'hidden'
+            }}>
+                {/* Scan laser */}
+                <div style={{
+                    position: 'absolute', left: 0, right: 0,
+                    top: `${(scanPos + 12) % 100}%`, height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(0,242,255,0.35), transparent)',
+                    pointerEvents: 'none', zIndex: 5
+                }} />
+
+                {/* Header */}
+                <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    marginBottom: '8px', flexShrink: 0
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Gauge size={12} color="#00F2FF" />
+                        <span style={{
+                            fontSize: '9px', fontWeight: '900', color: 'white',
+                            letterSpacing: '1.5px',
+                            textShadow: '0 1px 3px rgba(0,0,0,0.9)'
+                        }}>30 EQUIPMENT MATRIX · VME LIST</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        {[
+                            { label: 'SOP', count: STATS.sopReady, color: '#00F2FF' },
+                            { label: 'THEORY', count: STATS.theoryReady, color: '#f59e0b' },
+                            { label: 'PRACTICE', count: STATS.practiceReady, color: '#22c55e' },
+                            { label: 'COMPLETE', count: STATS.fullReady, color: '#3b82f6' },
+                        ].map((s, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                <span style={{
+                                    fontSize: '11px', fontWeight: '900', color: s.color,
+                                    fontFamily: '"Roboto Mono", monospace',
+                                    textShadow: `0 0 6px ${s.color}40`
+                                }}>{s.count}</span>
+                                <span style={{ fontSize: '7px', color: '#64748b', fontWeight: '700' }}>{s.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Grid: 6 columns × 5 rows */}
+                <div style={{
+                    flex: 1, display: 'grid',
+                    gridTemplateColumns: 'repeat(6, 1fr)',
+                    gap: '5px', minHeight: 0, overflow: 'auto'
+                }}>
+                    {EQUIPMENT.map((eq, ei) => {
+                        const readyCount = [eq.sop, eq.theory, eq.practice].filter(Boolean).length;
+                        const isBottomRows = ei >= 24;
+                        return (
+                            <div
+                                key={eq.id}
+                                onMouseEnter={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    setHoveredEquip({
+                                        equip: eq,
+                                        x: rect.left + rect.width / 2,
+                                        y: isBottomRows ? rect.top : rect.bottom,
+                                        isBottom: isBottomRows
+                                    });
+                                }}
+                                onMouseLeave={() => setHoveredEquip(null)}
+                                style={{
+                                    background: readyCount === 3
+                                        ? 'linear-gradient(145deg, rgba(34,197,94,0.04), rgba(20,20,20,0.95))'
+                                        : 'linear-gradient(145deg, rgba(22,22,22,0.95), rgba(14,14,14,0.98))',
+                                    border: `1px solid ${readyCount === 3 ? '#22c55e' : readyCount >= 1 ? '#2a2a2a' : '#ef4444'}20`,
+                                    borderRadius: '6px',
+                                    padding: '5px 7px',
+                                    cursor: 'default'
+                                }}
+                            >
+                                {/* Unit # + Name */}
+                                <div style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    marginBottom: '4px'
+                                }}>
+                                    <span style={{
+                                        fontSize: '7px', fontWeight: '800', color: '#475569',
+                                        fontFamily: '"Roboto Mono", monospace'
+                                    }}>#{eq.id.toString().padStart(2, '0')}</span>
+                                    {readyCount === 3 && <CheckCircle size={8} color="#22c55e" />}
+                                </div>
+                                <div style={{
+                                    fontSize: '8px', fontWeight: '800', color: 'white',
+                                    textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.5)',
+                                    marginBottom: '5px', lineHeight: 1.2,
+                                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                                }}>{eq.name}</div>
+
+                                {/* 3 Mini Dots: SOP | Theory | Practice */}
+                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                    {[
+                                        { ready: eq.sop, label: 'S', color: '#00F2FF' },
+                                        { ready: eq.theory, label: 'T', color: '#f59e0b' },
+                                        { ready: eq.practice, label: 'P', color: '#22c55e' },
+                                    ].map((dot, di) => (
+                                        <div key={di} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                            <div style={{
+                                                width: '6px', height: '6px', borderRadius: '50%',
+                                                backgroundColor: dot.ready ? dot.color : '#333',
+                                                boxShadow: dot.ready ? `0 0 4px ${dot.color}60` : 'none',
+                                                transition: 'all 0.2s'
+                                            }} />
+                                            <span style={{
+                                                fontSize: '6px', fontWeight: '700',
+                                                color: dot.ready ? dot.color : '#333'
+                                            }}>{dot.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Legend */}
+                <div style={{
+                    display: 'flex', gap: '14px', justifyContent: 'center',
+                    marginTop: '6px', flexShrink: 0
+                }}>
+                    {[
+                        { label: 'SOP Ready', color: '#00F2FF' },
+                        { label: 'Theory Ready', color: '#f59e0b' },
+                        { label: 'Practice Ready', color: '#22c55e' },
+                        { label: 'Pending', color: '#333' },
+                    ].map((l, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <div style={{
+                                width: '6px', height: '6px', borderRadius: '50%',
+                                backgroundColor: l.color,
+                                boxShadow: l.color !== '#333' ? `0 0 4px ${l.color}60` : 'none'
+                            }} />
+                            <span style={{ fontSize: '7px', color: '#64748b', fontWeight: '700' }}>{l.label}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* ══════ SMART TOOLTIP (z-index 9999 · bottom opens UP) ══════ */}
+            {hoveredEquip && (() => {
+                const eq = hoveredEquip.equip;
+                const readyCount = [eq.sop, eq.theory, eq.practice].filter(Boolean).length;
+                const tooltipHeight = 145;
+                const topPos = hoveredEquip.isBottom
+                    ? hoveredEquip.y - tooltipHeight - 10
+                    : hoveredEquip.y + 8;
+                const clampedTop = Math.max(10, Math.min(topPos, window.innerHeight - tooltipHeight - 10));
+                const leftPos = Math.max(10, Math.min(hoveredEquip.x - 100, window.innerWidth - 220));
+
+                return (
+                    <div style={{
+                        position: 'fixed',
+                        top: clampedTop, left: leftPos,
+                        width: '200px',
+                        background: 'rgba(8, 8, 12, 0.97)',
+                        backdropFilter: 'blur(30px)',
+                        border: '1px solid rgba(0,242,255,0.25)',
+                        borderRadius: '10px',
+                        padding: '10px 12px',
+                        zIndex: 9999,
+                        boxShadow: '0 16px 48px rgba(0,0,0,0.8), 0 0 15px rgba(0,242,255,0.12)',
+                        pointerEvents: 'none'
+                    }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '6px',
+                            marginBottom: '6px', paddingBottom: '5px',
+                            borderBottom: '1px solid rgba(255,255,255,0.08)'
+                        }}>
+                            <Truck size={10} color="#00F2FF" />
+                            <div>
+                                <div style={{
+                                    fontSize: '10px', fontWeight: '800', color: 'white',
+                                    textShadow: '0 1px 3px rgba(0,0,0,0.9)'
+                                }}>#{eq.id.toString().padStart(2, '0')} {eq.name}</div>
+                            </div>
+                        </div>
+
+                        <div style={{
+                            fontSize: '9px', fontWeight: '900', color: '#00F2FF',
+                            marginBottom: '6px', letterSpacing: '0.5px',
+                            textShadow: '0 0 6px rgba(0,242,255,0.3)'
+                        }}>READINESS: {readyCount}/3</div>
+
+                        {[
+                            { label: 'SOP Ready', ready: eq.sop, color: '#00F2FF' },
+                            { label: 'Theory Bank Ready', ready: eq.theory, color: '#f59e0b' },
+                            { label: 'Practical Form Ready', ready: eq.practice, color: '#22c55e' },
+                        ].map((item, i) => (
+                            <div key={i} style={{
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                marginBottom: '3px'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    {item.ready
+                                        ? <CheckCircle size={8} color={item.color} />
+                                        : <Circle size={8} color="#333" />
+                                    }
+                                    <span style={{ fontSize: '8px', color: '#94a3b8', fontWeight: '700' }}>{item.label}</span>
+                                </div>
+                                <span style={{
+                                    fontSize: '8px', fontWeight: '900',
+                                    color: item.ready ? item.color : '#ef4444',
+                                    textShadow: item.ready ? `0 0 6px ${item.color}40` : 'none'
+                                }}>{item.ready ? 'READY' : 'PENDING'}</span>
+                            </div>
+                        ))}
+
+                        {readyCount < 3 && (
+                            <div style={{
+                                marginTop: '5px', padding: '3px 6px',
+                                backgroundColor: 'rgba(239,68,68,0.08)',
+                                border: '1px solid rgba(239,68,68,0.15)',
+                                borderRadius: '4px',
+                                display: 'flex', alignItems: 'center', gap: '4px'
+                            }}>
+                                <AlertTriangle size={8} color="#ef4444" />
+                                <span style={{
+                                    fontSize: '7px', fontWeight: '800', color: '#ef4444'
+                                }}>{3 - readyCount} item{3 - readyCount > 1 ? 's' : ''} require completion</span>
+                            </div>
+                        )}
+                    </div>
+                );
+            })()}
+
+            {/* ══════ FOOTER ══════ */}
+            <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginTop: '8px', flexShrink: 0, position: 'relative', zIndex: 1
+            }}>
+                <div style={{ display: 'flex', gap: '20px' }}>
+                    <span style={{ fontSize: '9px', color: '#475569', fontWeight: '700', letterSpacing: '1px' }}>IMPACT THE MINDSET</span>
+                    <span style={{ fontSize: '9px', color: '#475569', fontWeight: '700', letterSpacing: '1px' }}>VME 2026</span>
+                </div>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '9px', color: '#334155', fontWeight: '700', letterSpacing: '1px' }}>
+                        System Admin: Dan Kahilu
+                    </span>
+                    <span style={{ fontSize: '9px', color: '#334155', fontWeight: '700', letterSpacing: '1px' }}>
+                        Powered by SafeEquip
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };

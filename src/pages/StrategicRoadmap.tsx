@@ -37,7 +37,7 @@ const timelineData = [
         title: 'Digitalization (Current)',
         status: 'IN PROGRESS',
         desc: 'Transition from Excel to Dynamic Reporting (Power BI Logic).',
-        color: '#3b82f6',
+        color: '#f97316',
         icon: Loader
     },
     {
@@ -120,67 +120,96 @@ const commandments = [
 
 const DarkCard = ({ children, className = '', style = {} }: { children: React.ReactNode, className?: string, style?: React.CSSProperties }) => (
     <div style={{
-        backgroundColor: '#1E1E1E',
-        border: '1px solid #333',
-        borderRadius: '8px',
+        background: 'linear-gradient(145deg, rgba(30,30,30,0.7), rgba(18,18,18,0.85))',
+        backdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '14px',
         padding: '24px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)',
         ...style
     }} className={className}>
         {children}
     </div>
 );
 
-const TimelineItem = ({ data, index }: { data: any, index: number }) => (
-    <div style={{ display: 'flex', gap: '24px', position: 'relative' }}>
-        {/* Connector Line */}
-        {index < timelineData.length - 1 && (
+const TimelineItem = ({ data, index }: { data: any, index: number }) => {
+    const isCurrent = data.status === 'IN PROGRESS';
+    return (
+        <div style={{ display: 'flex', gap: '24px', position: 'relative' }}>
+            {/* Glowing Gradient Connector Line */}
+            {index < timelineData.length - 1 && (
+                <div style={{
+                    position: 'absolute',
+                    left: '24px',
+                    top: '48px',
+                    bottom: '-24px',
+                    width: '2px',
+                    background: `linear-gradient(180deg, ${data.color}, ${timelineData[Math.min(index + 1, timelineData.length - 1)].color})`,
+                    boxShadow: `0 0 8px ${data.color}50`,
+                    zIndex: 0
+                }} />
+            )}
+
+            {/* Pulsing Data-Point Icon */}
             <div style={{
-                position: 'absolute',
-                left: '24px',
-                top: '48px',
-                bottom: '-24px',
-                width: '2px',
-                backgroundColor: '#333',
-                zIndex: 0
-            }}></div>
-        )}
-
-        {/* Icon */}
-        <div style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '50%',
-            backgroundColor: `${data.color}20`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: `2px solid ${data.color}`,
-            zIndex: 1,
-            flexShrink: 0
-        }}>
-            <data.icon size={24} color={data.color} />
-        </div>
-
-        {/* Content */}
-        <div style={{ flex: 1, paddingBottom: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}>{data.quarter} - {data.title}</h3>
-                <span style={{
-                    padding: '4px 12px',
-                    borderRadius: '20px',
-                    backgroundColor: `${data.color}20`,
-                    color: data.color,
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase'
-                }}>
-                    {data.status}
-                </span>
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: `${data.color}20`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: `2px solid ${data.color}`,
+                zIndex: 1,
+                flexShrink: 0,
+                boxShadow: `0 0 12px ${data.color}40, 0 0 24px ${data.color}15`,
+                animation: 'milestonePulse 2.5s ease-in-out infinite',
+                position: 'relative'
+            }}>
+                <data.icon size={24} color={data.color} />
             </div>
-            <p style={{ color: '#94a3b8', fontSize: '16px', lineHeight: '1.6' }}>{data.desc}</p>
+
+            {/* Content — Glassmorphism card */}
+            <div style={{
+                flex: 1, paddingBottom: '32px'
+            }}>
+                <div style={{
+                    background: isCurrent
+                        ? 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(249,115,22,0.02))'
+                        : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+                    backdropFilter: 'blur(8px)',
+                    border: `1px solid ${isCurrent ? 'rgba(249,115,22,0.25)' : 'rgba(255,255,255,0.06)'}`,
+                    borderRadius: '12px',
+                    padding: '16px 18px',
+                    boxShadow: isCurrent ? '0 0 20px rgba(249,115,22,0.08)' : 'none'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <h3 style={{
+                            fontSize: '18px', fontWeight: '900', color: 'white',
+                            textTransform: 'uppercase', letterSpacing: '1px',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                        }}>{data.quarter} — {data.title}</h3>
+                        <span style={{
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            backgroundColor: `${data.color}20`,
+                            color: data.color,
+                            fontSize: '11px',
+                            fontWeight: '900',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            border: isCurrent ? `1px solid ${data.color}40` : 'none',
+                            boxShadow: isCurrent ? `0 0 10px ${data.color}30` : 'none'
+                        }}>
+                            {data.status}
+                        </span>
+                    </div>
+                    <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: '1.6', margin: 0 }}>{data.desc}</p>
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // --- Cinematic Data ---
 const mindsetPillars = [
@@ -761,7 +790,49 @@ const StrategicRoadmap = () => {
                 opacity: 0.5,
                 zIndex: 0,
                 pointerEvents: 'none'
-            }}></div>
+            }} />
+
+            {/* 3D Perspective Grid Floor */}
+            <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '30vh',
+                background: 'linear-gradient(180deg, transparent 0%, rgba(0,242,255,0.015) 100%)',
+                backgroundImage: `
+                    linear-gradient(rgba(0,242,255,0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,242,255,0.04) 1px, transparent 1px)
+                `,
+                backgroundSize: '60px 60px',
+                transform: 'perspective(500px) rotateX(55deg)',
+                transformOrigin: 'bottom center',
+                zIndex: 0,
+                pointerEvents: 'none',
+                maskImage: 'linear-gradient(180deg, transparent 0%, black 40%)',
+                WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, black 40%)'
+            }} />
+
+            {/* Animations */}
+            <style>{`
+                @keyframes ctaGlowPulse {
+                    0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.2), 0 0 20px rgba(255,215,0,0.08); }
+                    50% { box-shadow: 0 0 16px rgba(255,215,0,0.4), 0 0 40px rgba(255,215,0,0.15), 0 0 60px rgba(255,215,0,0.06); }
+                }
+                @keyframes milestonePulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.06); }
+                }
+                .cta-vision-btn {
+                    animation: ctaGlowPulse 3s ease-in-out infinite;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                }
+                .cta-vision-btn:hover {
+                    transform: scale(1.03) !important;
+                    filter: brightness(1.25) !important;
+                    box-shadow: 0 0 24px rgba(255,215,0,0.5), 0 0 50px rgba(255,215,0,0.2) !important;
+                }
+            `}</style>
 
             <SlideOverPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
 
@@ -778,22 +849,24 @@ const StrategicRoadmap = () => {
 
                     <button
                         onClick={() => setIsPanelOpen(true)}
+                        className="cta-vision-btn"
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            padding: '12px 24px',
-                            backgroundColor: 'rgba(255,255,255,0.1)',
-                            border: '1px solid rgba(255,255,255,0.2)',
+                            gap: '10px',
+                            padding: '14px 32px',
+                            background: 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,255,255,0.06))',
+                            border: '1px solid rgba(255,215,0,0.3)',
                             borderRadius: '50px',
                             color: 'white',
-                            fontWeight: '600',
-                            backdropFilter: 'blur(4px)',
+                            fontWeight: '800',
+                            fontSize: '14px',
+                            letterSpacing: '0.5px',
+                            backdropFilter: 'blur(12px)',
                             cursor: 'pointer',
-                            transition: 'all 0.2s'
+                            position: 'relative',
+                            zIndex: 2
                         }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
                     >
                         <Lightbulb size={20} color="#ffd700" />
                         Strategic Vision: Impacting the Mindset
@@ -804,7 +877,12 @@ const StrategicRoadmap = () => {
 
                     {/* Left Column: Timeline */}
                     <div>
-                        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <h2 style={{
+                            fontSize: '22px', fontWeight: '900', color: 'white', marginBottom: '32px',
+                            display: 'flex', alignItems: 'center', gap: '12px',
+                            textTransform: 'uppercase', letterSpacing: '1px',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                        }}>
                             <Calendar size={28} color="#4ade80" /> Implementation Timeline
                         </h2>
                         <DarkCard style={{ backgroundColor: 'rgba(30,30,30,0.6)', backdropFilter: 'blur(10px)' }}>
@@ -826,7 +904,12 @@ const StrategicRoadmap = () => {
                         }}>
                             <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, backgroundColor: '#3b82f6', opacity: 0.1, borderRadius: '50%' }}></div>
 
-                            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <h3 style={{
+                                fontSize: '18px', fontWeight: '900', color: 'white', marginBottom: '24px',
+                                display: 'flex', alignItems: 'center', gap: '12px',
+                                textTransform: 'uppercase', letterSpacing: '1px',
+                                textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                            }}>
                                 <Database size={24} color="#3b82f6" /> The Digital Advantage
                             </h3>
 
@@ -861,7 +944,12 @@ const StrategicRoadmap = () => {
 
                         {/* Strategic Health Target Chart */}
                         <DarkCard style={{ backgroundColor: 'rgba(30,30,30,0.6)', backdropFilter: 'blur(10px)' }}>
-                            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <h3 style={{
+                                fontSize: '18px', fontWeight: '900', color: 'white', marginBottom: '8px',
+                                display: 'flex', alignItems: 'center', gap: '12px',
+                                textTransform: 'uppercase', letterSpacing: '1px',
+                                textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                            }}>
                                 <Shield size={24} color="#f59e0b" /> Strategic Health Target
                             </h3>
                             <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '24px' }}>Projected reduction of total accidents (58 → 48)</p>

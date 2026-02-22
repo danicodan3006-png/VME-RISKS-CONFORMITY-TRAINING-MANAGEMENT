@@ -178,7 +178,13 @@ const RedListLeaderboard = () => {
     const { dataset } = useSafeEquip();
     const mapRef = useRef<HTMLDivElement>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [radarSize, setRadarSize] = useState({ w: 0, h: 0 });
     const [snappedDept, setSnappedDept] = useState<any>(null);
+
+    // Tooltip dimensions for smart positioning
+    const TOOLTIP_W = 240;
+    const TOOLTIP_H = 160;
+    const TOOLTIP_GAP = 15;
 
     // Merge static department positions with dynamic data
     const departments = STATIC_DEPARTMENTS.map(dept => {
@@ -196,6 +202,9 @@ const RedListLeaderboard = () => {
         const rect = mapRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
+
+        // Track radar panel size for smart tooltip positioning
+        setRadarSize({ w: rect.width, h: rect.height });
 
         // Calculate magnetic snap
         let snapTarget = null;
@@ -330,44 +339,58 @@ const RedListLeaderboard = () => {
                         ))}
                     </div>
 
-                    {/* Magnetic Tooltip */}
-                    {snappedDept && (
-                        <div
-                            style={{
-                                left: mousePos.x + 24,
-                                top: mousePos.y + 24,
-                            }}
-                            className="glass-tooltip"
-                        >
-                            <div style={{ borderLeft: `4px solid ${getStatusColor(snappedDept.risk)}`, paddingLeft: '12px' }}>
-                                <h3 style={{ fontSize: '15px', fontWeight: '900', color: 'white', marginBottom: '8px', letterSpacing: '0.5px' }}>
-                                    {snappedDept.name.toUpperCase()}
-                                </h3>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>INCIDENT LEVEL:</span>
-                                    <span style={{ fontSize: '16px', fontWeight: '900', color: getStatusColor(snappedDept.risk) }}>{snappedDept.risk}</span>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>RISK STATUS:</span>
-                                    <span style={{
-                                        fontSize: '10px',
-                                        fontWeight: '900',
-                                        color: 'white',
-                                        backgroundColor: getStatusColor(snappedDept.risk),
-                                        padding: '2px 8px',
-                                        borderRadius: '4px'
-                                    }}>
-                                        {getStatusText(snappedDept.risk)}
-                                    </span>
-                                </div>
-                                {snappedDept.timestamp && (
-                                    <div style={{ fontSize: '9px', color: '#475569', borderTop: '1px solid #333', paddingTop: '8px', marginTop: '4px' }}>
-                                        LAST UPDATE: {new Date(snappedDept.timestamp).toLocaleTimeString()}
+                    {/* Magnetic Tooltip — Smart Positioning */}
+                    {snappedDept && (() => {
+                        // Right-half → open LEFT; Bottom-half → open UPWARD
+                        const isRightHalf = mousePos.x > radarSize.w / 2;
+                        const isBottomHalf = mousePos.y > radarSize.h / 2;
+
+                        const tooltipLeft = isRightHalf
+                            ? mousePos.x - TOOLTIP_W - TOOLTIP_GAP
+                            : mousePos.x + TOOLTIP_GAP;
+                        const tooltipTop = isBottomHalf
+                            ? mousePos.y - TOOLTIP_H - TOOLTIP_GAP
+                            : mousePos.y + TOOLTIP_GAP;
+
+                        return (
+                            <div
+                                style={{
+                                    left: Math.max(8, tooltipLeft),
+                                    top: Math.max(8, tooltipTop),
+                                    width: TOOLTIP_W,
+                                }}
+                                className="glass-tooltip"
+                            >
+                                <div style={{ borderLeft: `4px solid ${getStatusColor(snappedDept.risk)}`, paddingLeft: '12px' }}>
+                                    <h3 style={{ fontSize: '15px', fontWeight: '900', color: 'white', marginBottom: '8px', letterSpacing: '0.5px', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}>
+                                        {snappedDept.name.toUpperCase()}
+                                    </h3>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>INCIDENT LEVEL:</span>
+                                        <span style={{ fontSize: '16px', fontWeight: '900', color: getStatusColor(snappedDept.risk) }}>{snappedDept.risk}</span>
                                     </div>
-                                )}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>RISK STATUS:</span>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            fontWeight: '900',
+                                            color: 'white',
+                                            backgroundColor: getStatusColor(snappedDept.risk),
+                                            padding: '2px 8px',
+                                            borderRadius: '4px'
+                                        }}>
+                                            {getStatusText(snappedDept.risk)}
+                                        </span>
+                                    </div>
+                                    {snappedDept.timestamp && (
+                                        <div style={{ fontSize: '9px', color: '#475569', borderTop: '1px solid #333', paddingTop: '8px', marginTop: '4px' }}>
+                                            LAST UPDATE: {new Date(snappedDept.timestamp).toLocaleTimeString()}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* Proactive Legend */}
                     <div style={{ position: 'absolute', bottom: '32px', left: '32px', display: 'flex', gap: '20px', backgroundColor: 'rgba(10, 10, 10, 0.9)', padding: '16px', borderRadius: '12px', border: '1px solid #333' }}>
