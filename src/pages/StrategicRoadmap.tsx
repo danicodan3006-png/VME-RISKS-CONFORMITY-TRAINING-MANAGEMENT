@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     Rocket,
     CheckCircle,
@@ -128,133 +129,6 @@ const commandments = [
         actions: ['Install smart monitoring in high-risk zones', 'Publish real-time compliance dashboards', 'Reward proactive hazard reporting'], impact: 87
     },
 ];
-
-// --- Components ---
-
-const DarkCard = ({ children, className = '', style = {} }: { children: React.ReactNode, className?: string, style?: React.CSSProperties }) => (
-    <div style={{
-        background: 'linear-gradient(145deg, rgba(30,30,30,0.7), rgba(18,18,18,0.85))',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '14px',
-        padding: '24px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)',
-        ...style
-    }} className={className}>
-        {children}
-    </div>
-);
-
-const TimelineItem = ({ data, index }: { data: any, index: number }) => {
-    const isCurrent = data.status === 'IN PROGRESS';
-    const [showMilestones, setShowMilestones] = useState(false);
-    return (
-        <div style={{ display: 'flex', gap: '24px', position: 'relative' }}>
-            {/* Glowing Gradient Connector Line */}
-            {index < timelineData.length - 1 && (
-                <div style={{
-                    position: 'absolute',
-                    left: '24px',
-                    top: '48px',
-                    bottom: '-24px',
-                    width: '2px',
-                    background: `linear-gradient(180deg, ${data.color}, ${timelineData[Math.min(index + 1, timelineData.length - 1)].color})`,
-                    boxShadow: `0 0 8px ${data.color}50`,
-                    zIndex: 0
-                }} />
-            )}
-
-            {/* Pulsing Data-Point Icon */}
-            <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                backgroundColor: `${data.color}20`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: `2px solid ${data.color}`,
-                zIndex: 1,
-                flexShrink: 0,
-                boxShadow: `0 0 12px ${data.color}40, 0 0 24px ${data.color}15`,
-                animation: 'milestonePulse 2.5s ease-in-out infinite',
-                position: 'relative'
-            }}>
-                <data.icon size={24} color={data.color} />
-            </div>
-
-            {/* Content — Glassmorphism card with hover milestones */}
-            <div style={{
-                flex: 1, paddingBottom: '32px'
-            }}>
-                <div
-                    onMouseEnter={() => setShowMilestones(true)}
-                    onMouseLeave={() => setShowMilestones(false)}
-                    style={{
-                        background: isCurrent
-                            ? 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(249,115,22,0.02))'
-                            : 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
-                        backdropFilter: 'blur(8px)',
-                        border: `1px solid ${isCurrent ? 'rgba(249,115,22,0.25)' : 'rgba(255,255,255,0.06)'}`,
-                        borderRadius: '12px',
-                        padding: '16px 18px',
-                        boxShadow: isCurrent ? '0 0 20px rgba(249,115,22,0.08)' : 'none',
-                        cursor: 'default',
-                        transition: 'all 0.3s ease'
-                    }}
-                >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <h3 style={{
-                            fontSize: '16px', fontWeight: '900', color: 'white',
-                            textTransform: 'uppercase', letterSpacing: '1px',
-                            textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-                        }}>{data.quarter} — {data.title}</h3>
-                        <span style={{
-                            padding: '3px 10px',
-                            borderRadius: '20px',
-                            backgroundColor: `${data.color}20`,
-                            color: data.color,
-                            fontSize: '9px',
-                            fontWeight: '900',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            border: isCurrent ? `1px solid ${data.color}40` : 'none',
-                            boxShadow: isCurrent ? `0 0 10px ${data.color}30` : 'none'
-                        }}>
-                            {data.status}
-                        </span>
-                    </div>
-                    <p style={{ color: '#94a3b8', fontSize: '12px', lineHeight: '1.5', margin: 0 }}>{data.desc}</p>
-
-                    {/* Hidden Milestones — Revealed on hover */}
-                    {showMilestones && data.milestones && (
-                        <div style={{
-                            marginTop: '10px',
-                            paddingTop: '10px',
-                            borderTop: `1px solid ${data.color}25`,
-                            animation: 'milestoneReveal 0.3s ease-out forwards'
-                        }}>
-                            <span style={{
-                                fontSize: '7px', fontWeight: '800', color: data.color,
-                                letterSpacing: '2px', textTransform: 'uppercase',
-                                marginBottom: '6px', display: 'block'
-                            }}>UPCOMING MILESTONES</span>
-                            {data.milestones.map((m: string, mi: number) => (
-                                <div key={mi} style={{
-                                    display: 'flex', gap: '6px', alignItems: 'flex-start',
-                                    marginBottom: '3px'
-                                }}>
-                                    <span style={{ color: data.color, fontSize: '7px', marginTop: '3px', flexShrink: 0 }}>▸</span>
-                                    <span style={{ fontSize: '10px', color: '#cbd5e1', lineHeight: 1.4 }}>{m}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
 
 // --- Cinematic Data ---
 const mindsetPillars = [
@@ -815,446 +689,465 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
 
 const StrategicRoadmap = () => {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [hoveredCmd, setHoveredCmd] = useState<{ item: typeof commandments[0]; rect: DOMRect } | null>(null);
 
     return (
         <div style={{
-            backgroundColor: '#121212',
-            minHeight: '100%',
+            backgroundColor: '#0a0a0f',
+            height: '100vh',
+            overflow: 'hidden',
             color: 'white',
-            padding: '40px',
             fontFamily: '"Inter", sans-serif',
             position: 'relative',
-            overflowX: 'hidden'
+            display: 'flex',
+            flexDirection: 'column',
         }}>
-            {/* Background Grid Accent */}
+            {/* Background Grid */}
             <div style={{
-                position: 'absolute',
-                inset: 0,
+                position: 'absolute', inset: 0,
                 backgroundImage: 'radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0)',
-                backgroundSize: '32px 32px',
-                opacity: 0.5,
-                zIndex: 0,
-                pointerEvents: 'none'
-            }} />
-
-            {/* 3D Perspective Grid Floor */}
-            <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '30vh',
-                background: 'linear-gradient(180deg, transparent 0%, rgba(0,242,255,0.015) 100%)',
-                backgroundImage: `
-                    linear-gradient(rgba(0,242,255,0.04) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,242,255,0.04) 1px, transparent 1px)
-                `,
-                backgroundSize: '60px 60px',
-                transform: 'perspective(500px) rotateX(55deg)',
-                transformOrigin: 'bottom center',
-                zIndex: 0,
-                pointerEvents: 'none',
-                maskImage: 'linear-gradient(180deg, transparent 0%, black 40%)',
-                WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, black 40%)'
+                backgroundSize: '32px 32px', opacity: 0.4, zIndex: 0, pointerEvents: 'none'
             }} />
 
             {/* Animations */}
             <style>{`
                 @keyframes ctaGlowPulse {
                     0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.2), 0 0 20px rgba(255,215,0,0.08); }
-                    50% { box-shadow: 0 0 16px rgba(255,215,0,0.4), 0 0 40px rgba(255,215,0,0.15), 0 0 60px rgba(255,215,0,0.06); }
+                    50% { box-shadow: 0 0 16px rgba(255,215,0,0.4), 0 0 40px rgba(255,215,0,0.15); }
                 }
-                @keyframes milestonePulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.06); }
-                }
-                @keyframes milestoneReveal {
-                    0% { opacity: 0; transform: translateY(-6px); }
-                    100% { opacity: 1; transform: translateY(0); }
-                }
+                @keyframes milestonePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+                @keyframes milestoneReveal { 0% { opacity: 0; transform: translateY(-6px); } 100% { opacity: 1; transform: translateY(0); } }
                 @keyframes riskPulseRed {
                     0%, 100% { box-shadow: 0 0 6px rgba(239,68,68,0.3); }
                     50% { box-shadow: 0 0 18px rgba(239,68,68,0.6), 0 0 35px rgba(239,68,68,0.15); }
                 }
-                @keyframes dataStreamFall {
-                    0% { transform: translateY(-100%); opacity: 0; }
-                    10% { opacity: 0.6; }
-                    90% { opacity: 0.6; }
-                    100% { transform: translateY(200px); opacity: 0; }
-                }
-                .cta-vision-btn {
-                    animation: ctaGlowPulse 3s ease-in-out infinite;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                }
-                .cta-vision-btn:hover {
-                    transform: scale(1.03) !important;
-                    filter: brightness(1.25) !important;
-                    box-shadow: 0 0 24px rgba(255,215,0,0.5), 0 0 50px rgba(255,215,0,0.2) !important;
-                }
+                @keyframes dataStreamFall { 0% { transform: translateY(-100%); opacity: 0; } 10% { opacity: 0.6; } 90% { opacity: 0.6; } 100% { transform: translateY(200px); opacity: 0; } }
+                .cta-vision-btn { animation: ctaGlowPulse 3s ease-in-out infinite; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+                .cta-vision-btn:hover { transform: scale(1.03) !important; filter: brightness(1.25) !important; }
+                .bento-cell { transition: all 0.3s ease; }
+                .bento-cell:hover { border-color: rgba(6, 182, 212, 0.25) !important; }
+                @keyframes mindsetExpand { 0% { opacity: 0; transform: scale(0.96); } 100% { opacity: 1; transform: scale(1); } }
+                @keyframes cardReveal { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
+                @keyframes amberPulse { 0%, 100% { box-shadow: 0 0 12px rgba(245,158,11,0.15); } 50% { box-shadow: 0 0 24px rgba(245,158,11,0.35), 0 0 48px rgba(245,158,11,0.1); } }
+                .mindset-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+                .mindset-card:hover { border-color: rgba(245,158,11,0.4) !important; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.15) !important; }
             `}</style>
 
             <SlideOverPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
 
-            <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-
-                {/* ══════ VISION STATEMENT ══════ */}
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '16px',
-                    padding: '10px 24px',
-                    background: 'linear-gradient(90deg, transparent, rgba(0,242,255,0.04), transparent)',
-                    borderTop: '1px solid rgba(0,242,255,0.08)',
-                    borderBottom: '1px solid rgba(0,242,255,0.08)'
-                }}>
-                    <p style={{
-                        fontSize: '11px',
-                        fontWeight: '700',
-                        color: '#94a3b8',
-                        fontStyle: 'italic',
-                        letterSpacing: '0.5px',
-                        lineHeight: 1.6,
-                        maxWidth: '700px',
-                        margin: '0 auto'
-                    }}>
-                        "VME 2026 isn't just a report; it's the <span style={{ color: '#00F2FF', fontWeight: '900', fontStyle: 'normal' }}>operational heartbeat</span> of MMG Kinsevere. <span style={{ color: '#ffd700', fontWeight: '900', fontStyle: 'normal' }}>Excellence is non-negotiable.</span>"
-                    </p>
-                </div>
-
-                {/* Header */}
-                <div style={{ marginBottom: '32px', textAlign: 'center', position: 'relative' }}>
-                    <h1 style={{ fontSize: '40px', fontWeight: '900', color: 'white', letterSpacing: '-2px', marginBottom: '10px', textShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+            {/* ══════ COMPACT HEADER BAR ══════ */}
+            <div style={{
+                padding: '12px 24px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                background: 'linear-gradient(90deg, rgba(0,242,255,0.02), transparent, rgba(255,215,0,0.02))',
+                position: 'relative', zIndex: 2, flexShrink: 0,
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <h1 style={{ fontSize: '18px', fontWeight: '900', color: 'white', letterSpacing: '-0.5px', margin: 0 }}>
                         2026 STRATEGIC <span style={{ color: '#4ade80' }}>ROADMAP</span>
                     </h1>
-                    <p style={{ color: '#cbd5e1', fontSize: '15px', maxWidth: '700px', margin: '0 auto 20px' }}>
-                        Transforming VME's safety culture through digitalization, automation, and competency-based leadership.
+                    <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)' }} />
+                    <p style={{ fontSize: '10px', color: '#64748b', fontWeight: '600', letterSpacing: '1px', margin: 0 }}>
+                        VME · MISSION CONTROL
                     </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <p style={{ fontSize: '9px', color: '#94a3b8', fontStyle: 'italic', margin: 0, maxWidth: '400px', textAlign: 'right' }}>
+                        "The <span style={{ color: '#00F2FF', fontWeight: '800', fontStyle: 'normal' }}>operational heartbeat</span> of MMG Kinsevere. <span style={{ color: '#ffd700', fontWeight: '800', fontStyle: 'normal' }}>Excellence is non-negotiable.</span>"
+                    </p>
+                    <button onClick={() => setIsPanelOpen(true)} className="cta-vision-btn" style={{
+                        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 20px',
+                        background: 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,255,255,0.04))',
+                        border: '1px solid rgba(255,215,0,0.3)', borderRadius: '50px',
+                        color: 'white', cursor: 'pointer', flexShrink: 0
+                    }}>
+                        <Lightbulb size={14} color="#ffd700" />
+                        <span style={{ fontWeight: '800', fontSize: '10px', letterSpacing: '0.5px' }}>STRATEGIC VISION</span>
+                    </button>
+                </div>
+            </div>
 
-                    {/* CTA with Data Stream + Subtitle */}
-                    <div style={{ position: 'relative', display: 'inline-block' }}>
-                        {/* Data Stream Lines — falling toward CTA */}
-                        <div style={{
-                            position: 'absolute',
-                            top: '-60px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '120px',
-                            height: '60px',
-                            overflow: 'hidden',
-                            pointerEvents: 'none',
-                            zIndex: 0
-                        }}>
-                            {[...Array(6)].map((_, i) => (
-                                <div key={i} style={{
-                                    position: 'absolute',
-                                    width: '1px',
-                                    height: `${12 + Math.random() * 20}px`,
-                                    left: `${10 + Math.random() * 80}%`,
-                                    top: '-30px',
-                                    background: `linear-gradient(180deg, transparent, rgba(255,215,0,${0.15 + Math.random() * 0.2}), transparent)`,
-                                    animation: `dataStreamFall ${2 + Math.random() * 3}s linear ${Math.random() * 3}s infinite`
-                                }} />
-                            ))}
-                        </div>
+            {/* ══════ BENTO GRID ══════ */}
+            <div style={{
+                flex: 1, padding: '12px', position: 'relative', zIndex: 1,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateRows: 'auto 1fr 1fr auto',
+                gap: '10px',
+                minHeight: 0,
+            }}>
 
-                        <button
-                            onClick={() => setIsPanelOpen(true)}
-                            className="cta-vision-btn"
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '14px 36px 12px',
-                                background: 'linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,255,255,0.06))',
-                                border: '1px solid rgba(255,215,0,0.3)',
-                                borderRadius: '50px',
-                                color: 'white',
-                                backdropFilter: 'blur(12px)',
-                                cursor: 'pointer',
-                                position: 'relative',
-                                zIndex: 2
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <Lightbulb size={18} color="#ffd700" />
-                                <span style={{ fontWeight: '800', fontSize: '13px', letterSpacing: '0.5px' }}>Strategic Vision: Impacting the Mindset</span>
+                {/* ── CELL 1: Q1-Q2 Timeline (col 1-2, row 1-2) ── */}
+                <div className="bento-cell" style={{
+                    gridColumn: '1 / 3', gridRow: '1 / 3',
+                    background: 'linear-gradient(145deg, rgba(30,30,30,0.6), rgba(18,18,18,0.8))',
+                    border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px',
+                    padding: '16px', overflow: 'auto',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                }}>
+                    <h2 style={{
+                        fontSize: '11px', fontWeight: '900', color: '#4ade80', marginBottom: '12px',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        letterSpacing: '2px', textTransform: 'uppercase',
+                    }}>
+                        <Calendar size={16} color="#4ade80" /> THE 2026 PATH
+                    </h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                        {timelineData.map((item, index) => (
+                            <div key={index} style={{
+                                background: item.status === 'IN PROGRESS'
+                                    ? 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(249,115,22,0.02))'
+                                    : 'rgba(255,255,255,0.02)',
+                                border: `1px solid ${item.status === 'IN PROGRESS' ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.05)'}`,
+                                borderRadius: '12px', padding: '14px',
+                                display: 'flex', flexDirection: 'column', gap: '6px',
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{
+                                            width: '32px', height: '32px', borderRadius: '50%',
+                                            backgroundColor: `${item.color}18`, display: 'flex',
+                                            alignItems: 'center', justifyContent: 'center',
+                                            border: `2px solid ${item.color}`,
+                                            boxShadow: `0 0 10px ${item.color}30`,
+                                        }}>
+                                            <item.icon size={16} color={item.color} />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '13px', fontWeight: '900', color: 'white', letterSpacing: '0.5px' }}>
+                                                {item.quarter}
+                                            </div>
+                                            <div style={{ fontSize: '9px', fontWeight: '700', color: item.color, letterSpacing: '1px', textTransform: 'uppercase' }}>
+                                                {item.title}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span style={{
+                                        padding: '2px 8px', borderRadius: '20px',
+                                        backgroundColor: `${item.color}18`, color: item.color,
+                                        fontSize: '7px', fontWeight: '900', letterSpacing: '1px',
+                                    }}>{item.status}</span>
+                                </div>
+                                <p style={{ color: '#94a3b8', fontSize: '10px', lineHeight: 1.5, margin: 0 }}>{item.desc}</p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '2px' }}>
+                                    {item.milestones.map((m, mi) => (
+                                        <div key={mi} style={{ display: 'flex', gap: '5px', alignItems: 'flex-start' }}>
+                                            <span style={{ color: item.color, fontSize: '7px', marginTop: '3px' }}>▸</span>
+                                            <span style={{ fontSize: '9px', color: '#cbd5e1', lineHeight: 1.4 }}>{m}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <span style={{
-                                fontSize: '8px',
-                                fontWeight: '600',
-                                color: '#94a3b8',
-                                letterSpacing: '1px'
-                            }}>Discover the 10 Strategies that will redefine our Safety Culture.</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* ── CELL 2: Digital Advantage (col 3, row 1) ── */}
+                <div className="bento-cell" style={{
+                    gridColumn: '3 / 4', gridRow: '1 / 2',
+                    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                    border: '1px solid rgba(59,130,246,0.15)', borderRadius: '16px',
+                    padding: '16px', overflow: 'hidden', position: 'relative',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                }}>
+                    <div style={{ position: 'absolute', top: -30, right: -30, width: 80, height: 80, backgroundColor: '#3b82f6', opacity: 0.08, borderRadius: '50%' }} />
+                    <h3 style={{
+                        fontSize: '11px', fontWeight: '900', color: '#3b82f6', marginBottom: '12px',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        letterSpacing: '2px', textTransform: 'uppercase',
+                    }}>
+                        <Database size={14} color="#3b82f6" /> DIGITAL ADVANTAGE
+                    </h3>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'stretch' }}>
+                        <div style={{ flex: 1, opacity: 0.6 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px', color: '#ef4444', fontSize: '10px', fontWeight: '700' }}>
+                                <FileSpreadsheet size={12} /> Legacy Excel
+                            </div>
+                            <ul style={{ listStyle: 'none', padding: 0, fontSize: '10px', color: '#94a3b8', lineHeight: '1.7', margin: 0 }}>
+                                <li>❌ Manual vLookups</li>
+                                <li>❌ Fragmented Data</li>
+                                <li>❌ Delayed Reporting</li>
+                            </ul>
+                        </div>
+                        <div style={{ width: '1px', background: 'rgba(255,255,255,0.06)' }} />
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px', color: '#22c55e', fontWeight: '700', fontSize: '10px' }}>
+                                <Rocket size={12} /> VME Platform
+                            </div>
+                            <ul style={{ listStyle: 'none', padding: 0, fontSize: '10px', color: 'white', lineHeight: '1.7', margin: 0 }}>
+                                <li>✅ Real-time Alerts</li>
+                                <li>✅ Single Source</li>
+                                <li>✅ Auto Integrity</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── CELL 3: Risk Exposure (col 4, row 1-3) ── */}
+                <div className="bento-cell" style={{
+                    gridColumn: '4 / 5', gridRow: '1 / 4',
+                    background: 'linear-gradient(145deg, rgba(30,30,30,0.7), rgba(15,15,15,0.9))',
+                    border: '1px solid rgba(239,68,68,0.1)', borderRadius: '16px',
+                    padding: '16px', overflow: 'auto',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                }}>
+                    <h2 style={{
+                        fontSize: '11px', fontWeight: '900', color: '#f97316', marginBottom: '14px',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        letterSpacing: '2px', textTransform: 'uppercase',
+                    }}>
+                        <AlertTriangle size={16} color="#f97316" /> RISK EXPOSURE
+                    </h2>
+                    <div style={{ fontSize: '8px', fontWeight: '800', color: '#475569', letterSpacing: '2px', marginBottom: '10px' }}>
+                        TOP 3 — HIGHEST SAFETY GAP
+                    </div>
+                    {riskExposure.map((dept, i) => (
+                        <div key={i} style={{
+                            display: 'flex', alignItems: 'center', gap: '10px', padding: '10px',
+                            marginBottom: '8px',
+                            background: i === 0 ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))' : 'rgba(255,255,255,0.02)',
+                            border: `1px solid ${i === 0 ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.04)'}`,
+                            borderRadius: '10px',
+                            animation: i === 0 ? 'riskPulseRed 2.5s ease-in-out infinite' : 'none',
+                        }}>
+                            <div style={{
+                                width: '26px', height: '26px', borderRadius: '50%',
+                                background: i === 0 ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.04)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                border: `1px solid ${i === 0 ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.08)'}`, flexShrink: 0,
+                            }}>
+                                <span style={{ fontSize: '10px', fontWeight: '900', color: i === 0 ? '#ef4444' : '#64748b' }}>#{i + 1}</span>
+                            </div>
+                            <dept.icon size={14} color={i === 0 ? '#ef4444' : '#f97316'} strokeWidth={2.5} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: '10px', fontWeight: '800', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dept.dept}</div>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '3px' }}>
+                                    <span style={{ fontSize: '8px', color: '#64748b', fontWeight: '700' }}>GAP: <span style={{ color: i === 0 ? '#ef4444' : '#f97316', fontWeight: '900', fontSize: '10px' }}>{dept.gap}%</span></span>
+                                    <span style={{ fontSize: '8px', color: '#64748b', fontWeight: '700' }}>INC: <span style={{ color: '#00F2FF', fontWeight: '900', fontSize: '10px' }}>{dept.incidents}</span></span>
+                                </div>
+                            </div>
+                            <div style={{ width: '40px', flexShrink: 0 }}>
+                                <div style={{ width: '100%', height: '3px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${dept.gap}%`, height: '100%', background: i === 0 ? 'linear-gradient(90deg, #ef4444, #dc2626)' : 'linear-gradient(90deg, #f97316, #ea580c)', borderRadius: '2px' }} />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    {/* Intervention Alert */}
+                    <div style={{
+                        marginTop: '10px', padding: '8px 10px',
+                        background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)',
+                        borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px',
+                    }}>
+                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 0 8px rgba(239,68,68,0.6)', animation: 'riskPulseRed 2s infinite' }} />
+                        <span style={{ fontSize: '7px', fontWeight: '800', color: '#ef4444', letterSpacing: '1px' }}>IMMEDIATE MANAGEMENT INTERVENTION REQUIRED</span>
+                    </div>
+                    {/* Departments Under Observation */}
+                    <div style={{ marginTop: '14px' }}>
+                        <div style={{ fontSize: '8px', fontWeight: '800', color: '#475569', letterSpacing: '2px', marginBottom: '8px' }}>DEPARTMENTS UNDER OBSERVATION</div>
+                        {['Logistics & Transport', 'Maintenance Workshop'].map((d, di) => (
+                            <div key={di} style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                marginBottom: '5px', padding: '6px 10px',
+                                background: 'rgba(249,115,22,0.04)', border: '1px solid rgba(249,115,22,0.1)', borderRadius: '6px',
+                            }}>
+                                <AlertTriangle size={11} color="#f97316" />
+                                <span style={{ fontSize: '9px', fontWeight: '700', color: '#cbd5e1' }}>{d}</span>
+                                <span style={{ marginLeft: 'auto', fontSize: '7px', fontWeight: '800', color: '#f97316', letterSpacing: '1px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(249,115,22,0.1)' }}>WATCH</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* ── CELL 4: Strategic Health Target (col 2-3, row 2-3) — PROMINENT ── */}
+                <div className="bento-cell" style={{
+                    gridColumn: '3 / 4', gridRow: '2 / 4',
+                    background: 'linear-gradient(145deg, rgba(30,30,30,0.6), rgba(18,18,18,0.8))',
+                    border: '1px solid rgba(245,158,11,0.12)', borderRadius: '16px',
+                    padding: '16px', display: 'flex', flexDirection: 'column',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                }}>
+                    <h3 style={{
+                        fontSize: '11px', fontWeight: '900', color: '#f59e0b', marginBottom: '4px',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        letterSpacing: '2px', textTransform: 'uppercase',
+                    }}>
+                        <Shield size={14} color="#f59e0b" /> STRATEGIC HEALTH TARGET
+                    </h3>
+                    <p style={{ color: '#94a3b8', fontSize: '10px', marginBottom: '10px', margin: '0 0 10px 0' }}>
+                        Total accidents: <span style={{ color: '#ef4444', fontWeight: '900' }}>58</span> → <span style={{ color: '#22c55e', fontWeight: '900' }}>48</span>
+                    </p>
+                    <div style={{ flex: 1, minHeight: '120px' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={healthData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorAccidents" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
+                                <XAxis dataKey="month" stroke="#64748b" fontSize={9} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#64748b" fontSize={9} tickLine={false} axisLine={false} domain={[40, 65]} />
+                                <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: 'white', fontSize: '11px' }} labelStyle={{ color: '#94a3b8' }} />
+                                <ReferenceLine y={48} stroke="#22c55e" strokeDasharray="3 3" label={{ position: 'right', value: 'TARGET', fill: '#22c55e', fontSize: 8 }} />
+                                <Area type="monotone" dataKey="accidents" stroke="#f59e0b" fillOpacity={1} fill="url(#colorAccidents)" strokeWidth={2} />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* ── CELL 5: IMPACTING THE MINDSET (col 1-2, row 3) ── */}
+                <div className="bento-cell" style={{
+                    gridColumn: '1 / 3', gridRow: '3 / 4',
+                    background: 'linear-gradient(145deg, rgba(30,25,15,0.7), rgba(18,18,18,0.85))',
+                    border: '1px solid rgba(245,158,11,0.15)', borderRadius: '16px',
+                    padding: '14px 16px', overflow: 'visible',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                    animation: 'mindsetExpand 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards, amberPulse 4s ease-in-out 1s infinite',
+                    position: 'relative',
+                }}>
+                    {/* Amber glow accent */}
+                    <div style={{ position: 'absolute', top: -1, left: '10%', right: '10%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.4), transparent)' }} />
+
+                    {/* Header row */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'linear-gradient(145deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))', border: '1px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(245,158,11,0.1)' }}>
+                                <Lightbulb size={16} color="#f59e0b" />
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: '12px', fontWeight: '900', color: '#f59e0b', letterSpacing: '2px', margin: 0, textTransform: 'uppercase' }}>
+                                    IMPACTING THE MINDSET
+                                </h3>
+                                <p style={{ fontSize: '8px', color: '#64748b', fontWeight: '600', letterSpacing: '1px', margin: 0 }}>10 STRATEGIC COMMANDMENTS</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setIsPanelOpen(true)} style={{
+                            display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 12px',
+                            background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
+                            borderRadius: '20px', color: '#f59e0b', cursor: 'pointer', fontSize: '8px',
+                            fontWeight: '800', letterSpacing: '0.5px', transition: 'all 0.2s',
+                        }}>
+                            <Eye size={10} /> DEEP DIVE
                         </button>
                     </div>
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
-
-                    {/* ══════ LEFT: Timeline ══════ */}
-                    <div>
-                        <h2 style={{
-                            fontSize: '16px', fontWeight: '900', color: 'white', marginBottom: '16px',
-                            display: 'flex', alignItems: 'center', gap: '10px',
-                            textTransform: 'uppercase', letterSpacing: '1px',
-                            textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-                        }}>
-                            <Calendar size={20} color="#4ade80" /> The 2026 Path
-                        </h2>
-                        <DarkCard style={{ backgroundColor: 'rgba(30,30,30,0.6)', backdropFilter: 'blur(10px)', padding: '18px' }}>
-                            {timelineData.map((item, index) => (
-                                <TimelineItem key={index} data={item} index={index} />
-                            ))}
-                        </DarkCard>
-                    </div>
-
-                    {/* ══════ CENTER: Comparison & Charts ══════ */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-                        {/* Software vs Excel Card */}
-                        <DarkCard style={{
-                            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                            border: '1px solid #334155',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            padding: '18px'
-                        }}>
-                            <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, backgroundColor: '#3b82f6', opacity: 0.1, borderRadius: '50%' }} />
-
-                            <h3 style={{
-                                fontSize: '14px', fontWeight: '900', color: 'white', marginBottom: '16px',
-                                display: 'flex', alignItems: 'center', gap: '10px',
-                                textTransform: 'uppercase', letterSpacing: '1px',
-                                textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-                            }}>
-                                <Database size={18} color="#3b82f6" /> The Digital Advantage
-                            </h3>
-
-                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                <div style={{ flex: 1, opacity: 0.6 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: '#ef4444', fontSize: '11px', fontWeight: '700' }}>
-                                        <FileSpreadsheet size={13} /> Legacy Excel
-                                    </div>
-                                    <ul style={{ listStyle: 'none', padding: 0, fontSize: '11px', color: '#94a3b8', lineHeight: '1.6' }}>
-                                        <li>❌ Manual vLookups</li>
-                                        <li>❌ Fragmented Data</li>
-                                        <li>❌ Delayed Reporting</li>
-                                    </ul>
-                                </div>
-                                <div style={{ width: '1px', height: '50px', backgroundColor: '#334155' }} />
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: '#22c55e', fontWeight: '700', fontSize: '11px' }}>
-                                        <Rocket size={13} /> VME Platform
-                                    </div>
-                                    <ul style={{ listStyle: 'none', padding: 0, fontSize: '11px', color: 'white', lineHeight: '1.6' }}>
-                                        <li>✅ Real-time Alerts</li>
-                                        <li>✅ Single Source of Truth</li>
-                                        <li>✅ Automated Integrity</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </DarkCard>
-
-                        {/* Strategic Health Target Chart */}
-                        <DarkCard style={{ backgroundColor: 'rgba(30,30,30,0.6)', backdropFilter: 'blur(10px)', padding: '18px' }}>
-                            <h3 style={{
-                                fontSize: '14px', fontWeight: '900', color: 'white', marginBottom: '6px',
-                                display: 'flex', alignItems: 'center', gap: '10px',
-                                textTransform: 'uppercase', letterSpacing: '1px',
-                                textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-                            }}>
-                                <Shield size={18} color="#f59e0b" /> Strategic Health Target
-                            </h3>
-                            <p style={{ color: '#94a3b8', fontSize: '11px', marginBottom: '16px' }}>Projected reduction of total accidents (<span style={{ color: '#ef4444', fontWeight: '900' }}>58</span> → <span style={{ color: '#22c55e', fontWeight: '900' }}>48</span>)</p>
-
-                            <div style={{ height: '200px' }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={healthData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorAccidents" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
-                                                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                                        <XAxis dataKey="month" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
-                                        <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} domain={[40, 65]} />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#1E1E1E', border: '1px solid #333', color: 'white' }}
-                                            labelStyle={{ color: '#94a3b8' }}
-                                        />
-                                        <ReferenceLine y={48} stroke="#22c55e" strokeDasharray="3 3" label={{ position: 'right', value: 'TARGET (48)', fill: '#22c55e', fontSize: 9 }} />
-                                        <Area type="monotone" dataKey="accidents" stroke="#f59e0b" fillOpacity={1} fill="url(#colorAccidents)" strokeWidth={2} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </DarkCard>
-                    </div>
-
-                    {/* ══════ RIGHT: Departmental Risk Exposure ══════ */}
-                    <div>
-                        <h2 style={{
-                            fontSize: '16px', fontWeight: '900', color: 'white', marginBottom: '16px',
-                            display: 'flex', alignItems: 'center', gap: '10px',
-                            textTransform: 'uppercase', letterSpacing: '1px',
-                            textShadow: '0 1px 4px rgba(0,0,0,0.6)'
-                        }}>
-                            <AlertTriangle size={20} color="#f97316" /> Risk Exposure
-                        </h2>
-
-                        <DarkCard style={{
-                            background: 'linear-gradient(135deg, rgba(30,30,30,0.7), rgba(15,15,15,0.9))',
-                            border: '1px solid rgba(239,68,68,0.1)',
-                            padding: '18px'
-                        }}>
-                            <div style={{
-                                fontSize: '8px', fontWeight: '800', color: '#475569',
-                                letterSpacing: '2px', marginBottom: '12px', textTransform: 'uppercase'
-                            }}>
-                                TOP 3 — HIGHEST SAFETY GAP
-                            </div>
-
-                            {riskExposure.map((dept, i) => (
-                                <div key={i} style={{
-                                    display: 'flex', alignItems: 'center', gap: '12px',
-                                    padding: '12px',
-                                    marginBottom: '8px',
-                                    background: i === 0
-                                        ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'
-                                        : 'linear-gradient(135deg, rgba(255,255,255,0.02), transparent)',
-                                    border: `1px solid ${i === 0 ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.04)'}`,
+                    {/* 5×2 Strategy Mini-Cards Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+                        {commandments.map((item, index) => (
+                            <div
+                                key={index}
+                                className="mindset-card"
+                                onMouseEnter={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    setHoveredCmd({ item, rect });
+                                }}
+                                onMouseLeave={() => setHoveredCmd(null)}
+                                style={{
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                    gap: '4px', padding: '10px 6px 8px',
+                                    background: `linear-gradient(145deg, ${item.color}08, transparent)`,
                                     borderRadius: '10px',
-                                    animation: i === 0 ? 'riskPulseRed 2.5s ease-in-out infinite' : 'none',
-                                    position: 'relative'
+                                    border: `1px solid ${item.color}18`,
+                                    cursor: 'default', textAlign: 'center',
+                                    animation: `cardReveal 0.4s ease-out ${0.05 * index}s both`,
+                                }}
+                            >
+                                <div style={{
+                                    width: '28px', height: '28px', borderRadius: '8px',
+                                    background: `linear-gradient(145deg, ${item.color}18, ${item.color}08)`,
+                                    border: `1px solid ${item.color}25`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: `0 2px 8px ${item.color}10`,
                                 }}>
-                                    {/* Rank badge */}
-                                    <div style={{
-                                        width: '28px', height: '28px', borderRadius: '50%',
-                                        background: i === 0 ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.04)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        border: `1px solid ${i === 0 ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                                        flexShrink: 0
-                                    }}>
-                                        <span style={{
-                                            fontSize: '11px', fontWeight: '900',
-                                            color: i === 0 ? '#ef4444' : '#64748b'
-                                        }}>#{i + 1}</span>
-                                    </div>
+                                    <item.icon size={13} color={item.color} strokeWidth={2.2} />
+                                </div>
+                                <span style={{ fontSize: '8px', fontWeight: '700', color: '#e2e8f0', letterSpacing: '0.3px', lineHeight: 1.2 }}>{item.title}</span>
+                                <div style={{ width: '100%', height: '2px', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '1px', overflow: 'hidden', marginTop: '2px' }}>
+                                    <div style={{ width: `${item.impact}%`, height: '100%', borderRadius: '1px', background: `linear-gradient(90deg, ${item.color}, ${item.color}80)` }} />
+                                </div>
+                                <span style={{ fontSize: '7px', color: '#475569', fontWeight: '600' }}>{item.impact}%</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                                    {/* Icon */}
-                                    <dept.icon size={16} color={i === 0 ? '#ef4444' : '#f97316'} strokeWidth={2.5} />
-
-                                    {/* Info */}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{
-                                            fontSize: '11px', fontWeight: '800', color: 'white',
-                                            letterSpacing: '0.3px',
-                                            textShadow: '0 1px 3px rgba(0,0,0,0.6)',
-                                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                                        }}>
-                                            {dept.dept}
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-                                            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: '700' }}>
-                                                GAP: <span style={{
-                                                    color: i === 0 ? '#ef4444' : '#f97316',
-                                                    fontWeight: '900', fontSize: '11px',
-                                                    textShadow: `0 0 6px ${i === 0 ? 'rgba(239,68,68,0.4)' : 'rgba(249,115,22,0.3)'}`
-                                                }}>{dept.gap}%</span>
-                                            </span>
-                                            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: '700' }}>
-                                                INC: <span style={{
-                                                    color: '#00F2FF', fontWeight: '900', fontSize: '11px'
-                                                }}>{dept.incidents}</span>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Risk bar */}
-                                    <div style={{ width: '50px', flexShrink: 0 }}>
-                                        <div style={{
-                                            width: '100%', height: '4px',
-                                            backgroundColor: 'rgba(255,255,255,0.06)',
-                                            borderRadius: '2px', overflow: 'hidden'
-                                        }}>
-                                            <div style={{
-                                                width: `${dept.gap}%`,
-                                                height: '100%',
-                                                background: i === 0
-                                                    ? 'linear-gradient(90deg, #ef4444, #dc2626)'
-                                                    : 'linear-gradient(90deg, #f97316, #ea580c)',
-                                                borderRadius: '2px',
-                                                boxShadow: `0 0 6px ${i === 0 ? 'rgba(239,68,68,0.4)' : 'rgba(249,115,22,0.3)'}`
-                                            }} />
-                                        </div>
-                                    </div>
+                {/* ══ FIXED TOOLTIP PORTAL for Mindset Cards ══ */}
+                {hoveredCmd && createPortal(
+                    <div style={{
+                        position: 'fixed',
+                        top: Math.min(hoveredCmd.rect.top - 10, window.innerHeight - 240),
+                        left: hoveredCmd.rect.right + 12,
+                        width: '220px',
+                        background: 'rgba(10, 10, 18, 0.95)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(245,158,11,0.25)',
+                        borderRadius: '14px',
+                        padding: '14px 16px',
+                        zIndex: 9999,
+                        boxShadow: '0 12px 48px rgba(0,0,0,0.7), 0 0 24px rgba(245,158,11,0.08)',
+                        pointerEvents: 'none',
+                        animation: 'cardReveal 0.15s ease-out forwards',
+                    }}>
+                        {/* Tooltip Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                            <hoveredCmd.item.icon size={14} color={hoveredCmd.item.color} />
+                            <span style={{ fontSize: '12px', fontWeight: '800', color: 'white', letterSpacing: '0.3px' }}>{hoveredCmd.item.title}</span>
+                        </div>
+                        {/* Description */}
+                        <p style={{ fontSize: '10px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 10px 0' }}>{hoveredCmd.item.desc}</p>
+                        {/* Actions */}
+                        <div style={{ marginBottom: '10px' }}>
+                            {hoveredCmd.item.actions.map((action: string, ai: number) => (
+                                <div key={ai} style={{ display: 'flex', gap: '5px', marginBottom: '4px', alignItems: 'flex-start' }}>
+                                    <span style={{ color: hoveredCmd.item.color, fontSize: '7px', marginTop: '3px', flexShrink: 0 }}>▸</span>
+                                    <span style={{ fontSize: '9px', color: '#cbd5e1', lineHeight: 1.4 }}>{action}</span>
                                 </div>
                             ))}
-
-                            {/* Intervention Required */}
-                            <div style={{
-                                marginTop: '12px',
-                                padding: '10px 12px',
-                                background: 'rgba(239,68,68,0.06)',
-                                border: '1px solid rgba(239,68,68,0.15)',
-                                borderRadius: '8px',
-                                display: 'flex', alignItems: 'center', gap: '8px'
-                            }}>
-                                <div style={{
-                                    width: '6px', height: '6px', borderRadius: '50%',
-                                    backgroundColor: '#ef4444',
-                                    boxShadow: '0 0 8px rgba(239,68,68,0.6)',
-                                    animation: 'riskPulseRed 2s infinite'
-                                }} />
-                                <span style={{ fontSize: '8px', fontWeight: '800', color: '#ef4444', letterSpacing: '1px' }}>
-                                    IMMEDIATE MANAGEMENT INTERVENTION REQUIRED
-                                </span>
+                        </div>
+                        {/* Impact Bar */}
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
+                                <span style={{ fontSize: '7px', color: '#475569', fontWeight: '700', letterSpacing: '1px' }}>MINDSET IMPACT</span>
+                                <span style={{ fontSize: '10px', fontWeight: '900', color: hoveredCmd.item.impact >= 85 ? '#f59e0b' : '#64748b' }}>{hoveredCmd.item.impact}%</span>
                             </div>
-
-                            {/* Department under observation */}
-                            <div style={{ marginTop: '16px' }}>
-                                <div style={{
-                                    fontSize: '8px', fontWeight: '800', color: '#475569',
-                                    letterSpacing: '2px', marginBottom: '10px', textTransform: 'uppercase'
-                                }}>
-                                    DEPARTMENTS UNDER OBSERVATION
-                                </div>
-                                {['Logistics & Transport', 'Maintenance Workshop'].map((d, di) => (
-                                    <div key={di} style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        marginBottom: '6px', padding: '6px 10px',
-                                        background: 'rgba(249,115,22,0.04)',
-                                        border: '1px solid rgba(249,115,22,0.1)',
-                                        borderRadius: '6px'
-                                    }}>
-                                        <AlertTriangle size={12} color="#f97316" />
-                                        <span style={{ fontSize: '10px', fontWeight: '700', color: '#cbd5e1', letterSpacing: '0.3px' }}>{d}</span>
-                                        <span style={{
-                                            marginLeft: 'auto', fontSize: '7px', fontWeight: '800',
-                                            color: '#f97316', letterSpacing: '1px',
-                                            padding: '2px 6px', borderRadius: '4px',
-                                            background: 'rgba(249,115,22,0.1)'
-                                        }}>WATCH</span>
-                                    </div>
-                                ))}
+                            <div style={{ width: '100%', height: '3px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ width: `${hoveredCmd.item.impact}%`, height: '100%', borderRadius: '2px', background: `linear-gradient(90deg, ${hoveredCmd.item.color}, #f59e0b)`, boxShadow: `0 0 8px ${hoveredCmd.item.color}40` }} />
                             </div>
-                        </DarkCard>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+
+                {/* ── CELL 6: Status Bar (col 1-4, row 4) ── */}
+                <div style={{
+                    gridColumn: '1 / 5', gridRow: '4 / 5',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '6px 16px',
+                    background: 'rgba(255,255,255,0.02)', borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.03)',
+                }}>
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                        {[
+                            { label: 'Q1 STANDARDIZATION', color: '#22c55e', status: '● DONE' },
+                            { label: 'Q2 DIGITALIZATION', color: '#f97316', status: '◉ ACTIVE' },
+                            { label: 'Q3 AUTOMATION', color: '#f59e0b', status: '○ PLANNED' },
+                            { label: 'Q4 CULTURAL SHIFT', color: '#a855f7', status: '○ TARGET' },
+                        ].map((s, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '7px', fontWeight: '900', color: s.color, letterSpacing: '1px' }}>{s.status}</span>
+                                <span style={{ fontSize: '7px', fontWeight: '700', color: '#475569', letterSpacing: '0.5px' }}>{s.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ fontSize: '7px', color: '#334155', fontWeight: '600' }}>VME 2026 · Compétence sur la Quantité</span>
+                        <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#4ade80', boxShadow: '0 0 8px #4ade80' }} />
+                        <span style={{ fontSize: '7px', color: '#334155', fontWeight: '600' }}>BOARD PRESENTATION · FEB 2026</span>
                     </div>
                 </div>
-
-                {/* Closing Statement */}
-                <div style={{ marginTop: '32px', textAlign: 'center', padding: '24px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div style={{ display: 'inline-flex', padding: '10px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.06)', marginBottom: '10px' }}>
-                        <Rocket size={28} color="#4ade80" />
-                    </div>
-                    <h2 style={{ fontSize: '24px', fontWeight: '900', color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', marginBottom: '6px' }}>
-                        VME 2026
-                    </h2>
-                    <h3 style={{ fontSize: '16px', fontWeight: '300', color: '#cbd5e1' }}>
-                        Favoriser la <span style={{ color: '#4ade80', fontWeight: 'bold' }}>Compétence</span> sur la Quantité
-                    </h3>
-                </div>
-
             </div>
         </div>
     );
