@@ -74,16 +74,46 @@ const healthData = [
 ];
 
 const commandments = [
-    { icon: Gavel, title: "Discipline", desc: "Indirect pressure via strict sanction protocols.", color: "#3b82f6" },
-    { icon: Award, title: "Excellence", desc: "High motivation through L1 to L5 rank progression.", color: "#ffd700" },
-    { icon: UserCheck, title: "Selection", desc: "VOC rigorous filtering - Only the best behind the wheel.", color: "#3b82f6" },
-    { icon: Target, title: "Focus", desc: "Reducing non-essential interactions for maximum concentration.", color: "#ffd700" },
-    { icon: Shield, title: "HSE Proximity", desc: "On-field awareness - Bringing safety closer to operators.", color: "#3b82f6" },
-    { icon: Zap, title: "Coaching", desc: "Continuous monitoring and performance-oriented guidance.", color: "#ffd700" },
-    { icon: Briefcase, title: "Rigor", desc: "100% equipment compliance and pre-op inspections.", color: "#3b82f6" },
-    { icon: Database, title: "Digitalization", desc: "Automated alerts and data-driven decision making.", color: "#ffd700" },
-    { icon: MessageSquare, title: "Communication", desc: "Two-way feedback loops during awareness sessions.", color: "#3b82f6" },
-    { icon: Eye, title: "Vigilance", desc: "'We are watching' - Building a culture of accountability.", color: "#ef4444" },
+    {
+        icon: Gavel, title: "Discipline", desc: "Indirect pressure via strict sanction protocols.", color: "#3b82f6",
+        actions: ['Enforce zero-tolerance violation framework', 'Automate sanction escalation tiers', 'Publish monthly discipline scorecards'], impact: 85
+    },
+    {
+        icon: Award, title: "Excellence", desc: "High motivation through L1 to L5 rank progression.", color: "#ffd700",
+        actions: ['Deploy gamified L1-L5 badge system', 'Link competency rank to incentive pool', 'Run quarterly excellence ceremonies'], impact: 92
+    },
+    {
+        icon: UserCheck, title: "Selection", desc: "VOC rigorous filtering - Only the best behind the wheel.", color: "#3b82f6",
+        actions: ['Implement 3-stage VOC evaluation gate', 'Reject sub-threshold candidates at source', 'Track selection-to-incident correlation'], impact: 78
+    },
+    {
+        icon: Target, title: "Focus", desc: "Reducing non-essential interactions for maximum concentration.", color: "#ffd700",
+        actions: ['Ban phone usage in operational zones', 'Redesign cockpit distraction protocols', 'Audit focus-loss incident reports weekly'], impact: 70
+    },
+    {
+        icon: Shield, title: "HSE Proximity", desc: "On-field awareness - Bringing safety closer to operators.", color: "#3b82f6",
+        actions: ['Embed HSE officers per shift rotation', 'Deploy wearable proximity alerts', 'Run daily safety micro-briefings on-site'], impact: 88
+    },
+    {
+        icon: Zap, title: "Coaching", desc: "Continuous monitoring and performance-oriented guidance.", color: "#ffd700",
+        actions: ['Assign dedicated performance coaches', 'Implement real-time telemetry feedback', 'Track coaching hours per operator monthly'], impact: 82
+    },
+    {
+        icon: Briefcase, title: "Rigor", desc: "100% equipment compliance and pre-op inspections.", color: "#3b82f6",
+        actions: ['Mandate digital pre-op checklists', 'Flag non-compliant equipment in real-time', 'Achieve 100% inspection rate by Q3'], impact: 90
+    },
+    {
+        icon: Database, title: "Digitalization", desc: "Automated alerts and data-driven decision making.", color: "#ffd700",
+        actions: ['Replace Excel workflows with VME platform', 'Enable automated compliance notifications', 'Build predictive analytics dashboards'], impact: 95
+    },
+    {
+        icon: MessageSquare, title: "Communication", desc: "Two-way feedback loops during awareness sessions.", color: "#3b82f6",
+        actions: ['Conduct bi-weekly safety town halls', 'Deploy anonymous incident reporting app', 'Measure communication effectiveness via NPS'], impact: 68
+    },
+    {
+        icon: Eye, title: "Vigilance", desc: "'We are watching' - Building a culture of accountability.", color: "#ef4444",
+        actions: ['Install smart monitoring in high-risk zones', 'Publish real-time compliance dashboards', 'Reward proactive hazard reporting'], impact: 87
+    },
 ];
 
 // --- Components ---
@@ -152,7 +182,173 @@ const TimelineItem = ({ data, index }: { data: any, index: number }) => (
     </div>
 );
 
+// --- Cinematic Data ---
+const mindsetPillars = [
+    {
+        icon: Zap,
+        title: 'Behavioral Change',
+        desc: 'Embedding proactive safety habits through continuous coaching and consequence-driven accountability loops.',
+        accent: 'Commitment',
+        neonColor: '#06b6d4', // cyan
+        gradient: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(6, 182, 212, 0.02) 100%)'
+    },
+    {
+        icon: Eye,
+        title: 'Strategic Awareness',
+        desc: 'Shifting from reactive patching to predictive, intelligence-led safety operations across all departments.',
+        accent: 'Transformation',
+        neonColor: '#f97316', // orange
+        gradient: 'linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(249, 115, 22, 0.02) 100%)'
+    },
+    {
+        icon: Award,
+        title: 'Leadership',
+        desc: 'Cultivating L1-L5 rank-based competency where excellence is rewarded and mediocrity is systematically eliminated.',
+        accent: 'Excellence',
+        neonColor: '#a855f7', // purple
+        gradient: 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(168, 85, 247, 0.02) 100%)'
+    },
+];
+
+const curvePoints = [
+    { year: '2022', value: 15, label: 'Reactive' },
+    { year: '2023', value: 30, label: 'Compliant' },
+    { year: '2024', value: 50, label: 'Structured' },
+    { year: '2025', value: 72, label: 'Proactive' },
+    { year: '2026', value: 95, label: 'Generative' },
+];
+
+// --- 3D Icon Component ---
+const Icon3D = ({ icon: IconComponent, color, size = 40 }: { icon: any, color: string, size?: number }) => (
+    <div style={{
+        width: `${size + 16}px`,
+        height: `${size + 16}px`,
+        borderRadius: '16px',
+        background: `linear-gradient(145deg, ${color}22, ${color}08)`,
+        border: `1px solid ${color}40`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: `0 8px 32px ${color}20, inset 0 1px 0 ${color}30`,
+        position: 'relative',
+        flexShrink: 0
+    }}>
+        <div style={{
+            position: 'absolute',
+            inset: '2px',
+            borderRadius: '14px',
+            background: `radial-gradient(ellipse at 30% 20%, ${color}15 0%, transparent 60%)`,
+            pointerEvents: 'none'
+        }} />
+        <IconComponent size={size * 0.55} color={color} strokeWidth={2.2} />
+    </div>
+);
+
+// --- Culture Maturity Curve SVG ---
+const CultureMaturityCurve = () => {
+    const width = 380;
+    const height = 180;
+    const padX = 40;
+    const padY = 20;
+    const chartW = width - padX * 2;
+    const chartH = height - padY * 2;
+
+    const points = curvePoints.map((p, i) => ({
+        x: padX + (i / (curvePoints.length - 1)) * chartW,
+        y: padY + chartH - (p.value / 100) * chartH,
+        ...p
+    }));
+
+    // Smooth curve path
+    const pathD = points.reduce((acc, pt, i) => {
+        if (i === 0) return `M ${pt.x} ${pt.y}`;
+        const prev = points[i - 1];
+        const cpx1 = prev.x + (pt.x - prev.x) * 0.5;
+        const cpx2 = pt.x - (pt.x - prev.x) * 0.5;
+        return `${acc} C ${cpx1} ${prev.y}, ${cpx2} ${pt.y}, ${pt.x} ${pt.y}`;
+    }, '');
+
+    const areaD = `${pathD} L ${points[points.length - 1].x} ${padY + chartH} L ${points[0].x} ${padY + chartH} Z`;
+
+    return (
+        <svg width="100%" viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
+            <defs>
+                <linearGradient id="curveGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="50%" stopColor="#f97316" />
+                    <stop offset="100%" stopColor="#06b6d4" />
+                </linearGradient>
+                <linearGradient id="curveAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
+                </linearGradient>
+                <filter id="glowLine">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <filter id="glowDot">
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+
+            {/* Grid lines */}
+            {[0, 25, 50, 75, 100].map(v => {
+                const y = padY + chartH - (v / 100) * chartH;
+                return <line key={v} x1={padX} y1={y} x2={padX + chartW} y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />;
+            })}
+
+            {/* Area fill */}
+            <path d={areaD} fill="url(#curveAreaGrad)" />
+
+            {/* Curve line with glow */}
+            <path d={pathD} fill="none" stroke="url(#curveGrad)" strokeWidth="3" strokeLinecap="round" filter="url(#glowLine)" />
+
+            {/* Data points */}
+            {points.map((pt, i) => (
+                <g key={i}>
+                    {/* Glow ring for 2026 */}
+                    {i === points.length - 1 && (
+                        <>
+                            <circle cx={pt.x} cy={pt.y} r="14" fill="none" stroke="#06b6d4" strokeWidth="1" opacity="0.3">
+                                <animate attributeName="r" values="14;20;14" dur="2.5s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.3;0.08;0.3" dur="2.5s" repeatCount="indefinite" />
+                            </circle>
+                            {/* Target crosshair */}
+                            <line x1={pt.x - 8} y1={pt.y} x2={pt.x + 8} y2={pt.y} stroke="#06b6d4" strokeWidth="1" opacity="0.5" />
+                            <line x1={pt.x} y1={pt.y - 8} x2={pt.x} y2={pt.y + 8} stroke="#06b6d4" strokeWidth="1" opacity="0.5" />
+                        </>
+                    )}
+                    <circle cx={pt.x} cy={pt.y} r={i === points.length - 1 ? 6 : 4}
+                        fill={i === points.length - 1 ? '#06b6d4' : i === 0 ? '#ef4444' : '#f97316'}
+                        filter={i === points.length - 1 ? 'url(#glowDot)' : undefined}
+                    />
+                    {/* Year labels */}
+                    <text x={pt.x} y={padY + chartH + 16} textAnchor="middle" fill="#64748b" fontSize="10" fontWeight="600">{pt.year}</text>
+                    {/* Stage labels */}
+                    <text x={pt.x} y={pt.y - 12} textAnchor="middle" fill={i === points.length - 1 ? '#06b6d4' : '#94a3b8'} fontSize="9" fontWeight={i === points.length - 1 ? '800' : '500'}>
+                        {pt.label}
+                    </text>
+                </g>
+            ))}
+
+            {/* Target icon at 2026 peak */}
+            <g transform={`translate(${points[points.length - 1].x - 6}, ${points[points.length - 1].y - 30})`}>
+                <circle cx="6" cy="6" r="6" fill="none" stroke="#06b6d4" strokeWidth="1.5" />
+                <circle cx="6" cy="6" r="3" fill="none" stroke="#06b6d4" strokeWidth="1" />
+                <circle cx="6" cy="6" r="1" fill="#06b6d4" />
+            </g>
+        </svg>
+    );
+};
+
+// --- Cinematic SlideOverPanel ---
 const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+    const [hoveredStrategy, setHoveredStrategy] = useState<any>(null);
     return (
         <div style={{
             position: 'fixed',
@@ -162,109 +358,383 @@ const SlideOverPanel = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => v
             left: 0,
             zIndex: 50,
             visibility: isOpen ? 'visible' : 'hidden',
-            transition: 'visibility 0.3s ease'
+            transition: 'visibility 0.4s ease'
         }}>
-            {/* Backdrop with Blur */}
+            {/* Cinematic Backdrop */}
             <div
                 onClick={onClose}
                 style={{
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0,
-                    // Slightly darker backdrop for focus
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                    inset: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    backdropFilter: 'blur(4px)',
                     opacity: isOpen ? 1 : 0,
-                    transition: 'opacity 0.3s ease'
+                    transition: 'opacity 0.4s ease'
                 }}
             />
 
-            {/* Panel - 25% Width + Glassmorphism */}
+            {/* --- PANEL: Deep Charcoal Glassmorphism --- */}
             <div style={{
                 position: 'absolute',
                 top: 0,
                 right: 0,
                 bottom: 0,
-                width: '25%', // Strict 25% width
-                minWidth: '320px', // Safety for very small screens
-                backgroundColor: 'rgba(30, 30, 30, 0.85)', // Semi-transparent dark
-                backdropFilter: 'blur(16px)', // Glassmorphism
-                boxShadow: '-4px 0 24px rgba(0,0,0,0.5)',
+                width: '440px',
+                maxWidth: '92vw',
+                backgroundColor: 'rgba(18, 18, 22, 0.88)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '-8px 0 60px rgba(0,0,0,0.7), inset 1px 0 0 rgba(255,255,255,0.06)',
                 transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-                transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                 display: 'flex',
                 flexDirection: 'column',
-                borderLeft: '1px solid rgba(255,255,255,0.1)'
+                borderLeft: '1px solid rgba(6, 182, 212, 0.12)',
+                overflow: 'hidden'
             }}>
-                {/* Header */}
-                <div style={{ padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+                {/* Data-Stream Particle Background */}
+                <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+                    {[...Array(18)].map((_, i) => (
+                        <div key={i} style={{
+                            position: 'absolute',
+                            width: `${1 + Math.random() * 2}px`,
+                            height: `${20 + Math.random() * 60}px`,
+                            left: `${5 + Math.random() * 90}%`,
+                            top: '-80px',
+                            background: `linear-gradient(180deg, transparent, rgba(6, 182, 212, ${0.06 + Math.random() * 0.12}), transparent)`,
+                            borderRadius: '2px',
+                            animation: `dataStream ${4 + Math.random() * 6}s linear ${Math.random() * 5}s infinite`
+                        }} />
+                    ))}
+                </div>
+
+                {/* ═══════════ HEADER ═══════════ */}
+                <div style={{
+                    padding: '28px 28px 20px',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    zIndex: 1
+                }}>
                     <div>
-                        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Lightbulb size={24} color="#ffd700" /> Strategic Vision
+                        <p style={{
+                            fontSize: '10px',
+                            color: '#06b6d4',
+                            letterSpacing: '4px',
+                            fontWeight: '700',
+                            marginBottom: '8px',
+                            textTransform: 'uppercase'
+                        }}>VME 2026 · STRATEGIC VISION</p>
+                        <h2 style={{
+                            fontSize: '22px',
+                            fontWeight: '900',
+                            color: 'white',
+                            letterSpacing: '6px',
+                            textTransform: 'uppercase',
+                            lineHeight: 1.2,
+                            animation: isOpen ? 'flickerIn 1.2s ease-out forwards' : 'none'
+                        }}>
+                            IMPACTING<br />
+                            <span style={{ color: '#f97316' }}>THE MINDSET</span>
                         </h2>
-                        <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '4px' }}>The Mindset - VME 10 Strategic Pillars</p>
                     </div>
-                    <button onClick={onClose} style={{ color: '#64748b', background: 'transparent', padding: '8px', cursor: 'pointer', border: 'none' }}>
-                        <X size={24} />
+
+                    {/* Elegant Glowing Close Button */}
+                    <button
+                        onClick={onClose}
+                        className="cinematic-close-btn"
+                        style={{
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '12px',
+                            width: '40px',
+                            height: '40px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            color: '#64748b',
+                            flexShrink: 0,
+                            marginTop: '4px'
+                        }}
+                    >
+                        <X size={18} strokeWidth={2.5} />
                     </button>
                 </div>
 
-                {/* Content */}
-                <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {commandments.map((item, index) => (
+                {/* ═══════════ SCROLLABLE CONTENT ═══════════ */}
+                <div className="cinematic-panel-body" style={{ flex: 1, overflowY: 'auto', padding: '20px 28px', position: 'relative', zIndex: 1 }}>
+
+                    {/* Section Label */}
+                    <p style={{ fontSize: '9px', color: '#475569', letterSpacing: '3px', fontWeight: '700', marginBottom: '16px', textTransform: 'uppercase' }}>
+                        CORE STRATEGIC PILLARS
+                    </p>
+
+                    {/* ── Frosted Glass Cards ── */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '32px' }}>
+                        {mindsetPillars.map((pillar, index) => (
                             <div key={index} style={{
-                                display: 'flex',
-                                gap: '12px',
-                                padding: '12px',
-                                backgroundColor: 'rgba(0,0,0,0.2)',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.05)',
-                                transition: 'transform 0.2s',
+                                background: pillar.gradient,
+                                border: `1px solid ${pillar.neonColor}30`,
+                                borderRadius: '16px',
+                                padding: '20px',
+                                backdropFilter: 'blur(8px)',
+                                transition: 'all 0.3s ease',
+                                position: 'relative',
+                                overflow: 'hidden'
                             }}>
+                                {/* Subtle top-left glow */}
                                 <div style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '6px',
-                                    backgroundColor: `${item.color}15`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: `1px solid ${item.color}40`,
-                                    flexShrink: 0
-                                }}>
-                                    <item.icon size={16} color={item.color} />
-                                </div>
-                                <div>
-                                    <h4 style={{ color: 'white', fontWeight: 'bold', fontSize: '14px', marginBottom: '2px' }}>{item.title}</h4>
-                                    <p style={{ color: '#cbd5e1', fontSize: '12px', lineHeight: '1.3' }}>{item.desc}</p>
+                                    position: 'absolute',
+                                    top: '-20px',
+                                    left: '-20px',
+                                    width: '80px',
+                                    height: '80px',
+                                    background: `radial-gradient(circle, ${pillar.neonColor}10 0%, transparent 70%)`,
+                                    pointerEvents: 'none'
+                                }} />
+                                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                                    <Icon3D icon={pillar.icon} color={pillar.neonColor} />
+                                    <div style={{ flex: 1 }}>
+                                        <h4 style={{
+                                            fontSize: '15px',
+                                            fontWeight: '800',
+                                            color: 'white',
+                                            letterSpacing: '0.5px',
+                                            marginBottom: '6px'
+                                        }}>{pillar.title}</h4>
+                                        <p style={{
+                                            fontSize: '12px',
+                                            color: '#94a3b8',
+                                            lineHeight: 1.6,
+                                            margin: 0
+                                        }}>
+                                            {pillar.desc.split(pillar.accent).map((part, pi) => (
+                                                <React.Fragment key={pi}>
+                                                    {part}
+                                                    {pi < pillar.desc.split(pillar.accent).length - 1 && (
+                                                        <span style={{ color: '#f97316', fontWeight: '800' }}>{pillar.accent}</span>
+                                                    )}
+                                                </React.Fragment>
+                                            ))}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
+
+                    {/* ── Culture Maturity Curve ── */}
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(168, 85, 247, 0.03) 100%)',
+                        border: '1px solid rgba(6, 182, 212, 0.15)',
+                        borderRadius: '16px',
+                        padding: '20px',
+                        marginBottom: '24px'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                            <Target size={16} color="#06b6d4" />
+                            <h4 style={{ fontSize: '11px', fontWeight: '900', color: '#06b6d4', letterSpacing: '2px', textTransform: 'uppercase' }}>
+                                Culture Maturity Curve
+                            </h4>
+                        </div>
+                        <CultureMaturityCurve />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', padding: '0 8px' }}>
+                            <span style={{ fontSize: '9px', color: '#ef4444', fontWeight: '700', letterSpacing: '1px' }}>● REACTIVE</span>
+                            <span style={{ fontSize: '9px', color: '#f97316', fontWeight: '700', letterSpacing: '1px' }}>● TRANSITIONAL</span>
+                            <span style={{ fontSize: '9px', color: '#06b6d4', fontWeight: '700', letterSpacing: '1px' }}>● GENERATIVE</span>
+                        </div>
+                    </div>
+
+                    {/* ── 10 Commandments Interactive Grid ── */}
+                    <p style={{ fontSize: '9px', color: '#475569', letterSpacing: '3px', fontWeight: '700', marginBottom: '12px', textTransform: 'uppercase' }}>
+                        10 STRATEGIC COMMANDMENTS
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px', position: 'relative' }}>
+                        {commandments.map((item, index) => (
+                            <div
+                                key={index}
+                                className="strategy-card"
+                                onMouseEnter={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    setHoveredStrategy({ ...item, index, rect });
+                                }}
+                                onMouseLeave={() => setHoveredStrategy(null)}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '14px 10px 10px',
+                                    background: 'rgba(255,255,255,0.02)',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(255,255,255,0.05)',
+                                    cursor: 'default',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    position: 'relative',
+                                    textAlign: 'center'
+                                }}
+                            >
+                                <div style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '10px',
+                                    background: `linear-gradient(145deg, ${item.color}18, ${item.color}08)`,
+                                    border: `1px solid ${item.color}30`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: `0 4px 16px ${item.color}10`,
+                                    transition: 'all 0.3s ease'
+                                }}>
+                                    <item.icon size={16} color={item.color} strokeWidth={2.2} />
+                                </div>
+                                <span style={{ fontSize: '10px', fontWeight: '700', color: '#e2e8f0', letterSpacing: '0.3px', lineHeight: 1.2 }}>{item.title}</span>
+                                <span style={{ fontSize: '8px', color: '#475569', fontWeight: '600', letterSpacing: '0.5px', opacity: 0.7 }}>VIEW DETAILS</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ── Dynamic Tooltip (Rendered at panel level) ── */}
+                    {hoveredStrategy && (() => {
+                        const panelRect = document.querySelector('.cinematic-panel-body')?.getBoundingClientRect();
+                        if (!panelRect) return null;
+                        const cardRect = hoveredStrategy.rect;
+                        // Position tooltip to the left of the card, centered vertically
+                        let tooltipTop = cardRect.top - panelRect.top + (cardRect.height / 2) - 90;
+                        // Clamp so tooltip doesn't overflow
+                        tooltipTop = Math.max(8, Math.min(tooltipTop, panelRect.height - 220));
+                        const tooltipLeft = 16;
+
+                        return (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: tooltipTop,
+                                    left: tooltipLeft,
+                                    width: '200px',
+                                    background: 'rgba(12, 12, 16, 0.92)',
+                                    backdropFilter: 'blur(25px)',
+                                    border: '1px solid rgba(59, 130, 246, 0.25)',
+                                    borderRadius: '14px',
+                                    padding: '16px',
+                                    zIndex: 100,
+                                    boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.08)',
+                                    pointerEvents: 'none',
+                                    animation: 'tooltipFadeIn 0.2s ease-out forwards'
+                                }}
+                            >
+                                {/* Tooltip Header */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                    <hoveredStrategy.icon size={14} color={hoveredStrategy.color} />
+                                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'white', letterSpacing: '0.5px' }}>{hoveredStrategy.title}</span>
+                                </div>
+
+                                {/* Strategic Actions */}
+                                <div style={{ marginBottom: '12px' }}>
+                                    {hoveredStrategy.actions.map((action: string, ai: number) => (
+                                        <div key={ai} style={{ display: 'flex', gap: '6px', marginBottom: '5px', alignItems: 'flex-start' }}>
+                                            <span style={{ color: hoveredStrategy.color, fontSize: '8px', marginTop: '3px', flexShrink: 0 }}>▸</span>
+                                            <span style={{ fontSize: '10px', color: '#94a3b8', lineHeight: 1.4 }}>{action}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Impact Meter */}
+                                <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '8px', color: '#475569', fontWeight: '700', letterSpacing: '1px' }}>MINDSET IMPACT</span>
+                                        <span style={{ fontSize: '10px', fontWeight: '900', color: hoveredStrategy.impact >= 85 ? '#06b6d4' : hoveredStrategy.impact >= 70 ? '#f59e0b' : '#64748b' }}>{hoveredStrategy.impact}%</span>
+                                    </div>
+                                    <div style={{ width: '100%', height: '4px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                                        <div style={{
+                                            width: `${hoveredStrategy.impact}%`,
+                                            height: '100%',
+                                            borderRadius: '2px',
+                                            background: hoveredStrategy.impact >= 85
+                                                ? 'linear-gradient(90deg, #06b6d4, #3b82f6)'
+                                                : hoveredStrategy.impact >= 70
+                                                    ? 'linear-gradient(90deg, #f59e0b, #f97316)'
+                                                    : 'linear-gradient(90deg, #64748b, #94a3b8)',
+                                            transition: 'width 0.4s ease-out',
+                                            boxShadow: `0 0 8px ${hoveredStrategy.impact >= 85 ? '#06b6d4' : '#f59e0b'}40`
+                                        }} />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
                 </div>
 
-                {/* Footer */}
-                <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            backgroundColor: '#3b82f6',
-                            color: 'white',
-                            fontWeight: 'bold',
-                            borderRadius: '8px',
-                            transition: 'background-color 0.2s',
-                            border: 'none',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Close Panel
-                    </button>
+                {/* ═══════════ FOOTER ═══════════ */}
+                <div style={{
+                    padding: '16px 28px',
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    zIndex: 1
+                }}>
+                    <div>
+                        <p style={{ fontSize: '9px', color: '#475569', fontWeight: '700', letterSpacing: '1px' }}>VME STRATEGIC DIVISION</p>
+                        <p style={{ fontSize: '8px', color: '#334155', marginTop: '2px' }}>BOARD PRESENTATION · CONFIDENTIAL</p>
+                    </div>
+                    <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: '#06b6d4',
+                        boxShadow: '0 0 12px #06b6d4',
+                        animation: 'pulse 2s infinite'
+                    }} />
                 </div>
             </div>
+
+            {/* ═══════════ ANIMATIONS ═══════════ */}
+            <style>{`
+                @keyframes dataStream {
+                    0% { transform: translateY(-100px); opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { transform: translateY(calc(100vh + 100px)); opacity: 0; }
+                }
+                @keyframes flickerIn {
+                    0% { opacity: 0; filter: brightness(3) blur(2px); }
+                    15% { opacity: 1; filter: brightness(1.5) blur(0); }
+                    25% { opacity: 0.7; filter: brightness(0.8); }
+                    40% { opacity: 1; filter: brightness(1.2); }
+                    60% { opacity: 0.9; filter: brightness(1); }
+                    100% { opacity: 1; filter: brightness(1) blur(0); }
+                }
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(1.3); }
+                }
+                .cinematic-close-btn:hover {
+                    background: rgba(6, 182, 212, 0.1) !important;
+                    border-color: rgba(6, 182, 212, 0.4) !important;
+                    color: #06b6d4 !important;
+                    box-shadow: 0 0 20px rgba(6, 182, 212, 0.15) !important;
+                }
+                .strategy-card:hover {
+                    border-color: rgba(59, 130, 246, 0.4) !important;
+                    box-shadow: 0 0 20px rgba(59, 130, 246, 0.12), inset 0 0 12px rgba(59, 130, 246, 0.04) !important;
+                    transform: scale(1.05);
+                    background: rgba(59, 130, 246, 0.06) !important;
+                }
+                .strategy-card:hover span:last-child {
+                    opacity: 1 !important;
+                    color: #3b82f6 !important;
+                }
+                @keyframes tooltipFadeIn {
+                    0% { opacity: 0; transform: translateY(6px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
         </div>
     );
 };
@@ -274,14 +744,24 @@ const StrategicRoadmap = () => {
 
     return (
         <div style={{
-            background: 'linear-gradient(180deg, #0f172a 0%, #064e3b 100%)', // Dark blue to green gradient
-            minHeight: '100vh',
+            backgroundColor: '#121212',
+            minHeight: '100%',
             color: 'white',
             padding: '40px',
             fontFamily: '"Inter", sans-serif',
             position: 'relative',
             overflowX: 'hidden'
         }}>
+            {/* Background Grid Accent */}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: 'radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0)',
+                backgroundSize: '32px 32px',
+                opacity: 0.5,
+                zIndex: 0,
+                pointerEvents: 'none'
+            }}></div>
 
             <SlideOverPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
 

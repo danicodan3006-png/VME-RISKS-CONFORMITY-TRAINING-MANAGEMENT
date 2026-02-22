@@ -8,9 +8,13 @@ import {
     Shield,
     FileText,
     Trophy,
-    Flag,
-    Activity
+    Activity,
+    Database,
+    LogOut,
+    Rocket
 } from 'lucide-react';
+import { useSafeEquip } from '../../context/SafeEquipContext';
+import LandingPage from '../../pages/LandingPage';
 
 const SidebarItem = ({ to, icon: Icon, label, active, collapsed }: { to: string, icon: any, label: string, active: boolean, collapsed: boolean }) => (
     <Link
@@ -37,12 +41,33 @@ const SidebarItem = ({ to, icon: Icon, label, active, collapsed }: { to: string,
 );
 
 const Layout = () => {
+    const { logout, isAuthenticated } = useSafeEquip();
     // Default collapsed for "Mission Control" focus, user can expand
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const location = useLocation();
 
     return (
-        <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: '#121212', overflow: 'hidden' }}>
+        <div style={{
+            display: 'flex',
+            height: '100vh',
+            width: '100vw',
+            backgroundColor: '#121212',
+            color: 'white',
+            overflow: 'hidden',
+            fontFamily: '"Inter", sans-serif',
+            position: 'relative'
+        }}>
+            {/* Landing Page Overlay - Gated Entry */}
+            {!isAuthenticated && (
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 1000,
+                    backgroundColor: '#121212'
+                }}>
+                    <LandingPage />
+                </div>
+            )}
 
             {/* Sidebar */}
             <aside style={{
@@ -75,58 +100,66 @@ const Layout = () => {
                 <nav style={{ flex: 1, overflowY: 'auto', padding: '16px 8px' }}>
 
                     <SidebarItem
-                        to="/executive-summary"
+                        to="/dashboard/strategic-roadmap"
+                        icon={Rocket}
+                        label="Strategic Roadmap"
+                        active={location.pathname === '/dashboard/strategic-roadmap'}
+                        collapsed={sidebarCollapsed}
+                    />
+
+                    <SidebarItem
+                        to="/dashboard/executive-summary"
                         icon={Activity}
                         label="Executive Summary"
-                        active={location.pathname === '/executive-summary'}
+                        active={location.pathname === '/dashboard/executive-summary'}
                         collapsed={sidebarCollapsed}
                     />
 
                     <SidebarItem
-                        to="/training-stats"
+                        to="/dashboard/training-stats"
                         icon={GraduationCap}
                         label="Training & VOC Stats"
-                        active={location.pathname === '/training-stats'}
+                        active={location.pathname === '/dashboard/training-stats'}
                         collapsed={sidebarCollapsed}
                     />
 
                     <SidebarItem
-                        to="/safety-awareness"
+                        to="/dashboard/safety-awareness"
                         icon={Shield}
                         label="Safety Awareness"
-                        active={location.pathname === '/safety-awareness'}
+                        active={location.pathname === '/dashboard/safety-awareness'}
                         collapsed={sidebarCollapsed}
                     />
 
                     <SidebarItem
-                        to="/fleet-compliance"
+                        to="/dashboard/fleet-compliance"
                         icon={Truck}
                         label="Fleet Compliance"
-                        active={location.pathname === '/fleet-compliance'}
+                        active={location.pathname === '/dashboard/fleet-compliance'}
                         collapsed={sidebarCollapsed}
                     />
 
                     <SidebarItem
-                        to="/documentation-status"
+                        to="/dashboard/documentation-status"
                         icon={FileText}
                         label="Documentation Status"
-                        active={location.pathname === '/documentation-status'}
+                        active={location.pathname === '/dashboard/documentation-status'}
                         collapsed={sidebarCollapsed}
                     />
 
                     <SidebarItem
-                        to="/red-list-leaderboard"
+                        to="/dashboard/red-list-leaderboard"
                         icon={Trophy}
                         label="Red List & L1-L5"
-                        active={location.pathname === '/red-list-leaderboard'}
+                        active={location.pathname === '/dashboard/red-list-leaderboard'}
                         collapsed={sidebarCollapsed}
                     />
 
                     <SidebarItem
-                        to="/roadmap"
-                        icon={Flag}
-                        label="2026 Strategic Roadmap"
-                        active={location.pathname === '/roadmap'}
+                        to="/dashboard/master-form"
+                        icon={Database}
+                        label="Master Data Entry"
+                        active={location.pathname === '/dashboard/master-form'}
                         collapsed={sidebarCollapsed}
                     />
 
@@ -135,19 +168,32 @@ const Layout = () => {
                 {/* Sidebar Footer */}
                 <div style={{ padding: '16px', borderTop: '1px solid #333' }}>
                     {!sidebarCollapsed ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>DK</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>DK</span>
+                                </div>
+                                <div style={{ overflow: 'hidden' }}>
+                                    <p style={{ fontSize: '13px', fontWeight: '500', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Dan Kahilu</p>
+                                    <p style={{ fontSize: '11px', color: '#94a3b8' }}>Lead Data Architect</p>
+                                </div>
                             </div>
-                            <div style={{ overflow: 'hidden' }}>
-                                <p style={{ fontSize: '13px', fontWeight: '500', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Dan Kahilu</p>
-                                <p style={{ fontSize: '11px', color: '#94a3b8' }}>Lead Data Architect</p>
-                            </div>
+                            <button
+                                onClick={logout}
+                                style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
+                                title="Logout"
+                            >
+                                <LogOut size={16} />
+                            </button>
                         </div>
                     ) : (
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
-                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'white' }}>DK</span>
-                        </div>
+                        <button
+                            onClick={logout}
+                            style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                            title="Logout"
+                        >
+                            <LogOut size={16} />
+                        </button>
                     )}
                 </div>
             </aside>
@@ -158,17 +204,32 @@ const Layout = () => {
                 {/* Header - Slim for Mission Control */}
                 <header style={{ height: '56px', backgroundColor: '#1E1E1E', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', flexShrink: 0 }}>
                     <h1 style={{ fontSize: '16px', fontWeight: 'bold', color: 'white', letterSpacing: '0.5px' }}>
-                        VME 2026 - Digital Safety Suite
+                        VME 2026 - Operational Dashboard
                     </h1>
                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                        {/* Optional top actions could go here */}
-                        <span style={{ fontSize: '12px', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', boxShadow: '0 0 8px #ef4444' }}></span> LIVE</span>
+                        <span style={{ fontSize: '12px', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', boxShadow: '0 0 8px #ef4444' }}></span> LIVE COMMAND</span>
                     </div>
                 </header>
 
                 {/* Page Content - fills remaining space */}
-                <main style={{ flex: 1, overflowY: 'auto', backgroundColor: '#121212', padding: '0', position: 'relative' }}>
-                    <Outlet />
+                <main style={{ flex: 1, overflowY: 'auto', backgroundColor: '#121212', padding: '0', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ flex: 1 }}>
+                        <Outlet />
+                    </div>
+
+                    {/* Branding Footer */}
+                    <footer style={{
+                        padding: '12px 24px',
+                        borderTop: '1px solid #1E1E1E',
+                        textAlign: 'right',
+                        fontSize: '10px',
+                        color: '#475569',
+                        fontWeight: 'bold',
+                        letterSpacing: '1px',
+                        backgroundColor: '#121212'
+                    }}>
+                        INSPIRED BY SAFEEQUIP TECHNOLOGY | VME 2026 CORE ENGINE
+                    </footer>
                 </main>
 
             </div>

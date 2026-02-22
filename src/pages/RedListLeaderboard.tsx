@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
     Trophy,
     Medal,
@@ -9,29 +9,30 @@ import {
     Zap,
     Layout
 } from 'lucide-react';
+import { useSafeEquip } from '../context/SafeEquipContext';
 
 // --- Data Engine ---
 
-const departments = [
-    { name: 'Mining', risk: 0, x: 50, y: 15 },
-    { name: 'Transport', risk: 2, x: 80, y: 30 },
-    { name: 'SSHEC', risk: 0, x: 75, y: 70 },
-    { name: 'Exploration', risk: 0, x: 50, y: 85 },
-    { name: 'Supply Chain', risk: 0, x: 25, y: 70 },
-    { name: 'Finance', risk: 0, x: 15, y: 50 },
-    { name: 'Hydromet', risk: 0, x: 30, y: 25 },
-    { name: 'Tailings', risk: 0, x: 65, y: 20 },
-    { name: 'Sulphite', risk: 0, x: 85, y: 50 },
-    { name: 'HR & Medical', risk: 0, x: 10, y: 35 },
-    { name: 'Compliance', risk: 0, x: 40, y: 10 },
-    { name: 'Stakeholder', risk: 0, x: 90, y: 65 },
-    { name: 'People Svcs', risk: 0, x: 20, y: 80 },
-    { name: 'Project Del', risk: 0, x: 35, y: 90 },
-    { name: 'Civil Svcs', risk: 1, x: 60, y: 80 },
-    { name: 'Lean Prod', risk: 0, x: 95, y: 40 },
-    { name: 'Farm & Camp', risk: 0, x: 5, y: 55 },
-    { name: 'Debottlenecking', risk: 0, x: 45, y: 45 },
-    { name: 'Central Lab', risk: 0, x: 55, y: 55 },
+const STATIC_DEPARTMENTS = [
+    { name: 'Mining', x: 50, y: 15 },
+    { name: 'Transport', x: 80, y: 30 },
+    { name: 'SSHEC', x: 75, y: 70 },
+    { name: 'Exploration', x: 50, y: 85 },
+    { name: 'Supply Chain', x: 25, y: 70 },
+    { name: 'Finance', x: 15, y: 50 },
+    { name: 'Hydromet', x: 30, y: 25 },
+    { name: 'Tailings', x: 65, y: 20 },
+    { name: 'Sulphite', x: 85, y: 50 },
+    { name: 'HR & Medical', x: 10, y: 35 },
+    { name: 'Compliance', x: 40, y: 10 },
+    { name: 'Stakeholder', x: 90, y: 65 },
+    { name: 'People Svcs', x: 20, y: 80 },
+    { name: 'Project Del', x: 35, y: 90 },
+    { name: 'Civil Svcs', x: 60, y: 80 },
+    { name: 'Lean Prod', x: 95, y: 40 },
+    { name: 'Farm & Camp', x: 5, y: 55 },
+    { name: 'Debottlenecking', x: 45, y: 45 },
+    { name: 'Central Lab', x: 55, y: 55 },
 ];
 
 const levels = [
@@ -52,10 +53,10 @@ const rankingData = [
 
 // --- Sub-components ---
 
-const Hotspot = ({ dept, onHover, onLeave, onMove }: { dept: any, onHover: any, onLeave: any, onMove: any }) => {
-    const isRed = dept.risk >= 2;
-    const isOrange = dept.risk === 1;
-    const isZero = dept.risk === 0;
+const Hotspot = ({ name, risk, x, y, active }: { name: string, risk: number, x: number, y: number, active: boolean }) => {
+    const isRed = risk >= 2;
+    const isOrange = risk === 1;
+    const isZero = risk === 0;
 
     const color = isRed ? '#ef4444' : isOrange ? '#f59e0b' : 'rgba(148, 163, 184, 0.4)';
     const size = isRed ? '48px' : isOrange ? '36px' : '20px';
@@ -64,22 +65,19 @@ const Hotspot = ({ dept, onHover, onLeave, onMove }: { dept: any, onHover: any, 
         <div
             style={{
                 position: 'absolute',
-                left: `${dept.x}%`,
-                top: `${dept.y}%`,
+                left: `${x}%`,
+                top: `${y}%`,
                 transform: 'translate(-50%, -50%)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                zIndex: dept.risk > 0 ? 10 : 1,
-                cursor: 'pointer',
-                padding: '20px' // Invisible hit area
+                zIndex: risk > 0 ? 10 : 1,
+                opacity: active ? 1 : 0.4,
+                transition: 'all 0.3s ease'
             }}
-            onMouseEnter={(e) => onHover(dept, e)}
-            onMouseLeave={onLeave}
-            onMouseMove={onMove}
         >
             {/* Radial Pulse Effect for 1+ Risk */}
-            {dept.risk > 0 && (
+            {risk > 0 && (
                 <div style={{
                     position: 'absolute',
                     width: size,
@@ -91,7 +89,6 @@ const Hotspot = ({ dept, onHover, onLeave, onMove }: { dept: any, onHover: any, 
             )}
 
             <div
-                className="bubble"
                 style={{
                     width: size,
                     height: size,
@@ -110,43 +107,121 @@ const Hotspot = ({ dept, onHover, onLeave, onMove }: { dept: any, onHover: any, 
                     boxShadow: isZero ? 'none' : '0 0 10px rgba(0,0,0,0.5)'
                 }}
             >
-                {dept.risk}
+                {risk}
             </div>
             <span style={{
                 marginTop: '8px',
                 fontSize: '9px',
-                fontWeight: dept.risk > 0 ? '900' : '500',
-                color: dept.risk > 0 ? 'white' : '#64748b',
+                fontWeight: risk > 0 ? '900' : '500',
+                color: risk > 0 ? 'white' : '#64748b',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
                 whiteSpace: 'nowrap',
-                backgroundColor: dept.risk > 0 ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                backgroundColor: risk > 0 ? 'rgba(18, 18, 18, 0.6)' : 'transparent',
                 padding: '2px 6px',
                 borderRadius: '4px',
                 pointerEvents: 'none',
                 transition: 'all 0.3s ease'
             }}>
-                {dept.name}
+                {name}
             </span>
         </div>
     );
 };
 
+const Crosshair = ({ x, y }: { x: number, y: number }) => (
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 100 }}>
+        {/* Horizontal Line */}
+        <div style={{
+            position: 'absolute',
+            top: y,
+            left: 0,
+            width: '100%',
+            height: '1px',
+            backgroundColor: 'rgba(6, 182, 212, 0.4)',
+            boxShadow: '0 0 8px rgba(6, 182, 212, 0.3)',
+            transition: 'top 0.1s linear'
+        }}></div>
+        {/* Vertical Line */}
+        <div style={{
+            position: 'absolute',
+            left: x,
+            top: 0,
+            width: '1px',
+            height: '100%',
+            backgroundColor: 'rgba(6, 182, 212, 0.4)',
+            boxShadow: '0 0 8px rgba(6, 182, 212, 0.3)',
+            transition: 'left 0.1s linear'
+        }}></div>
+        {/* Aim Point */}
+        <div style={{
+            position: 'absolute',
+            left: x,
+            top: y,
+            width: '16px',
+            height: '16px',
+            borderRadius: '50%',
+            border: '1px solid #06b6d4',
+            transform: 'translate(-50%, -50%)',
+            boxShadow: '0 0 15px #06b6d4',
+            transition: 'all 0.1s linear',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
+            <div style={{ width: '2px', height: '2px', backgroundColor: '#06b6d4', borderRadius: '50%' }}></div>
+        </div>
+    </div>
+);
+
 const RedListLeaderboard = () => {
-    const [hoveredDept, setHoveredDept] = useState<any>(null);
+    const { dataset } = useSafeEquip();
+    const mapRef = useRef<HTMLDivElement>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [snappedDept, setSnappedDept] = useState<any>(null);
 
-    const handleHover = (dept: any, e: any) => {
-        setHoveredDept(dept);
-        setMousePos({ x: e.clientX, y: e.clientY });
-    };
+    // Merge static department positions with dynamic data
+    const departments = STATIC_DEPARTMENTS.map(dept => {
+        const dynamicData = dataset.find(d => d.department === dept.name);
+        return {
+            ...dept,
+            risk: dynamicData?.red_list_status ? dynamicData.risk_level : 0,
+            active: dynamicData?.red_list_status || false,
+            timestamp: dynamicData?.timestamp || null
+        };
+    });
 
-    const handleLeave = () => {
-        setHoveredDept(null);
-    };
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!mapRef.current) return;
+        const rect = mapRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-    const handleMove = (e: any) => {
-        setMousePos({ x: e.clientX, y: e.clientY });
+        // Calculate magnetic snap
+        let snapTarget = null;
+        const snapRadius = 40;
+
+        for (const dept of departments) {
+            const dx = (dept.x / 100) * rect.width - x;
+            const dy = (dept.y / 100) * rect.height - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < snapRadius) {
+                snapTarget = dept;
+                break;
+            }
+        }
+
+        if (snapTarget) {
+            setSnappedDept(snapTarget);
+            setMousePos({
+                x: (snapTarget.x / 100) * rect.width,
+                y: (snapTarget.y / 100) * rect.height
+            });
+        } else {
+            setSnappedDept(null);
+            setMousePos({ x, y });
+        }
     };
 
     const getStatusText = (risk: number) => {
@@ -179,11 +254,6 @@ const RedListLeaderboard = () => {
                     0% { transform: scale(1); opacity: 0.8; }
                     100% { transform: scale(2.5); opacity: 0; }
                 }
-                .bubble:hover {
-                    transform: scale(1.3);
-                    box-shadow: 0 0 30px rgba(255,255,255,0.2);
-                    border-color: #fff !important;
-                }
                 .radar-bg {
                     background: radial-gradient(circle at center, transparent 0%, rgba(30,30,30, 0.4) 100%),
                                 repeating-radial-gradient(circle at center, transparent, transparent 15%, rgba(255, 255, 255, 0.02) 15.1%);
@@ -191,101 +261,113 @@ const RedListLeaderboard = () => {
                 .glass-tooltip {
                     background: rgba(20, 20, 20, 0.8);
                     backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                    border: 1px solid #06b6d466;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
                     border-radius: 12px;
                     padding: 16px;
                     pointer-events: none;
-                    z-index: 9999;
-                    position: fixed;
+                    z-index: 1000;
+                    position: absolute;
                     min-width: 220px;
-                    transition: opacity 0.2s ease;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 }
             `}</style>
-
-            {/* Floating Glassmorphism Tooltip */}
-            {hoveredDept && (
-                <div
-                    style={{
-                        left: mousePos.x + 24,
-                        top: mousePos.y + 24,
-                    }}
-                    className="glass-tooltip"
-                >
-                    <h3 style={{ fontSize: '15px', fontWeight: '900', color: 'white', marginBottom: '8px', letterSpacing: '0.5px' }}>
-                        {hoveredDept.name}
-                    </h3>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>INCIDENT COUNT:</span>
-                        <span style={{ fontSize: '16px', fontWeight: '900', color: getStatusColor(hoveredDept.risk) }}>{hoveredDept.risk}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>RISK STATUS:</span>
-                        <span style={{
-                            fontSize: '10px',
-                            fontWeight: '900',
-                            color: 'white',
-                            backgroundColor: getStatusColor(hoveredDept.risk),
-                            padding: '2px 8px',
-                            borderRadius: '4px'
-                        }}>
-                            {getStatusText(hoveredDept.risk)}
-                        </span>
-                    </div>
-                </div>
-            )}
 
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexShrink: 0 }}>
                 <div>
                     <h1 style={{ fontSize: '28px', fontWeight: '900', color: '#ef4444', letterSpacing: '2px', lineHeight: 1 }}>
-                        CONTRACTOR RISK RADAR <span style={{ color: 'white', fontSize: '12px', fontWeight: '400', letterSpacing: 'normal' }}>v4.0 REAL-TIME</span>
+                        CONTRACTOR RISK RADAR <span style={{ color: 'white', fontSize: '12px', fontWeight: '400', letterSpacing: 'normal' }}>v4.5 TACTICAL</span>
                     </h1>
-                    <p style={{ fontSize: '14px', color: '#475569', marginTop: '6px', fontWeight: '500' }}> Interactive Geography & Operator Exclusion Zones</p>
+                    <p style={{ fontSize: '14px', color: '#475569', marginTop: '6px', fontWeight: '500' }}> TARGETING SECTOR: {snappedDept ? snappedDept.name.toUpperCase() : 'SEARCHING...'}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <div style={{ padding: '8px 20px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef444444', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <ShieldAlert size={18} color="#ef4444" />
-                        <span style={{ fontSize: '12px', fontWeight: '900', color: '#ef4444' }}>3 CRITICAL THREATS DETECTED</span>
+                        <span style={{ fontSize: '12px', fontWeight: '900', color: '#ef4444' }}>{dataset.filter(d => d.red_list_status).length} THREATS DETECTED</span>
                     </div>
                 </div>
             </div>
 
             <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 420px', gap: '32px', minHeight: 0 }}>
 
-                {/* 1. INTERACTIVE RADAR AREA */}
-                <div style={{
-                    backgroundColor: '#1E1E1E',
-                    border: '1px solid #333',
-                    borderRadius: '16px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }} className="radar-bg">
+                {/* 1. TACTICAL RADAR AREA */}
+                <div
+                    ref={mapRef}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={() => { setSnappedDept(null); setMousePos({ x: 0, y: 0 }); }}
+                    style={{
+                        backgroundColor: '#1E1E1E',
+                        border: '1px solid #333',
+                        borderRadius: '16px',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'none'
+                    }} className="radar-bg"
+                >
+                    {/* Tactical Crosshair */}
+                    {mousePos.x !== 0 && <Crosshair x={mousePos.x} y={mousePos.y} />}
 
                     {/* Radar Scars/Grid */}
                     <div style={{ position: 'absolute', width: '90%', height: '90%', border: '1px solid rgba(255,255,255,0.02)', borderRadius: '50%' }}></div>
                     <div style={{ position: 'absolute', width: '70%', height: '70%', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
                     <div style={{ position: 'absolute', width: '50%', height: '50%', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '50%' }}></div>
 
-                    {/* Crosshair lines */}
-                    <div style={{ position: 'absolute', width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.02)' }}></div>
-                    <div style={{ position: 'absolute', width: '1px', height: '100%', backgroundColor: 'rgba(255,255,255,0.02)' }}></div>
-
                     {/* Hotspots Container */}
                     <div style={{ position: 'absolute', width: '100%', height: '100%' }}>
                         {departments.map((dept, i) => (
                             <Hotspot
                                 key={i}
-                                dept={dept}
-                                onHover={handleHover}
-                                onLeave={handleLeave}
-                                onMove={handleMove}
+                                name={dept.name}
+                                risk={dept.risk}
+                                x={dept.x}
+                                y={dept.y}
+                                active={dept.active}
                             />
                         ))}
                     </div>
+
+                    {/* Magnetic Tooltip */}
+                    {snappedDept && (
+                        <div
+                            style={{
+                                left: mousePos.x + 24,
+                                top: mousePos.y + 24,
+                            }}
+                            className="glass-tooltip"
+                        >
+                            <div style={{ borderLeft: `4px solid ${getStatusColor(snappedDept.risk)}`, paddingLeft: '12px' }}>
+                                <h3 style={{ fontSize: '15px', fontWeight: '900', color: 'white', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                                    {snappedDept.name.toUpperCase()}
+                                </h3>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>INCIDENT LEVEL:</span>
+                                    <span style={{ fontSize: '16px', fontWeight: '900', color: getStatusColor(snappedDept.risk) }}>{snappedDept.risk}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>RISK STATUS:</span>
+                                    <span style={{
+                                        fontSize: '10px',
+                                        fontWeight: '900',
+                                        color: 'white',
+                                        backgroundColor: getStatusColor(snappedDept.risk),
+                                        padding: '2px 8px',
+                                        borderRadius: '4px'
+                                    }}>
+                                        {getStatusText(snappedDept.risk)}
+                                    </span>
+                                </div>
+                                {snappedDept.timestamp && (
+                                    <div style={{ fontSize: '9px', color: '#475569', borderTop: '1px solid #333', paddingTop: '8px', marginTop: '4px' }}>
+                                        LAST UPDATE: {new Date(snappedDept.timestamp).toLocaleTimeString()}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Proactive Legend */}
                     <div style={{ position: 'absolute', bottom: '32px', left: '32px', display: 'flex', gap: '20px', backgroundColor: 'rgba(10, 10, 10, 0.9)', padding: '16px', borderRadius: '12px', border: '1px solid #333' }}>
@@ -391,10 +473,10 @@ const RedListLeaderboard = () => {
                     <div style={{ padding: '20px', backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: '16px', border: '1px dashed #3b82f644' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                             <Zap size={16} color="#3b82f6" fill="#3b82f6" />
-                            <span style={{ fontSize: '12px', fontWeight: '900', color: '#3b82f6', letterSpacing: '1px' }}>RADAR INTERACTIVITY ENABLED</span>
+                            <span style={{ fontSize: '12px', fontWeight: '900', color: '#3b82f6', letterSpacing: '1px' }}>TACTICAL INTERFACE LIVE</span>
                         </div>
                         <p style={{ fontSize: '11px', color: '#475569', lineHeight: 1.6, fontWeight: '500' }}>
-                            Hover over any hotspot to access real-time exclusion metrics. Transitions are synced to mission-control protocol v4.0.
+                            Crosshair targeting active. Real-time data sync with SafeEquip_Dynamic_Dataset established. Pulse triggers at {new Date().toLocaleTimeString()}.
                         </p>
                     </div>
 
@@ -404,10 +486,10 @@ const RedListLeaderboard = () => {
             {/* Global Footer */}
             <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #2a2a2a', paddingTop: '20px', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '24px' }}>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>VERSION: 2026.RADAR.PRO</div>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>STATUS: ACTIVE TELEMETRY</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>VERSION: 2026.RADAR.TACTICAL</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>STATUS: TARGETING ACTIVE</div>
                 </div>
-                <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '900', letterSpacing: '1px' }}>ANALYST: DAN KAHILU</div>
+                <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '900', letterSpacing: '1px' }}>CHIEF DATA ARCHITECT: DAN KAHILU</div>
             </div>
         </div>
     );

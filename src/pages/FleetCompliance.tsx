@@ -11,22 +11,15 @@ import {
     ResponsiveContainer,
     Legend
 } from 'recharts';
+import { useSafeEquip } from '../context/SafeEquipContext';
 
-// --- Audited Contractor Data 2026 ---
-const companyData = [
-    { id: 'MMG', name: 'MMG Kinsevere', total: 296, compliant: 113, nonCompliant: 183, rate: 38.2 },
-    { id: 'MEXCO', name: 'Mexco Mining', total: 112, compliant: 43, nonCompliant: 69, rate: 38.4 },
-    { id: 'ML', name: 'Masterlift', total: 14, compliant: 11, nonCompliant: 3, rate: 78.6 },
-    { id: 'TKM', name: 'TKM', total: 21, compliant: 8, nonCompliant: 13, rate: 38.1 },
-    { id: 'SLV', name: 'Solvay', total: 2, compliant: 2, nonCompliant: 0, rate: 100 },
-    { id: 'ITM', name: 'ITM', total: 2, compliant: 1, nonCompliant: 1, rate: 50 },
-    { id: 'NMA', name: 'Neema', total: 1, compliant: 1, nonCompliant: 0, rate: 100 },
-    { id: 'MBNK', name: 'MALA BNK', total: 1, compliant: 1, nonCompliant: 0, rate: 100 },
+// --- Baseline Contractors (Safety Fallback) ---
+const STATIC_COMPANIES = [
+    { id: 'MMG', name: 'MMG Kinsevere', total: 296, compliant: 113 },
+    { id: 'MEXCO', name: 'Mexco Mining', total: 112, compliant: 43 },
+    { id: 'ML', name: 'Masterlift', total: 14, compliant: 11 },
+    { id: 'TKM', name: 'TKM', total: 21, compliant: 8 },
 ];
-
-const totalFleetSize = 449;
-const totalNonCompliantCount = 269;
-const globalComplianceRate = "40.1";
 
 // --- Components ---
 
@@ -46,12 +39,51 @@ const DarkCard = ({ children, style = {} }: { children: React.ReactNode, style?:
 
 const ProgressBar = ({ value, color = '#3b82f6' }: { value: number, color?: string }) => (
     <div style={{ width: '100%', height: '6px', backgroundColor: '#333', borderRadius: '3px', overflow: 'hidden' }}>
-        <div style={{ width: `${value}%`, height: '100%', backgroundColor: color, transition: 'width 0.5s ease' }}></div>
+        <div style={{ width: `${Math.min(100, value)}%`, height: '100%', backgroundColor: color, transition: 'width 0.5s ease' }}></div>
     </div>
 );
 
 const FleetCompliance = () => {
+    const { dataset } = useSafeEquip();
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Aggregate Data from Dataset
+    const aggregatedDataset = dataset.reduce((acc: any, curr) => {
+        const coName = curr.company_name;
+        if (!acc[coName]) acc[coName] = { total: 0, compliant: 0 };
+        acc[coName].total += curr.vehicles_total;
+        acc[coName].compliant += curr.vehicles_compliant;
+        return acc;
+    }, {});
+
+    // Merge Dynamic with Static Baseline
+    const mergedCompanies = [...STATIC_COMPANIES];
+    Object.keys(aggregatedDataset).forEach(name => {
+        const existing = mergedCompanies.find(c => c.name === name);
+        if (existing) {
+            existing.total += aggregatedDataset[name].total;
+            existing.compliant += aggregatedDataset[name].compliant;
+        } else {
+            mergedCompanies.push({
+                id: name.substring(0, 4).toUpperCase(),
+                name,
+                total: aggregatedDataset[name].total,
+                compliant: aggregatedDataset[name].compliant
+            });
+        }
+    });
+
+    // Final Data Processing
+    const companyData = mergedCompanies.map(co => {
+        const nonCompliant = co.total - co.compliant;
+        const rate = co.total > 0 ? parseFloat(((co.compliant / co.total) * 100).toFixed(1)) : 0;
+        return { ...co, nonCompliant, rate };
+    }).sort((a, b) => b.rate - a.rate);
+
+    const totalFleetSize = companyData.reduce((sum, c) => sum + c.total, 0);
+    const totalCompliant = companyData.reduce((sum, c) => sum + c.compliant, 0);
+    const totalNonCompliantCount = totalFleetSize - totalCompliant;
+    const globalComplianceRate = totalFleetSize > 0 ? ((totalCompliant / totalFleetSize) * 100).toFixed(1) : "0.0";
 
     const filteredData = companyData.filter(company =>
         company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -78,11 +110,11 @@ const FleetCompliance = () => {
                     <h1 style={{ fontSize: '28px', fontWeight: '900', color: 'white', letterSpacing: '-0.5px', lineHeight: 1 }}>
                         FLEET <span style={{ color: '#3b82f6' }}>COMPLIANCE 2026</span>
                     </h1>
-                    <p style={{ color: '#64748b', marginTop: '6px', fontSize: '15px' }}>Audited Contractor Vehicle Conformity Reports</p>
+                    <p style={{ color: '#64748b', marginTop: '6px', fontSize: '15px' }}>Audited Contractor Vehicle Conformity Reports | SafeEquip Sync: ACTIVE</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>AUDITOR: DAN KAHILU</div>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>VERSION: 4.1.26</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>REAL-TIME STATUS: SYNCHRONIZED</div>
                 </div>
             </div>
 
@@ -124,7 +156,7 @@ const FleetCompliance = () => {
                 <DarkCard style={{ minHeight: 0 }}>
                     <div style={{ marginBottom: '24px' }}>
                         <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>Audit Comparison Chart</h3>
-                        <p style={{ fontSize: '13px', color: '#64748b' }}>Compliant (Green) vs. Non-Compliant (Red) per Contractor</p>
+                        <p style={{ fontSize: '13px', color: '#64748b' }}>Live Compliance Distribution per Contractor</p>
                     </div>
                     <div style={{ flex: 1, width: '100%', minHeight: 0 }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -214,10 +246,10 @@ const FleetCompliance = () => {
                     <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px dashed #333', flexShrink: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                             <Activity size={14} color="#3b82f6" />
-                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#3b82f6' }}>AUDIT NOTE</span>
+                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#3b82f6' }}>DYNAMIC SYNC</span>
                         </div>
                         <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: 1.5 }}>
-                            Compliance rate weighted by fleet volume. MMG Kinsevere significantly impacts global site average.
+                            Audited data mapping is now live. Updates to the HSSEC form will propagate here instantly.
                         </p>
                     </div>
                 </DarkCard>

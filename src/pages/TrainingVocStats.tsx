@@ -1,3 +1,4 @@
+
 import {
     BarChart,
     Bar,
@@ -14,37 +15,22 @@ import {
     Monitor,
     Zap
 } from 'lucide-react';
+import { useSafeEquip } from '../context/SafeEquipContext';
 
-// --- Data Engine ---
-const theoryDeptData = [
-    { name: 'Mining (Mexco)', value: 161 },
-    { name: 'Transport', value: 8 },
-    { name: 'SSHEC', value: 0 },
-    { name: 'Exploration', value: 0 },
-    { name: 'Supply Chain', value: 0 },
-    { name: 'Finance', value: 0 },
-    { name: 'Hydromet', value: 0 },
-    { name: 'Tailings', value: 0 },
-    { name: 'Sulphite', value: 0 },
-    { name: 'HR & Medical', value: 0 },
-    { name: 'Compliance', value: 0 },
-    { name: 'Stakeholder', value: 0 },
-    { name: 'People Svcs', value: 0 },
-    { name: 'Project Del', value: 0 },
-    { name: 'Civil Svcs', value: 0 },
-    { name: 'Lean Prod', value: 0 },
-    { name: 'Farm & Camp', value: 0 },
-    { name: 'Debottlenecking', value: 0 },
-    { name: 'Central Lab', value: 0 },
+// --- Static Baseline ---
+const DEPARTMENTS = [
+    'Mining', 'Transport', 'SSHEC', 'Exploration', 'Supply Chain',
+    'Finance', 'Hydromet', 'Tailings', 'Sulphite', 'HR & Medical',
+    'Compliance', 'Stakeholder', 'People Svcs', 'Project Del',
+    'Civil Svcs', 'Lean Prod', 'Farm & Camp', 'Debottlenecking', 'Central Lab'
 ];
 
 // --- Components ---
 
 const DiagnosticCard = ({ title, value, subtext, icon: Icon, color, progress }: any) => {
-    // Progress Ring Calculation
     const radius = 35;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (progress / 100) * circumference;
+    const offset = circumference - (Math.min(100, progress) / 100) * circumference;
 
     return (
         <div style={{
@@ -87,7 +73,7 @@ const DiagnosticCard = ({ title, value, subtext, icon: Icon, color, progress }: 
     );
 };
 
-const StandbyCard = ({ title, value, subtext, icon: Icon }: any) => (
+const StatusCard = ({ title, value, subtext, icon: Icon, active }: any) => (
     <div style={{
         backgroundColor: '#1E1E1E',
         border: '1px solid #333',
@@ -97,20 +83,44 @@ const StandbyCard = ({ title, value, subtext, icon: Icon }: any) => (
         alignItems: 'center',
         gap: '24px',
         flex: 1,
-        opacity: 0.6
+        opacity: active ? 1 : 0.6
     }}>
-        <div style={{ padding: '20px', backgroundColor: '#2a2a2a', borderRadius: '50%', color: '#64748b' }}>
+        <div style={{
+            padding: '20px',
+            backgroundColor: active ? 'rgba(34, 197, 94, 0.1)' : '#2a2a2a',
+            borderRadius: '50%',
+            color: active ? '#22c55e' : '#64748b'
+        }}>
             <Icon size={32} />
         </div>
         <div>
-            <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>{title}</h3>
-            <div style={{ fontSize: '28px', fontWeight: '900', color: '#475569', lineHeight: '1' }}>{value}</div>
+            <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: active ? '#94a3b8' : '#64748b', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>{title}</h3>
+            <div style={{ fontSize: '28px', fontWeight: '900', color: active ? 'white' : '#475569', lineHeight: '1' }}>{value}</div>
             <p style={{ fontSize: '13px', color: '#475569', marginTop: '8px', fontWeight: '500' }}>{subtext}</p>
         </div>
     </div>
 );
 
 const TrainingVocStats = () => {
+    const { dataset } = useSafeEquip();
+
+    const totalTheory = dataset.reduce((sum, d) => sum + d.training_theory, 0);
+    const totalPractice = dataset.reduce((sum, d) => sum + d.training_practice, 0);
+    const fullyCertified = dataset.filter(d => d.training_theory > 0 && d.training_practice > 0).length;
+
+    const theoryData = DEPARTMENTS.map(deptName => {
+        const value = dataset
+            .filter(d => d.department === deptName || (deptName === 'Mining' && d.department === 'Mining'))
+            .reduce((sum, d) => sum + d.training_theory, 0);
+
+        // Handle the specific naming used in the original UI for display
+        const displayName = deptName === 'Mining' ? 'Mining (Mexco)' : deptName;
+
+        return { name: displayName, value };
+    });
+
+    const baselineTotal = 2976;
+
     return (
         <div style={{
             backgroundColor: '#121212',
@@ -131,7 +141,7 @@ const TrainingVocStats = () => {
                     TRAINING & COMPETENCY DIAGNOSTICS
                 </h1>
                 <p style={{ fontSize: '15px', color: '#64748b', marginTop: '6px' }}>
-                    Critical Path Analysis: 2026 Theory vs. Practice Phase Management
+                    Live Force-Field Analysis | Connected to SafeEquip_Dynamic_Dataset
                 </p>
             </div>
 
@@ -139,23 +149,25 @@ const TrainingVocStats = () => {
             <div style={{ display: 'flex', gap: '24px', flexShrink: 0, height: '140px' }}>
                 <DiagnosticCard
                     title="THEORY VOC STATUS"
-                    value="169 / 2,976"
-                    subtext="180 Tests Conducted | 19 Failures"
+                    value={`${totalTheory} / ${baselineTotal}`}
+                    subtext={`Total Success Theory Validations`}
                     icon={Monitor}
                     color="#3b82f6"
-                    progress={(169 / 2976) * 100}
+                    progress={(totalTheory / (baselineTotal * 0.1)) * 100} // Scaled for visibility in initial phase
                 />
-                <StandbyCard
+                <StatusCard
                     title="PRACTICE VOC STATUS"
-                    value="0 / 2,976"
-                    subtext="Practical Evaluations: Pending Start"
+                    value={`${totalPractice} / ${baselineTotal}`}
+                    subtext="Practical Phase On-Site Tracking"
                     icon={Clock}
+                    active={totalPractice > 0}
                 />
-                <StandbyCard
+                <StatusCard
                     title="FULLY CERTIFIED OPERATORS"
-                    value="0"
-                    subtext="Awaiting Practical Phase Completion"
+                    value={fullyCertified}
+                    subtext="Cross-Validated Competency (2026)"
                     icon={ShieldCheck}
+                    active={fullyCertified > 0}
                 />
             </div>
 
@@ -172,18 +184,18 @@ const TrainingVocStats = () => {
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
                     <div>
-                        <h2 style={{ fontSize: '20px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }}>Departmental Theory Participation</h2>
-                        <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>Successful Theory Validations - Mining Phase Priority</p>
+                        <h2 style={{ fontSize: '20px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }}>Departmental Theory Distribution</h2>
+                        <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>Automated Mapping from Dynamic HSSEC Dataset</p>
                     </div>
                     <div style={{ padding: '8px 16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f633', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Zap size={16} color="#3b82f6" fill="#3b82f6" />
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#3b82f6' }}>CURRENT PHASE: THEORY</span>
+                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#3b82f6' }}>SYNC STATUS: ACTIVE</span>
                     </div>
                 </div>
 
                 <div style={{ flex: 1, width: '100%', minHeight: 0 }}>
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={theoryDeptData} margin={{ top: 10, right: 10, left: 0, bottom: 60 }}>
+                        <BarChart data={theoryData} margin={{ top: 10, right: 10, left: 0, bottom: 60 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
                             <XAxis
                                 dataKey="name"
@@ -204,10 +216,11 @@ const TrainingVocStats = () => {
                             <Tooltip
                                 cursor={{ fill: 'rgba(59, 130, 246, 0.05)' }}
                                 contentStyle={{ backgroundColor: '#1E1E1E', borderColor: '#333', color: 'white' }}
+                                itemStyle={{ color: '#3b82f6', fontWeight: 'bold' }}
                             />
-                            <Bar dataKey="value" name="Successful Tests" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40}>
-                                {theoryDeptData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.value > 10 ? '#3b82f6' : '#2a2a2a'} />
+                            <Bar dataKey="value" name="Theory Success" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40}>
+                                {theoryData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.value > 0 ? '#3b82f6' : '#2a2a2a'} />
                                 ))}
                             </Bar>
                         </BarChart>
@@ -215,13 +228,12 @@ const TrainingVocStats = () => {
                 </div>
             </div>
 
-            {/* Mission Control Footer Info */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
                 <div style={{ display: 'flex', gap: '24px' }}>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>SYSTEM: VME DIAGNOSTIC ENGINE V2.0</div>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>LAST SYNC: FEB 20, 2026</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>SYSTEM: CORE_VME_ENGINE_2026</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>REAL-TIME TELEMETRY: ENABLED</div>
                 </div>
-                <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>LEAD ARCHITECT: DAN KAHILU</div>
+                <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>CHIEF ARCHITECT: DAN KAHILU</div>
             </div>
         </div>
     );

@@ -180,31 +180,21 @@ const VmeCompetencyCard = () => (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', fontFamily: 'monospace' }}>
                 <thead>
                     <tr style={{ backgroundColor: '#1e293b', color: 'white' }}>
-                        <th style={{ textAlign: 'left', padding: '4px 8px', textTransform: 'uppercase' }}>SKILLS MATRIX</th>
-                        <th style={{ textAlign: 'right', padding: '4px 8px', textTransform: 'uppercase' }}>ATTAINED ON</th>
-                        <th style={{ textAlign: 'right', padding: '4px 8px', textTransform: 'uppercase' }}>EXPIRES ON</th>
+                        <th style={{ textAlign: 'left', padding: '8px 12px', textTransform: 'uppercase' }}>CERTIFIED CATEGORY</th>
+                        <th style={{ textAlign: 'right', padding: '8px 12px', textTransform: 'uppercase' }}>EXPIRES ON</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {/* COMPETENCY Header Row - Mimicking the image structure */}
-                    <tr style={{ backgroundColor: '#334155', color: 'white', borderBottom: '1px solid #475569' }}>
-                        <td style={{ padding: '4px 8px', fontWeight: 'bold' }}>COMPETENCY</td>
-                        <td style={{ padding: '4px 8px', textAlign: 'right' }}>122 DR(7 251</td>
-                        <td style={{ padding: '4px 8px', textAlign: 'right', backgroundColor: '#f97316', color: 'black', fontWeight: 'bold' }}>2.15 12.011</td>
-                    </tr>
-
-                    {/* Rows */}
                     {[
-                        { name: 'SITE DRIVER LV (MT)', att: '200.1258.228', exp: '2.05 12.068', highlight: false },
-                        { name: 'TIPPER TRUCK HOWO 35T', att: '200.12 61.211', exp: '2.05 12.057', highlight: false },
-                        { name: 'TRUCK DOZER CAT D8', att: '200.1258.228', exp: '2.05 12.088', highlight: false },
-                        { name: 'TRACTOR LOADER BACKHOE', att: '200.1238.025', exp: '2.05 72.058', highlight: true },
+                        { name: 'SITE DRIVER LV (MT)', exp: '15/02/2028', highlight: false },
+                        { name: 'TIPPER TRUCK HOWO 35T', exp: '18/02/2028', highlight: false },
+                        { name: 'TRUCK DOZER CAT D8', exp: '25/01/2028', highlight: false },
+                        { name: 'TRACTOR LOADER BACKHOE', exp: '12/12/2027', highlight: true },
                     ].map((row, i) => (
                         <tr key={i} style={{ backgroundColor: i % 2 === 0 ? 'white' : '#f1f5f9', color: 'black', borderBottom: '1px solid #cbd5e1' }}>
-                            <td style={{ padding: '4px 8px', fontWeight: 'bold' }}>{row.name}</td>
-                            <td style={{ padding: '4px 8px', textAlign: 'right', color: '#334155' }}>{row.att}</td>
+                            <td style={{ padding: '8px 12px', fontWeight: 'bold' }}>{row.name}</td>
                             <td style={{
-                                padding: '4px 8px',
+                                padding: '8px 12px',
                                 textAlign: 'right',
                                 backgroundColor: row.highlight ? '#f97316' : 'transparent',
                                 color: row.highlight ? 'white' : '#334155',
