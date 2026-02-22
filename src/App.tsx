@@ -14,6 +14,7 @@ import StrategicRoadmap from './pages/StrategicRoadmap';
 import MasterForm from './pages/MasterForm';
 
 import { SafeEquipProvider } from './context/SafeEquipContext';
+import PWAUpdatePrompt from './components/PWAUpdatePrompt';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="*" element={<Navigate to="/dashboard/strategic-roadmap" replace />} />
         </Routes>
       </BrowserRouter>
+      <PWAUpdatePrompt />
     </SafeEquipProvider>
   );
 }

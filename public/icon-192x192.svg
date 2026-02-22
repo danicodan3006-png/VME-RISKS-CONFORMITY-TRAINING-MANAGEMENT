@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="32" fill="url(#bg)"/>
+  <!-- Shield shape -->
+  <path d="M96 28 L148 52 L148 100 Q148 140 96 164 Q44 140 44 100 L44 52 Z" 
+        fill="none" stroke="url(#accent)" stroke-width="4" opacity="0.3"/>
+  <path d="M96 40 L140 60 L140 98 Q140 132 96 152 Q52 132 52 98 L52 60 Z" 
+        fill="url(#accent)" opacity="0.15"/>
+  <!-- VME Text -->
+  <text x="96" y="105" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-weight="bold" font-size="36" fill="url(#accent)">VME</text>
+  <text x="96" y="130" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-weight="600" font-size="16" fill="#94a3b8">2026</text>
+</svg>
