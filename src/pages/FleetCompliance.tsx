@@ -257,7 +257,7 @@ const FleetCompliance = () => {
     } | null>(null);
 
     // Dataset integration for live sync
-    const _dsFleet = dataset.reduce((s, d) => s + d.vehicles_total, 0);
+    void dataset.reduce((s, d) => s + d.vehicles_total, 0);
 
     const handleCardHover = (e: React.MouseEvent, contractor: typeof CONTRACTORS[0], index: number) => {
         const rect = e.currentTarget.getBoundingClientRect();

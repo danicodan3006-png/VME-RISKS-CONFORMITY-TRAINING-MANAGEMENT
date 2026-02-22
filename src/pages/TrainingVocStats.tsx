@@ -279,7 +279,7 @@ const TrainingVocStats = () => {
     const globalReadiness = ((TOTAL_THEORY / TOTAL_TARGET) * 100);
 
     // Cross-validation with dataset
-    const _totalFromDataset = dataset.reduce((s, d) => s + d.training_theory, 0);
+    void dataset.reduce((s, d) => s + d.training_theory, 0);
 
 
     const handleBarHover = (e: React.MouseEvent, dept: typeof DEPT_DATA[0], rank: number) => {

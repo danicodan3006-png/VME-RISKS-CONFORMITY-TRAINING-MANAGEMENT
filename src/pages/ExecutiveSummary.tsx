@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import { AlertTriangle, TrendingUp, AlertCircle, Shield, Copy, FileDown, ChevronRight } from 'lucide-react';
+import { AlertTriangle, TrendingUp, AlertCircle, Copy, FileDown, ChevronRight } from 'lucide-react';
 import { useSafeEquip } from '../context/SafeEquipContext';
 
 // --- Data ---
@@ -361,8 +361,8 @@ const ExecutiveSummary = () => {
     const fleetCompliance = totalVehicles > 0 ? (compliantVehicles / totalVehicles) * 100 : 0;
 
     // Training progress
-    const avgTheory = dataset.reduce((s, d) => s + d.theory_score, 0) / (dataset.length || 1);
-    const avgPractice = dataset.reduce((s, d) => s + d.practice_score, 0) / (dataset.length || 1);
+    const avgTheory = dataset.reduce((s, d) => s + d.training_theory, 0) / (dataset.length || 1);
+    const avgPractice = dataset.reduce((s, d) => s + d.training_practice, 0) / (dataset.length || 1);
     const globalTraining = (avgTheory + avgPractice) / 2;
 
     const comparisonData = HISTORICAL_DATA.map(d => ({
