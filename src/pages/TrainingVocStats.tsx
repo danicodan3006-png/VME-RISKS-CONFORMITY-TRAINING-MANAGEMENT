@@ -37,11 +37,7 @@ const DEPT_DATA = [
     { name: 'People Svcs', theory: 0, employees: 5, redListed: 0 },
 ];
 
-const TOTAL_TARGET = 2976;
-const TOTAL_THEORY = 169;
-const TOTAL_PRACTICE = 0;
-
-// --- 3D Icon Component ---
+// --- Sub-components for Training & VOC Stats ---
 const Icon3D = ({ icon: Icon, color, size = 20 }: { icon: any, color: string, size?: number }) => (
     <div style={{
         width: `${size + 16}px`,
@@ -67,11 +63,11 @@ const Icon3D = ({ icon: Icon, color, size = 20 }: { icon: any, color: string, si
 );
 
 // --- Certification Funnel ---
-const CertificationFunnel = () => {
+const CertificationFunnel = ({ totalTarget, totalTheory, totalPractice }: { totalTarget: number, totalTheory: number, totalPractice: number }) => {
     const steps = [
-        { label: 'ENROLLMENT', value: TOTAL_TARGET, color: '#3b82f6', icon: Users, width: '100%' },
-        { label: 'THEORY (VOC)', value: TOTAL_THEORY, color: '#f59e0b', icon: BookOpen, width: '85%' },
-        { label: 'PRACTICE (VOC)', value: TOTAL_PRACTICE, color: '#22c55e', icon: GraduationCap, width: '70%' },
+        { label: 'ENROLLMENT', value: totalTarget, color: '#3b82f6', icon: Users, width: '100%' },
+        { label: 'THEORY (VOC)', value: totalTheory, color: '#f59e0b', icon: BookOpen, width: '85%' },
+        { label: 'PRACTICE (VOC)', value: totalPractice, color: '#22c55e', icon: GraduationCap, width: '70%' },
     ];
 
     return (
@@ -157,7 +153,7 @@ const CertificationFunnel = () => {
     );
 };
 
-// --- Interactive Bar for Leaderboard ---
+
 const LeaderboardBar = ({ dept, maxValue, rank, onHover, onLeave }: {
     dept: typeof DEPT_DATA[0], maxValue: number, rank: number,
     onHover: (e: React.MouseEvent, dept: typeof DEPT_DATA[0], rank: number) => void,
@@ -168,6 +164,7 @@ const LeaderboardBar = ({ dept, maxValue, rank, onHover, onLeave }: {
         const t = setTimeout(() => setAnimated(true), 100 + rank * 60);
         return () => clearTimeout(t);
     }, [rank]);
+
 
     const pct = maxValue > 0 ? (dept.theory / maxValue) * 100 : 0;
     const barColor = dept.theory >= 100 ? '#00F2FF' : dept.theory >= 2 ? '#f59e0b' : '#64748b';
@@ -268,7 +265,10 @@ const LeaderboardBar = ({ dept, maxValue, rank, onHover, onLeave }: {
 // =====================================================
 
 const TrainingVocStats = () => {
-    const { dataset } = useSafeEquip();
+    const { TOTAL_POPULATION } = useSafeEquip();
+    const TOTAL_TARGET = TOTAL_POPULATION;
+    const TOTAL_THEORY = 169;
+    const TOTAL_PRACTICE = 0;
     const [hoveredDept, setHoveredDept] = useState<{ dept: typeof DEPT_DATA[0], x: number, y: number, rank: number } | null>(null);
 
     // Sort departments by theory descending
@@ -279,7 +279,6 @@ const TrainingVocStats = () => {
     const globalReadiness = ((TOTAL_THEORY / TOTAL_TARGET) * 100);
 
     // Cross-validation with dataset
-    void dataset.reduce((s, d) => s + d.training_theory, 0);
 
 
     const handleBarHover = (e: React.MouseEvent, dept: typeof DEPT_DATA[0], rank: number) => {
@@ -484,7 +483,7 @@ const TrainingVocStats = () => {
                         <Zap size={12} color="#06b6d4" />
                         <h3 style={{ fontSize: '9px', fontWeight: '900', color: '#06b6d4', letterSpacing: '2px' }}>CERTIFICATION FUNNEL</h3>
                     </div>
-                    <CertificationFunnel />
+                    <CertificationFunnel totalTarget={TOTAL_TARGET} totalTheory={TOTAL_THEORY} totalPractice={TOTAL_PRACTICE} />
                     {/* Funnel Stats */}
                     <div style={{
                         marginTop: 'auto',

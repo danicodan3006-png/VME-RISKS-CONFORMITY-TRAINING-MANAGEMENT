@@ -212,7 +212,7 @@ const QuadrantCard = ({ title, icon: Icon, accentColor, children, glowBorder }: 
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════
 const MasterForm = () => {
-    const { updateDataset } = useSafeEquip();
+    const { updateDataset, resetIncidentCounter } = useSafeEquip();
 
     // === Q1: Accidents ===
     const [accDept, setAccDept] = useState(DEPARTMENTS[0]);
@@ -262,13 +262,21 @@ const MasterForm = () => {
     // === Push Handlers ===
     const pushAccidents = () => {
         setAccStatus('saving');
+        const count = Number(accCount);
         const entry = {
             id: `ACC-${Date.now()}`, timestamp: accDate, department: accDept,
-            incidents: Number(accCount), training_theory: 0, training_practice: 0,
+            incidents: count, training_theory: 0, training_practice: 0,
             company_name: 'MMG Kinsevere', vehicles_total: 0, vehicles_compliant: 0,
-            red_list_status: accCount >= 2, risk_level: accCount >= 2 ? 2 : accCount === 1 ? 1 : 0
+            red_list_status: count >= 2, risk_level: count >= 2 ? 2 : count === 1 ? 1 : 0
         };
-        setTimeout(() => { updateDataset(entry); setAccStatus('success'); setTimeout(() => setAccStatus('idle'), 2000); }, 700);
+        setTimeout(() => {
+            updateDataset(entry);
+            if (count > 0) {
+                resetIncidentCounter(accDate);
+            }
+            setAccStatus('success');
+            setTimeout(() => setAccStatus('idle'), 2000);
+        }, 700);
     };
 
     const pushTraining = () => {

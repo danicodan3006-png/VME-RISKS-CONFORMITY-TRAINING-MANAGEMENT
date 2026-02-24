@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import {
     FolderOpen, FileText, Download, Eye, Shield, Award,
     CheckCircle, Circle, AlertTriangle, Gauge, BadgeCheck, BookOpen,
     ClipboardCheck, GraduationCap, Truck
 } from 'lucide-react';
+import { useSafeEquip } from '../context/SafeEquipContext';
 
 // ═══════════════════════════════════════════════
 // RESOURCE & GOVERNANCE CENTER — VME 2026
@@ -192,6 +192,8 @@ const DocRow = ({ item, folderColor, isLast }: {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════
 const DocumentationStatus = () => {
+    const { dataset, TOTAL_POPULATION } = useSafeEquip();
+    const activePopulation = TOTAL_POPULATION;
     const [hoveredEquip, setHoveredEquip] = useState<{
         equip: typeof EQUIPMENT[0], x: number, y: number, isBottom: boolean
     } | null>(null);

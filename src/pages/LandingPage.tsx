@@ -434,7 +434,7 @@ const SlideToUnlock = ({ onUnlock, disabled }: { onUnlock: () => void; disabled:
 // MAIN LANDING PAGE
 // ═══════════════════════════════════════════════════════
 const LandingPage = () => {
-    const { dataset, login } = useSafeEquip();
+    const { dataset, login, lastIncidentDate, TOTAL_POPULATION } = useSafeEquip();
     const [accessCode, setAccessCode] = useState('');
     const [error, setError] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
@@ -444,12 +444,7 @@ const LandingPage = () => {
     const [autoFillPhase, setAutoFillPhase] = useState<'typing' | 'done' | 'idle'>('idle');
 
     // Safety Clock (Dynamic Counter)
-    const lastIncidentDate = dataset
-        .filter(d => d.incidents > 0)
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]?.timestamp;
-    const daysWithoutIncident = lastIncidentDate
-        ? Math.floor((new Date().getTime() - new Date(lastIncidentDate).getTime()) / (1000 * 3600 * 24))
-        : 127;
+    const daysWithoutIncident = Math.floor((new Date().getTime() - new Date(lastIncidentDate).getTime()) / (1000 * 3600 * 24));
 
     const [displayDays, setDisplayDays] = useState(0);
     useEffect(() => {
@@ -466,10 +461,7 @@ const LandingPage = () => {
         return () => clearInterval(timer);
     }, [daysWithoutIncident]);
 
-    // Compliance
-    const totalFleet = dataset.reduce((sum, d) => sum + d.vehicles_total, 0) + 443;
-    const totalCompliant = dataset.reduce((sum, d) => sum + d.vehicles_compliant, 0) + 177;
-    const globalCompliance = ((totalCompliant / totalFleet) * 100).toFixed(1);
+    // Compliance Target
     const complianceTarget = 54.8;
 
     // Typewriter Auto-Fill
@@ -627,14 +619,16 @@ const LandingPage = () => {
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(59,130,246,0.3), transparent)' }} />
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
                         <Activity size={18} color="#3b82f6" />
-                        <h3 style={{ fontSize: '10px', color: '#3b82f6', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Annual YTD 2026</h3>
+                        <h3 style={{ fontSize: '10px', color: '#3b82f6', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Global Incidents 2026</h3>
                     </div>
                     <div style={{
-                        fontSize: '36px', fontWeight: '900', color: '#3b82f6', lineHeight: 1,
+                        fontSize: '56px', fontWeight: '900', color: '#3b82f6', lineHeight: 1,
                         textShadow: '0 0 30px rgba(59,130,246,0.4)', fontFamily: '"JetBrains Mono", monospace', marginBottom: '6px',
-                    }}>{globalCompliance}%</div>
-                    <p style={{ fontSize: '9px', color: '#94a3b8', margin: '0 0 12px 0', fontWeight: '600' }}>Global Fleet Conformity</p>
+                    }}>{dataset.reduce((sum, d) => sum + d.incidents, 0)}</div>
+                    <p style={{ fontSize: '9px', color: '#94a3b8', margin: '0 0 12px 0', fontWeight: '600' }}>Annual YTD Audited Count</p>
                     <div style={{ width: '100%' }}>
+                        <div style={{ fontSize: '26px', fontWeight: '900', color: '#f59e0b', fontFamily: '"Roboto Mono", monospace', textShadow: '0 0 10px rgba(245,158,11,0.3)' }}>{TOTAL_POPULATION.toLocaleString()}</div>
+                        <div style={{ fontSize: '8px', color: '#475569', fontWeight: '800', letterSpacing: '1px', marginTop: '2px' }}>TOTAL POPULATION</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <span style={{ fontSize: '8px', color: '#475569', fontWeight: '700', letterSpacing: '1px' }}>2026 TARGET COMPLIANCE</span>
                             <span style={{ fontSize: '9px', fontWeight: '900', color: '#f59e0b' }}>{complianceTarget}%</span>

@@ -1,263 +1,81 @@
 
-import { useState, useRef } from 'react';
 import {
-    Trophy,
     Medal,
     ShieldAlert,
     Star,
     UserCheck,
     Zap,
-    Layout
+    Layout,
+    TrendingUp
 } from 'lucide-react';
+import {
+    RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+    ResponsiveContainer
+} from 'recharts';
 import { useSafeEquip } from '../context/SafeEquipContext';
 
 // --- Data Engine ---
 
-const STATIC_DEPARTMENTS = [
-    { name: 'Mining', x: 50, y: 15 },
-    { name: 'Transport', x: 80, y: 30 },
-    { name: 'SSHEC', x: 75, y: 70 },
-    { name: 'Exploration', x: 50, y: 85 },
-    { name: 'Supply Chain', x: 25, y: 70 },
-    { name: 'Finance', x: 15, y: 50 },
-    { name: 'Hydromet', x: 30, y: 25 },
-    { name: 'Tailings', x: 65, y: 20 },
-    { name: 'Sulphite', x: 85, y: 50 },
-    { name: 'HR & Medical', x: 10, y: 35 },
-    { name: 'Compliance', x: 40, y: 10 },
-    { name: 'Stakeholder', x: 90, y: 65 },
-    { name: 'People Svcs', x: 20, y: 80 },
-    { name: 'Project Del', x: 35, y: 90 },
-    { name: 'Civil Svcs', x: 60, y: 80 },
-    { name: 'Lean Prod', x: 95, y: 40 },
-    { name: 'Farm & Camp', x: 5, y: 55 },
-    { name: 'Debottlenecking', x: 45, y: 45 },
-    { name: 'Central Lab', x: 55, y: 55 },
-];
-
 const levels = [
-    { level: 'L5', title: 'ELITE DIAMOND', color: '#b9f2ff', stars: 5, icon: Star },
-    { level: 'L4', title: 'GOLD BADGE', color: '#ffd700', stars: 4, icon: Medal },
-    { level: 'L3', title: 'SILVER BADGE', color: '#c0c0c0', stars: 3, icon: Medal },
-    { level: 'L2', title: 'BRONZE BADGE', color: '#cd7f32', stars: 2, icon: Medal },
-    { level: 'L1', title: 'BLUE BADGE', color: '#3b82f6', stars: 1, icon: UserCheck },
+    { level: 'L5', title: 'FATAL/CRITICAL', color: '#ef4444', stars: 5, icon: Star },
+    { level: 'L4', title: 'HIGH RISK', color: '#f59e0b', stars: 4, icon: Medal },
+    { level: 'L3', title: 'MEDIUM RISK', color: '#fbbf24', stars: 3, icon: Medal },
+    { level: 'L2', title: 'MINOR RISK', color: '#3b82f6', stars: 2, icon: Medal },
+    { level: 'L1', title: 'NEGLIGIBLE', color: '#94a3b8', stars: 1, icon: UserCheck },
 ];
 
-const rankingData = [
-    { rank: 1, name: 'Exemple 1', dept: 'Transport', level: 'L5', score: 98 },
-    { rank: 2, name: 'Exemple 2', dept: 'Transport', level: 'L5', score: 96 },
-    { rank: 3, name: 'Exemple 3', dept: 'Civil Svcs', level: 'L4', score: 94 },
-    { rank: 4, name: 'Exemple 4', dept: 'N/A', level: 'L4', score: 92 },
-    { rank: 5, name: 'Exemple 5', dept: 'N/A', level: 'L3', score: 88 },
-];
-
-// --- Sub-components ---
-
-const Hotspot = ({ name, risk, x, y, active }: { name: string, risk: number, x: number, y: number, active: boolean }) => {
-    const isRed = risk >= 2;
-    const isOrange = risk === 1;
-    const isZero = risk === 0;
-
-    const color = isRed ? '#ef4444' : isOrange ? '#f59e0b' : 'rgba(148, 163, 184, 0.4)';
-    const size = isRed ? '48px' : isOrange ? '36px' : '20px';
-
-    return (
-        <div
-            style={{
-                position: 'absolute',
-                left: `${x}%`,
-                top: `${y}%`,
-                transform: 'translate(-50%, -50%)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                zIndex: risk > 0 ? 10 : 1,
-                opacity: active ? 1 : 0.4,
-                transition: 'all 0.3s ease'
-            }}
-        >
-            {/* Radial Pulse Effect for 1+ Risk */}
-            {risk > 0 && (
-                <div style={{
-                    position: 'absolute',
-                    width: size,
-                    height: size,
-                    borderRadius: '50%',
-                    border: `2px solid ${color}`,
-                    animation: 'radialPulse 2s infinite cubic-bezier(0.24, 0, 0.38, 1)'
-                }}></div>
-            )}
-
-            <div
-                style={{
-                    width: size,
-                    height: size,
-                    borderRadius: '50%',
-                    backgroundColor: isZero ? 'rgba(30, 30, 30, 0.9)' : color,
-                    border: `1px solid ${isZero ? 'rgba(148, 163, 184, 0.2)' : '#fff'}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: isZero ? '#94a3b8' : 'white',
-                    fontSize: isZero ? '10px' : '16px',
-                    fontWeight: '900',
-                    transition: 'all 0.3s ease-in-out',
-                    position: 'relative',
-                    zIndex: 2,
-                    boxShadow: isZero ? 'none' : '0 0 10px rgba(0,0,0,0.5)'
-                }}
-            >
-                {risk}
-            </div>
-            <span style={{
-                marginTop: '8px',
-                fontSize: '9px',
-                fontWeight: risk > 0 ? '900' : '500',
-                color: risk > 0 ? 'white' : '#64748b',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                whiteSpace: 'nowrap',
-                backgroundColor: risk > 0 ? 'rgba(18, 18, 18, 0.6)' : 'transparent',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                pointerEvents: 'none',
-                transition: 'all 0.3s ease'
-            }}>
-                {name}
-            </span>
-        </div>
-    );
-};
-
-const Crosshair = ({ x, y }: { x: number, y: number }) => (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 100 }}>
-        {/* Horizontal Line */}
-        <div style={{
-            position: 'absolute',
-            top: y,
-            left: 0,
-            width: '100%',
-            height: '1px',
-            backgroundColor: 'rgba(6, 182, 212, 0.4)',
-            boxShadow: '0 0 8px rgba(6, 182, 212, 0.3)',
-            transition: 'top 0.1s linear'
-        }}></div>
-        {/* Vertical Line */}
-        <div style={{
-            position: 'absolute',
-            left: x,
-            top: 0,
-            width: '1px',
-            height: '100%',
-            backgroundColor: 'rgba(6, 182, 212, 0.4)',
-            boxShadow: '0 0 8px rgba(6, 182, 212, 0.3)',
-            transition: 'left 0.1s linear'
-        }}></div>
-        {/* Aim Point */}
-        <div style={{
-            position: 'absolute',
-            left: x,
-            top: y,
-            width: '16px',
-            height: '16px',
-            borderRadius: '50%',
-            border: '1px solid #06b6d4',
-            transform: 'translate(-50%, -50%)',
-            boxShadow: '0 0 15px #06b6d4',
-            transition: 'all 0.1s linear',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-        }}>
-            <div style={{ width: '2px', height: '2px', backgroundColor: '#06b6d4', borderRadius: '50%' }}></div>
-        </div>
-    </div>
+const RadarGradient = () => (
+    <svg style={{ height: 0, width: 0 }}>
+        <defs>
+            <radialGradient id="radarRiskGrad" cx="50%" cy="50%" r="65%" fx="50%" fy="50%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="60%" stopColor="#f59e0b" />
+                <stop offset="100%" stopColor="#ef4444" />
+            </radialGradient>
+        </defs>
+    </svg>
 );
 
 const RedListLeaderboard = () => {
-    const { dataset } = useSafeEquip();
-    const mapRef = useRef<HTMLDivElement>(null);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [radarSize, setRadarSize] = useState({ w: 0, h: 0 });
-    const [snappedDept, setSnappedDept] = useState<any>(null);
+    const { dataset, theme } = useSafeEquip();
+    const isHighTech = theme === 'high-tech';
 
-    // Tooltip dimensions for smart positioning
-    const TOOLTIP_W = 240;
-    const TOOLTIP_H = 160;
-    const TOOLTIP_GAP = 15;
+    // Sync data from SafeEquip_Dynamic_Dataset
+    const radarData = dataset
+        .filter(d => ['Mining', 'Civil Svcs', 'Transport', 'Lean Prod', 'Commercial'].includes(d.department))
+        .map(d => ({
+            axis: d.department,
+            value: d.risk_level,
+            fullMark: 5
+        }));
 
-    // Merge static department positions with dynamic data
-    const departments = STATIC_DEPARTMENTS.map(dept => {
-        const dynamicData = dataset.find(d => d.department === dept.name);
-        return {
-            ...dept,
-            risk: dynamicData?.red_list_status ? dynamicData.risk_level : 0,
-            active: dynamicData?.red_list_status || false,
-            timestamp: dynamicData?.timestamp || null
-        };
-    });
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!mapRef.current) return;
-        const rect = mapRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Track radar panel size for smart tooltip positioning
-        setRadarSize({ w: rect.width, h: rect.height });
-
-        // Calculate magnetic snap
-        let snapTarget = null;
-        const snapRadius = 40;
-
-        for (const dept of departments) {
-            const dx = (dept.x / 100) * rect.width - x;
-            const dy = (dept.y / 100) * rect.height - y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < snapRadius) {
-                snapTarget = dept;
-                break;
-            }
-        }
-
-        if (snapTarget) {
-            setSnappedDept(snapTarget);
-            setMousePos({
-                x: (snapTarget.x / 100) * rect.width,
-                y: (snapTarget.y / 100) * rect.height
-            });
-        } else {
-            setSnappedDept(null);
-            setMousePos({ x, y });
-        }
-    };
-
-    const getStatusText = (risk: number) => {
-        if (risk >= 2) return 'CRITICAL';
-        if (risk === 1) return 'ACTION REQUIRED';
-        return 'SAFE';
-    };
-
-    const getStatusColor = (risk: number) => {
-        if (risk >= 2) return '#ef4444';
-        if (risk === 1) return '#f59e0b';
-        return '#22c55e';
-    };
+    const rankingData = dataset
+        .filter(d => ['Mining', 'Civil Svcs', 'Transport', 'Lean Prod', 'Commercial'].includes(d.department))
+        .sort((a, b) => b.risk_level - a.risk_level)
+        .map((d, i) => ({
+            rank: i + 1,
+            name: d.company_name,
+            dept: d.department,
+            level: `L${d.risk_level}`,
+            risk_level: d.risk_level,
+            score: 100 - (d.risk_level * 10),
+            color: d.risk_level >= 3 ? '#ef4444' : (d.risk_level === 2 ? '#f59e0b' : '#3b82f6')
+        }));
 
     return (
         <div style={{
-            backgroundColor: '#121212',
+            backgroundColor: isHighTech ? '#121212' : '#f8fafc',
             height: '100vh',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            color: 'white',
+            color: isHighTech ? 'white' : '#1e293b',
             padding: '24px',
             fontFamily: '"Inter", sans-serif',
             overflow: 'hidden',
             boxSizing: 'border-box'
         }}>
+            <RadarGradient />
             <style>{`
                 @keyframes radialPulse {
                     0% { transform: scale(1); opacity: 0.8; }
@@ -265,146 +83,93 @@ const RedListLeaderboard = () => {
                 }
                 .radar-bg {
                     background: radial-gradient(circle at center, transparent 0%, rgba(30,30,30, 0.4) 100%),
-                                repeating-radial-gradient(circle at center, transparent, transparent 15%, rgba(255, 255, 255, 0.02) 15.1%);
-                }
-                .glass-tooltip {
-                    background: rgba(20, 20, 20, 0.8);
-                    backdrop-filter: blur(12px);
-                    border: 1px solid #06b6d466;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-                    border-radius: 12px;
-                    padding: 16px;
-                    pointer-events: none;
-                    z-index: 1000;
-                    position: absolute;
-                    min-width: 220px;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                                repeating-radial-gradient(circle at center, transparent, transparent 15%, rgba(255, 255, 255, 0.01) 15.1%);
                 }
             `}</style>
 
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexShrink: 0 }}>
                 <div>
-                    <h1 style={{ fontSize: '28px', fontWeight: '900', color: '#ef4444', letterSpacing: '2px', lineHeight: 1 }}>
-                        CONTRACTOR RISK RADAR <span style={{ color: 'white', fontSize: '12px', fontWeight: '400', letterSpacing: 'normal' }}>v4.5 TACTICAL</span>
+                    <h1 style={{ fontSize: '28px', fontWeight: '900', color: isHighTech ? '#3b82f6' : '#2563eb', letterSpacing: '2px', lineHeight: 1 }}>
+                        CONTRACTOR RISK RADAR <span style={{ color: isHighTech ? 'white' : '#64748b', fontSize: '12px', fontWeight: '400', letterSpacing: 'normal' }}>v5.0 AUDITED</span>
                     </h1>
-                    <p style={{ fontSize: '14px', color: '#475569', marginTop: '6px', fontWeight: '500' }}> TARGETING SECTOR: {snappedDept ? snappedDept.name.toUpperCase() : 'SEARCHING...'}</p>
+                    <p style={{ fontSize: '14px', color: '#475569', marginTop: '6px', fontWeight: '500' }}> TARGETING SECTOR: REAL CONTRACTOR LEVELS L1-L5</p>
                 </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    <div style={{ padding: '8px 20px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef444444', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <ShieldAlert size={18} color="#ef4444" />
-                        <span style={{ fontSize: '12px', fontWeight: '900', color: '#ef4444' }}>{dataset.filter(d => d.red_list_status).length} THREATS DETECTED</span>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div style={{
+                        padding: '8px 20px',
+                        backgroundColor: isHighTech ? 'rgba(59, 130, 246, 0.1)' : '#ffffff',
+                        border: isHighTech ? '1px solid #3b82f644' : '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: isHighTech ? 'none' : '0 1px 3px rgba(0,0,0,0.05)'
+                    }}>
+                        <ShieldAlert size={18} color={isHighTech ? "#3b82f6" : "#2563eb"} />
+                        <span style={{ fontSize: '12px', fontWeight: '900', color: isHighTech ? '#3b82f6' : '#2563eb' }}>{radarData.length} CONTRACTORS TRACKED</span>
                     </div>
                 </div>
             </div>
 
             <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 420px', gap: '32px', minHeight: 0 }}>
 
-                {/* 1. TACTICAL RADAR AREA */}
+                {/* 1. REAL DATA RADAR CHART */}
                 <div
-                    ref={mapRef}
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={() => { setSnappedDept(null); setMousePos({ x: 0, y: 0 }); }}
                     style={{
-                        backgroundColor: '#1E1E1E',
-                        border: '1px solid #333',
+                        backgroundColor: isHighTech ? '#1E1E1E' : '#ffffff',
+                        border: isHighTech ? '1px solid #333' : '1px solid #e2e8f0',
                         borderRadius: '16px',
                         position: 'relative',
                         overflow: 'hidden',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        cursor: 'none'
-                    }} className="radar-bg"
+                        boxShadow: isHighTech ? 'none' : '0 10px 15px -3px rgba(0,0,0,0.1)'
+                    }} className={isHighTech ? "radar-bg" : ""}
                 >
-                    {/* Tactical Crosshair */}
-                    {mousePos.x !== 0 && <Crosshair x={mousePos.x} y={mousePos.y} />}
-
-                    {/* Radar Scars/Grid */}
-                    <div style={{ position: 'absolute', width: '90%', height: '90%', border: '1px solid rgba(255,255,255,0.02)', borderRadius: '50%' }}></div>
-                    <div style={{ position: 'absolute', width: '70%', height: '70%', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
-                    <div style={{ position: 'absolute', width: '50%', height: '50%', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '50%' }}></div>
-
-                    {/* Hotspots Container */}
-                    <div style={{ position: 'absolute', width: '100%', height: '100%' }}>
-                        {departments.map((dept, i) => (
-                            <Hotspot
-                                key={i}
-                                name={dept.name}
-                                risk={dept.risk}
-                                x={dept.x}
-                                y={dept.y}
-                                active={dept.active}
-                            />
-                        ))}
+                    <div style={{ width: '90%', height: '90%' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                                <PolarGrid stroke={isHighTech ? "#334155" : "#e2e8f0"} />
+                                <PolarAngleAxis dataKey="axis" tick={{ fill: isHighTech ? '#94a3b8' : '#64748b', fontSize: 12, fontWeight: '700' }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fill: isHighTech ? '#475569' : '#94a3b8', fontSize: 10 }} axisLine={false} />
+                                <Radar
+                                    name="Risk Level"
+                                    dataKey="value"
+                                    stroke={isHighTech ? "#3b82f6" : "#2563eb"}
+                                    fill="url(#radarRiskGrad)"
+                                    fillOpacity={isHighTech ? 0.4 : 0.2}
+                                    strokeWidth={3}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
                     </div>
 
-                    {/* Magnetic Tooltip — Smart Positioning */}
-                    {snappedDept && (() => {
-                        // Right-half → open LEFT; Bottom-half → open UPWARD
-                        const isRightHalf = mousePos.x > radarSize.w / 2;
-                        const isBottomHalf = mousePos.y > radarSize.h / 2;
-
-                        const tooltipLeft = isRightHalf
-                            ? mousePos.x - TOOLTIP_W - TOOLTIP_GAP
-                            : mousePos.x + TOOLTIP_GAP;
-                        const tooltipTop = isBottomHalf
-                            ? mousePos.y - TOOLTIP_H - TOOLTIP_GAP
-                            : mousePos.y + TOOLTIP_GAP;
-
-                        return (
-                            <div
-                                style={{
-                                    left: Math.max(8, tooltipLeft),
-                                    top: Math.max(8, tooltipTop),
-                                    width: TOOLTIP_W,
-                                }}
-                                className="glass-tooltip"
-                            >
-                                <div style={{ borderLeft: `4px solid ${getStatusColor(snappedDept.risk)}`, paddingLeft: '12px' }}>
-                                    <h3 style={{ fontSize: '15px', fontWeight: '900', color: 'white', marginBottom: '8px', letterSpacing: '0.5px', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}>
-                                        {snappedDept.name.toUpperCase()}
-                                    </h3>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>INCIDENT LEVEL:</span>
-                                        <span style={{ fontSize: '16px', fontWeight: '900', color: getStatusColor(snappedDept.risk) }}>{snappedDept.risk}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold' }}>RISK STATUS:</span>
-                                        <span style={{
-                                            fontSize: '10px',
-                                            fontWeight: '900',
-                                            color: 'white',
-                                            backgroundColor: getStatusColor(snappedDept.risk),
-                                            padding: '2px 8px',
-                                            borderRadius: '4px'
-                                        }}>
-                                            {getStatusText(snappedDept.risk)}
-                                        </span>
-                                    </div>
-                                    {snappedDept.timestamp && (
-                                        <div style={{ fontSize: '9px', color: '#475569', borderTop: '1px solid #333', paddingTop: '8px', marginTop: '4px' }}>
-                                            LAST UPDATE: {new Date(snappedDept.timestamp).toLocaleTimeString()}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })()}
-
                     {/* Proactive Legend */}
-                    <div style={{ position: 'absolute', bottom: '32px', left: '32px', display: 'flex', gap: '20px', backgroundColor: 'rgba(10, 10, 10, 0.9)', padding: '16px', borderRadius: '12px', border: '1px solid #333' }}>
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '32px',
+                        left: '32px',
+                        display: 'flex',
+                        gap: '20px',
+                        backgroundColor: isHighTech ? 'rgba(10, 10, 10, 0.9)' : '#ffffff',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        border: isHighTech ? '1px solid #333' : '1px solid #e2e8f0',
+                        boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
+                    }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 0 10px #ef4444' }}></div>
-                            <span style={{ fontSize: '11px', fontWeight: '800' }}>CRITICAL</span>
+                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: isHighTech ? '0 0 10px #ef4444' : 'none' }}></div>
+                            <span style={{ fontSize: '11px', fontWeight: '800' }}>HIGH RISK</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#f59e0b', boxShadow: '0 0 10px #f59e0b' }}></div>
-                            <span style={{ fontSize: '11px', fontWeight: '800' }}>THREAT</span>
+                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#f59e0b', boxShadow: isHighTech ? '0 0 10px #f59e0b' : 'none' }}></div>
+                            <span style={{ fontSize: '11px', fontWeight: '800' }}>ALERT</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(30, 30, 30, 0.8)', border: '1px solid #475569' }}></div>
-                            <span style={{ fontSize: '11px', fontWeight: '800', color: '#475569' }}>NOMINAL</span>
+                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#3b82f6', boxShadow: isHighTech ? '0 0 10px #3b82f6' : 'none' }}></div>
+                            <span style={{ fontSize: '11px', fontWeight: '800' }}>NOMINAL</span>
                         </div>
                     </div>
                 </div>
@@ -414,38 +179,39 @@ const RedListLeaderboard = () => {
 
                     {/* Premium Ranking */}
                     <div style={{
-                        backgroundColor: '#1E1E1E',
-                        border: '1px solid #333',
+                        backgroundColor: isHighTech ? '#1E1E1E' : '#ffffff',
+                        border: isHighTech ? '1px solid #333' : '1px solid #e2e8f0',
                         borderRadius: '16px',
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        minHeight: 0
+                        minHeight: 0,
+                        boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
                     }}>
-                        <div style={{ padding: '20px', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Trophy color="#fbbf24" size={20} />
-                            <h3 style={{ fontSize: '15px', fontWeight: '900', letterSpacing: '1px' }}>CONFIDENTIAL PERFORMANCE</h3>
+                        <div style={{ padding: '20px', borderBottom: isHighTech ? '1px solid #333' : '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <TrendingUp color={isHighTech ? "#3b82f6" : "#2563eb"} size={20} />
+                            <h3 style={{ fontSize: '15px', fontWeight: '900', letterSpacing: '1px' }}>CONTRACTOR RISK REGISTRY</h3>
                         </div>
                         <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <tbody>
-                                    {rankingData.map((driver) => (
-                                        <tr key={driver.rank} style={{ borderBottom: '1px solid #2a2a2a' }}>
+                                    {rankingData.map((contractor) => (
+                                        <tr key={contractor.dept} style={{ borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #f1f5f9' }}>
                                             <td style={{ padding: '14px 0' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                                    <div style={{ width: '32px', height: '32px', backgroundColor: '#2a2a2a', border: '1px solid #333', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '900', color: '#fbbf24' }}>
-                                                        {driver.rank}
+                                                    <div style={{ width: '32px', height: '32px', backgroundColor: isHighTech ? '#2a2a2a' : '#f8fafc', border: `1px solid ${contractor.color}`, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '900', color: contractor.color }}>
+                                                        {contractor.rank}
                                                     </div>
                                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span style={{ fontSize: '14px', fontWeight: '700' }}>{driver.name}</span>
-                                                        <span style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>{driver.dept}</span>
+                                                        <span style={{ fontSize: '14px', fontWeight: '700' }}>{contractor.name}</span>
+                                                        <span style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>{contractor.dept}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td style={{ padding: '14px 0', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                                    <span style={{ fontSize: '12px', fontWeight: '900', color: driver.level === 'L5' ? '#b9f2ff' : '#fbbf24' }}>{driver.level}</span>
-                                                    <span style={{ fontSize: '12px', color: '#22c55e', fontWeight: '900' }}>{driver.score}%</span>
+                                                    <span style={{ fontSize: '12px', fontWeight: '900', color: contractor.color }}>{contractor.level}</span>
+                                                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '900' }}>RISK LEVEL: {contractor.risk_level}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -457,13 +223,14 @@ const RedListLeaderboard = () => {
 
                     {/* L1-L5 Legend */}
                     <div style={{
-                        backgroundColor: '#1E1E1E',
-                        border: '1px solid #333',
+                        backgroundColor: isHighTech ? '#1E1E1E' : '#ffffff',
+                        border: isHighTech ? '1px solid #333' : '1px solid #e2e8f0',
                         borderRadius: '16px',
-                        padding: '24px'
+                        padding: '24px',
+                        boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                            <Layout size={18} color="#3b82f6" />
+                            <Layout size={18} color={isHighTech ? "#3b82f6" : "#2563eb"} />
                             <h3 style={{ fontSize: '13px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Level Protocol Legend</h3>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -473,14 +240,14 @@ const RedListLeaderboard = () => {
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
                                     padding: '10px 16px',
-                                    backgroundColor: 'rgba(30, 30, 30, 0.4)',
+                                    backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.4)' : '#f8fafc',
                                     borderRadius: '10px',
                                     borderLeft: `4px solid ${lvl.color}`
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <lvl.icon size={14} color={lvl.color} />
                                         <span style={{ fontSize: '12px', fontWeight: '900', color: lvl.color }}>{lvl.level}</span>
-                                        <span style={{ fontSize: '11px', color: 'white', opacity: 0.7, fontWeight: 'bold' }}>{lvl.title}</span>
+                                        <span style={{ fontSize: '11px', color: isHighTech ? 'white' : '#1e293b', opacity: 0.7, fontWeight: 'bold' }}>{lvl.title}</span>
                                     </div>
                                     <div style={{ display: 'flex', gap: '2px' }}>
                                         {[...Array(lvl.stars)].map((_, i) => (
@@ -493,13 +260,19 @@ const RedListLeaderboard = () => {
                     </div>
 
                     {/* Mission Notification */}
-                    <div style={{ padding: '20px', backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: '16px', border: '1px dashed #3b82f644' }}>
+                    <div style={{
+                        padding: '20px',
+                        backgroundColor: isHighTech ? 'rgba(59, 130, 246, 0.05)' : '#ffffff',
+                        borderRadius: '16px',
+                        border: isHighTech ? '1px dashed #3b82f644' : '1px dashed #e2e8f0',
+                        boxShadow: isHighTech ? 'none' : '0 1px 3px rgba(0,0,0,0.05)'
+                    }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                            <Zap size={16} color="#3b82f6" fill="#3b82f6" />
-                            <span style={{ fontSize: '12px', fontWeight: '900', color: '#3b82f6', letterSpacing: '1px' }}>TACTICAL INTERFACE LIVE</span>
+                            <Zap size={16} color={isHighTech ? "#3b82f6" : "#2563eb"} fill={isHighTech ? "#3b82f6" : "#2563eb"} />
+                            <span style={{ fontSize: '12px', fontWeight: '900', color: isHighTech ? '#3b82f6' : '#2563eb', letterSpacing: '1px' }}>VME 2026 MISSION TITLE</span>
                         </div>
                         <p style={{ fontSize: '11px', color: '#475569', lineHeight: 1.6, fontWeight: '500' }}>
-                            Crosshair targeting active. Real-time data sync with SafeEquip_Dynamic_Dataset established. Pulse triggers at {new Date().toLocaleTimeString()}.
+                            Audited data visualization active. Radial gradient mapping synchronized with Red List status. MMG Kinsevere Operational Command.
                         </p>
                     </div>
 
@@ -507,12 +280,20 @@ const RedListLeaderboard = () => {
             </div>
 
             {/* Global Footer */}
-            <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #2a2a2a', paddingTop: '20px', flexShrink: 0 }}>
+            <div style={{
+                marginTop: '32px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderTop: isHighTech ? '1px solid #2a2a2a' : '1px solid #f1f5f9',
+                paddingTop: '20px',
+                flexShrink: 0
+            }}>
                 <div style={{ display: 'flex', gap: '24px' }}>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>VERSION: 2026.RADAR.TACTICAL</div>
-                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>STATUS: TARGETING ACTIVE</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>VERSION: 2026.RADAR.SYNC</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold' }}>STATUS: AUDITED DATA LIVE</div>
                 </div>
-                <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '900', letterSpacing: '1px' }}>CHIEF DATA ARCHITECT: DAN KAHILU</div>
+                <div style={{ fontSize: '11px', color: isHighTech ? '#3b82f6' : '#2563eb', fontWeight: '900', letterSpacing: '1px' }}>CHIEF DATA ARCHITECT: DAN KAHILU</div>
             </div>
         </div>
     );

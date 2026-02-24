@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import { AlertTriangle, TrendingUp, AlertCircle, Copy, FileDown, ChevronRight } from 'lucide-react';
+import { AlertTriangle, TrendingUp, AlertCircle, Copy, FileDown, ChevronRight, Users } from 'lucide-react';
 import { useSafeEquip } from '../context/SafeEquipContext';
 
 // --- Data ---
@@ -232,13 +232,12 @@ const Sparkline = ({ data, color = 'rgba(59, 130, 246, 0.3)', height = 40 }: { d
     );
 };
 
-// --- KPI Card with Sparkline ---
-const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert, sparkData }: {
-    title: string, mainValue: string, subText: string, icon: any, color: string, alert?: string, sparkData: number[]
+const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert, sparkData, isHighTech }: {
+    title: string, mainValue: string, subText: string, icon: any, color: string, alert?: string, sparkData: number[], isHighTech: boolean
 }) => (
     <div style={{
-        backgroundColor: 'rgba(30, 30, 30, 0.6)',
-        border: '1px solid #2a2a2a',
+        backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.6)' : '#ffffff',
+        border: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0',
         borderRadius: '10px',
         padding: '16px',
         display: 'flex',
@@ -247,7 +246,8 @@ const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert, spark
         height: '100%',
         position: 'relative',
         overflow: 'hidden',
-        backdropFilter: 'blur(8px)'
+        backdropFilter: isHighTech ? 'blur(8px)' : 'none',
+        boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
     }}>
         <Sparkline data={sparkData} color={color} />
         <div style={{ position: 'relative', zIndex: 1 }}>
@@ -261,7 +261,7 @@ const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert, spark
                 <div style={{
                     fontSize: '28px',
                     fontWeight: '900',
-                    color: 'white',
+                    color: isHighTech ? 'white' : '#1e293b',
                     lineHeight: 1,
                     fontFamily: '"JetBrains Mono", monospace'
                 }}>
@@ -287,7 +287,7 @@ const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert, spark
 );
 
 // --- MTD Mini Ring ---
-const MtdRing = ({ mtdValue }: { mtdValue: number }) => {
+const MtdRing = ({ mtdValue, isHighTech }: { mtdValue: number, isHighTech: boolean }) => {
     const isSafe = mtdValue === 0;
     const color = isSafe ? '#22c55e' : '#f59e0b';
     const radius = 16;
@@ -297,22 +297,23 @@ const MtdRing = ({ mtdValue }: { mtdValue: number }) => {
 
     return (
         <div style={{
-            backgroundColor: 'rgba(30, 30, 30, 0.6)',
-            border: '1px solid #2a2a2a',
+            backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.6)' : '#ffffff',
+            border: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0',
             borderRadius: '10px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             height: '100%',
-            backdropFilter: 'blur(8px)',
+            backdropFilter: isHighTech ? 'blur(8px)' : 'none',
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
         }}>
             <Sparkline data={[0, 1, 2, 1, 2, mtdValue, mtdValue]} color={color} />
             <div style={{ position: 'relative', zIndex: 1 }}>
                 <h3 style={{ color: '#64748b', fontSize: '9px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>MTD (FEB)</h3>
-                <div style={{ fontSize: '28px', fontWeight: '900', color: 'white', lineHeight: 1, fontFamily: '"JetBrains Mono", monospace' }}>{mtdValue}</div>
+                <div style={{ fontSize: '28px', fontWeight: '900', color: isHighTech ? 'white' : '#1e293b', lineHeight: 1, fontFamily: '"JetBrains Mono", monospace' }}>{mtdValue}</div>
                 <p style={{ color: '#475569', fontSize: '10px', marginTop: '4px' }}>Feb 2026</p>
             </div>
             <div style={{ position: 'relative', width: '44px', height: '44px', zIndex: 1 }}>
@@ -341,7 +342,8 @@ const MtdRing = ({ mtdValue }: { mtdValue: number }) => {
 // =====================================================
 
 const ExecutiveSummary = () => {
-    const { dataset } = useSafeEquip();
+    const { dataset, lastIncidentDate, TOTAL_POPULATION, theme } = useSafeEquip();
+    const isHighTech = theme === 'high-tech';
     const [showReport, setShowReport] = useState(false);
 
     const totalAccidents2026 = dataset.reduce((sum, item) => sum + item.incidents, 0);
@@ -349,7 +351,7 @@ const ExecutiveSummary = () => {
         .filter(item => new Date(item.timestamp).getMonth() === 1)
         .reduce((sum, item) => sum + item.incidents, 0);
 
-    const daysElapsed = 51;
+    const daysElapsed = 55; // Jan 31 + Feb 24
     const projection = Math.round((totalAccidents2026 / daysElapsed) * 365);
     const dailyRate = totalAccidents2026 / daysElapsed;
     const ceilingRate = 48 / 365;
@@ -360,6 +362,9 @@ const ExecutiveSummary = () => {
     const compliantVehicles = dataset.reduce((s, d) => s + d.vehicles_compliant, 0);
     const fleetCompliance = totalVehicles > 0 ? (compliantVehicles / totalVehicles) * 100 : 0;
 
+    // Population Baseline
+    const activePopulation = TOTAL_POPULATION;
+
     // Training progress
     const avgTheory = dataset.reduce((s, d) => s + d.training_theory, 0) / (dataset.length || 1);
     const avgPractice = dataset.reduce((s, d) => s + d.training_practice, 0) / (dataset.length || 1);
@@ -367,22 +372,15 @@ const ExecutiveSummary = () => {
 
     const comparisonData = HISTORICAL_DATA.map(d => ({
         ...d,
-        y2026: d.month === 'Jan' ? 4 : (d.month === 'Feb' ? mtdAccidents : null)
+        y2026: d.month === 'Jan' ? 2 : (d.month === 'Feb' ? mtdAccidents : null)
     }));
 
-    const lastIncidentDate = dataset
-        .filter(d => d.incidents > 0)
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]?.timestamp;
-
-    const daysSinceLast = lastIncidentDate
-        ? Math.floor((new Date().getTime() - new Date(lastIncidentDate).getTime()) / (1000 * 3600 * 24))
-        : 3;
-
+    const daysSinceLast = Math.floor((new Date().getTime() - new Date(lastIncidentDate).getTime()) / (1000 * 3600 * 24));
     const isRecent = daysSinceLast <= 1;
 
     // Sparkline data (simulated 7-day trends)
-    const sparkAccidents = [3, 2, 4, 3, 5, 4, totalAccidents2026 % 10];
-    const sparkProjection = [52, 50, 55, 48, 51, 49, projection % 60];
+    const sparkAccidents = [1, 2, 2, 3, 3, 4, 5];
+    const sparkProjection = [45, 42, 40, 38, 36, 35, projection];
 
     const generateFlashReport = () => {
         const report = `VME 2026 WEEKLY FLASH REPORT
@@ -408,11 +406,11 @@ END OF REPORT | VME 2026 COMMAND CENTER`;
 
     return (
         <div style={{
-            backgroundColor: '#121212',
+            backgroundColor: isHighTech ? '#121212' : '#f8fafc',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            color: 'white',
+            color: isHighTech ? 'white' : '#1e293b',
             padding: '16px 20px',
             fontFamily: '"Inter", sans-serif',
             overflow: 'hidden',
@@ -438,9 +436,10 @@ END OF REPORT | VME 2026 COMMAND CENTER`;
                 position: 'relative',
                 zIndex: 1,
                 padding: '8px 12px',
-                backgroundColor: 'rgba(30, 30, 30, 0.4)',
+                backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.4)' : '#ffffff',
                 borderRadius: '10px',
-                border: '1px solid rgba(255,255,255,0.04)'
+                border: isHighTech ? '1px solid rgba(255,255,255,0.04)' : '1px solid #e2e8f0',
+                boxShadow: isHighTech ? 'none' : '0 1px 3px rgba(0,0,0,0.05)'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{
@@ -512,17 +511,18 @@ END OF REPORT | VME 2026 COMMAND CENTER`;
             }}>
                 {/* The Heartbeat - Incident Ring */}
                 <div style={{
-                    backgroundColor: 'rgba(30, 30, 30, 0.6)',
-                    border: '1px solid #2a2a2a',
+                    backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.6)' : '#ffffff',
+                    border: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0',
                     borderRadius: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '12px 24px',
-                    backdropFilter: 'blur(8px)',
+                    backdropFilter: isHighTech ? 'blur(8px)' : 'none',
                     width: '200px',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
                 }}>
                     <IncidentRing days={daysSinceLast} isRecent={isRecent} />
                     <span style={{ fontSize: '8px', color: '#475569', letterSpacing: '2px', fontWeight: '700', marginTop: '4px' }}>
@@ -535,42 +535,65 @@ END OF REPORT | VME 2026 COMMAND CENTER`;
                     <CommandKPI
                         title="Annual YTD 2026"
                         mainValue={totalAccidents2026.toString()}
-                        subText="Jan 1 – Feb 20 Sync"
+                        subText="Audited Reality Sync"
                         icon={AlertCircle}
                         color="#ef4444"
                         alert={isCriticalSpeed ? "CRITICAL PACE" : "ON TARGET"}
                         sparkData={sparkAccidents}
+                        isHighTech={isHighTech}
                     />
-                    <MtdRing mtdValue={mtdAccidents} />
+                    <MtdRing mtdValue={mtdAccidents} isHighTech={isHighTech} />
                     <CommandKPI
                         title="Projected YE"
                         mainValue={projection.toString()}
-                        subText="Based on Q1 velocity"
+                        subText="Velocity Projection"
                         icon={TrendingUp}
                         color="#f59e0b"
                         alert={projection > 48 ? `+${projection - 48} > Ceiling` : "UNDER CEILING"}
                         sparkData={sparkProjection}
+                        isHighTech={isHighTech}
                     />
                 </div>
 
                 {/* Tachometer Gauges */}
                 <div style={{
-                    backgroundColor: 'rgba(30, 30, 30, 0.6)',
-                    border: '1px solid #2a2a2a',
+                    backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.6)' : '#ffffff',
+                    border: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0',
                     borderRadius: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '12px 16px',
-                    backdropFilter: 'blur(8px)',
+                    backdropFilter: isHighTech ? 'blur(8px)' : 'none',
                     width: '280px',
                     flexShrink: 0,
-                    gap: '4px'
+                    gap: '4px',
+                    boxShadow: isHighTech ? 'none' : '0 4px 6px -1px rgba(0,0,0,0.1)'
                 }}>
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <Tachometer value={fleetCompliance} maxValue={100} label="Fleet Compliance" color="#3b82f6" />
                         <Tachometer value={globalTraining} maxValue={100} label="Training Progress" color="#f59e0b" />
+                    </div>
+                    {/* Operational Force */}
+                    <div style={{
+                        marginTop: '8px',
+                        padding: '10px',
+                        backgroundColor: 'rgba(0, 242, 255, 0.03)',
+                        border: '1px solid rgba(0, 242, 255, 0.1)',
+                        borderRadius: '8px',
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                            <Users size={12} color="#00F2FF" />
+                            <span style={{ fontSize: '8px', fontWeight: '800', color: '#475569', letterSpacing: '1px' }}>OPERATIONAL FORCE</span>
+                        </div>
+                        <div style={{ fontSize: '20px', fontWeight: '900', color: 'white', fontFamily: '"Roboto Mono", monospace' }}>
+                            {activePopulation.toLocaleString()}
+                        </div>
                     </div>
                     <span style={{ fontSize: '7px', color: '#334155', letterSpacing: '1px', fontWeight: '700' }}>
                         REAL-TIME GAUGE TELEMETRY
@@ -581,8 +604,8 @@ END OF REPORT | VME 2026 COMMAND CENTER`;
             {/* ══════ BOTTOM: 3-Year Chart ══════ */}
             <div style={{
                 flex: 1,
-                backgroundColor: 'rgba(30, 30, 30, 0.5)',
-                border: '1px solid #2a2a2a',
+                backgroundColor: isHighTech ? 'rgba(30, 30, 30, 0.5)' : '#ffffff',
+                border: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0',
                 borderRadius: '12px',
                 padding: '14px 16px',
                 display: 'flex',
@@ -590,7 +613,8 @@ END OF REPORT | VME 2026 COMMAND CENTER`;
                 minHeight: 0,
                 position: 'relative',
                 zIndex: 1,
-                backdropFilter: 'blur(4px)'
+                backdropFilter: isHighTech ? 'blur(4px)' : 'none',
+                boxShadow: isHighTech ? 'none' : '0 10px 15px -3px rgba(0,0,0,0.1)'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
                     <div>

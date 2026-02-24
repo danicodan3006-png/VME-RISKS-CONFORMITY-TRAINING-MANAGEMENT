@@ -251,7 +251,8 @@ const ContractorCard = ({ contractor, index, onHover, onLeave }: {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════
 const FleetCompliance = () => {
-    const { dataset } = useSafeEquip();
+    const { dataset, TOTAL_POPULATION } = useSafeEquip();
+    const activePopulation = TOTAL_POPULATION;
     const [hoveredContractor, setHoveredContractor] = useState<{
         contractor: typeof CONTRACTORS[0], x: number, y: number, index: number
     } | null>(null);

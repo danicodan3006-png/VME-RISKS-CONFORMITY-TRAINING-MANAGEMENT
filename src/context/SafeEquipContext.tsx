@@ -5,16 +5,31 @@ import { SafeEquip_Dynamic_Dataset } from '../data/SafeEquipDataset';
 interface SafeEquipContextType {
     dataset: SafeEquipEntry[];
     updateDataset: (newEntry: SafeEquipEntry) => void;
+    lastIncidentDate: string;
+    resetIncidentCounter: (date: string) => void;
+    TOTAL_POPULATION: number;
     isAuthenticated: boolean;
     login: (code: string) => boolean;
     logout: () => void;
+    theme: 'high-tech' | 'executive';
+    toggleTheme: () => void;
 }
 
 const SafeEquipContext = createContext<SafeEquipContextType | undefined>(undefined);
 
 export const SafeEquipProvider = ({ children }: { children: ReactNode }) => {
     const [dataset, setDataset] = useState<SafeEquipEntry[]>(SafeEquip_Dynamic_Dataset);
+    const [lastIncidentDate, setLastIncidentDate] = useState<string>('2026-02-17');
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [theme, setTheme] = useState<'high-tech' | 'executive'>('high-tech');
+
+    const toggleTheme = () => {
+        setTheme(prev => prev === 'high-tech' ? 'executive' : 'high-tech');
+    };
+
+    const resetIncidentCounter = (date: string) => {
+        setLastIncidentDate(date);
+    };
 
     const updateDataset = (newEntry: SafeEquipEntry) => {
         setDataset((prev) => {
@@ -37,9 +52,21 @@ export const SafeEquipProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = () => setIsAuthenticated(false);
+    const TOTAL_POPULATION = 2976;
 
     return (
-        <SafeEquipContext.Provider value={{ dataset, updateDataset, isAuthenticated, login, logout }}>
+        <SafeEquipContext.Provider value={{
+            dataset,
+            updateDataset,
+            lastIncidentDate,
+            resetIncidentCounter,
+            TOTAL_POPULATION,
+            isAuthenticated,
+            login,
+            logout,
+            theme,
+            toggleTheme
+        }}>
             {children}
         </SafeEquipContext.Provider>
     );

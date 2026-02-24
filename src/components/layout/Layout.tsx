@@ -12,7 +12,10 @@ import {
     Database,
     LogOut,
     Rocket,
-    BadgeCheck
+    BadgeCheck,
+    AlertTriangle,
+    Palmtree,
+    Cpu
 } from 'lucide-react';
 import { useSafeEquip } from '../../context/SafeEquipContext';
 import LandingPage from '../../pages/LandingPage';
@@ -175,12 +178,130 @@ const MMGLogo = ({ size = 48 }: { size?: number }) => (
 );
 
 // ═══════════════════════════════════════════════
+// MINI INTERACTIVE CALENDAR
+// ═══════════════════════════════════════════════
+const MiniCalendar = () => {
+    const { dataset } = useSafeEquip();
+    const now = new Date();
+    const today = now.getDate();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Mapping dataset to dates for indicators
+    const eventsByDay = dataset.reduce((acc: Record<number, { voc: boolean, insp: boolean }>, entry) => {
+        const date = new Date(entry.timestamp);
+        if (date.getMonth() === month && date.getFullYear() === year) {
+            const d = date.getDate();
+            if (!acc[d]) acc[d] = { voc: false, insp: false };
+            if (entry.training_theory > 0 || entry.training_practice > 0) acc[d].voc = true;
+            if (entry.vehicles_total > 0) acc[d].insp = true;
+        }
+        return acc;
+    }, {});
+
+    return (
+        <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '10px',
+            padding: '10px',
+            margin: '10px 0',
+            backdropFilter: 'blur(10px)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.02)'
+        }}>
+            <div style={{
+                textAlign: 'center',
+                fontSize: '9px',
+                fontWeight: '900',
+                color: '#64748b',
+                letterSpacing: '2px',
+                marginBottom: '8px',
+                textTransform: 'uppercase'
+            }}>
+                {monthNames[month]} {year}
+            </div>
+
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: '2px',
+                marginBottom: '4px'
+            }}>
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
+                    <div key={d} style={{ textAlign: 'center', fontSize: '7px', fontWeight: '800', color: '#334155' }}>{d}</div>
+                ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+                {Array.from({ length: firstDay }).map((_, i) => <div key={`e-${i}`} />)}
+                {Array.from({ length: daysInMonth }).map((_, i) => {
+                    const d = i + 1;
+                    const isToday = d === today;
+                    const hasVoc = eventsByDay[d]?.voc;
+                    const hasInsp = eventsByDay[d]?.insp;
+
+                    return (
+                        <div key={d} style={{
+                            textAlign: 'center',
+                            fontSize: '8px',
+                            fontWeight: isToday ? '900' : '600',
+                            color: isToday ? '#00F2FF' : '#475569',
+                            padding: '4px 0',
+                            borderRadius: '4px',
+                            position: 'relative',
+                            background: isToday ? 'rgba(0,242,255,0.08)' : 'transparent',
+                            border: isToday ? '1px solid rgba(0,242,255,0.2)' : '1px solid transparent',
+                            transition: 'all 0.2s'
+                        }}>
+                            {d}
+                            <div style={{
+                                position: 'absolute',
+                                bottom: '1px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                display: 'flex',
+                                gap: '1px'
+                            }}>
+                                {hasVoc && <div style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#f59e0b' }} />}
+                                {hasInsp && <div style={{ width: '2px', height: '2px', borderRadius: '50%', backgroundColor: '#3b82f6' }} />}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+
+// ═══════════════════════════════════════════════
 // MAIN LAYOUT
 // ═══════════════════════════════════════════════
 const Layout = () => {
-    const { logout, isAuthenticated } = useSafeEquip();
+    const { logout, isAuthenticated, theme, toggleTheme } = useSafeEquip();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const location = useLocation();
+
+    const isHighTech = theme === 'high-tech';
+
+    const sidebarBg = isHighTech
+        ? 'linear-gradient(180deg, rgba(14,14,18,0.92), rgba(10,10,14,0.96))'
+        : '#ffffff';
+
+    const sidebarBorder = isHighTech
+        ? '1px solid rgba(0,242,255,0.08)'
+        : '1px solid #e2e8f0';
+
+    const headerBg = isHighTech
+        ? 'linear-gradient(90deg, rgba(14,14,18,0.95), rgba(18,18,22,0.9))'
+        : '#ffffff';
+
+    const mainBg = isHighTech ? '#121212' : '#f8fafc';
+    const textColor = isHighTech ? 'white' : '#1e293b';
 
     return (
         <div style={{
@@ -222,9 +343,9 @@ const Layout = () => {
                 ══════════════════════════════════════════════ */}
             <aside style={{
                 width: sidebarCollapsed ? '64px' : '240px',
-                background: 'linear-gradient(180deg, rgba(14,14,18,0.92), rgba(10,10,14,0.96))',
-                backdropFilter: 'blur(20px)',
-                borderRight: '1px solid rgba(0,242,255,0.08)',
+                background: sidebarBg,
+                backdropFilter: isHighTech ? 'blur(20px)' : 'none',
+                borderRight: sidebarBorder,
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -402,13 +523,53 @@ const Layout = () => {
                         active={location.pathname === '/dashboard/master-form'}
                         collapsed={sidebarCollapsed}
                     />
+                    <SidebarItem
+                        to="/dashboard/accident-management"
+                        icon={AlertTriangle}
+                        label="Accident Management"
+                        active={location.pathname === '/dashboard/accident-management'}
+                        collapsed={sidebarCollapsed}
+                    />
+
+                    {/* Integrated Mini Calendar */}
+                    {!sidebarCollapsed && <MiniCalendar />}
                 </nav>
+
+                {/* ══════ THEME SWITCHER — The Paradigm Shift ══════ */}
+                <div style={{ padding: sidebarCollapsed ? '8px' : '0 16px 12px', marginTop: 'auto' }}>
+                    <button
+                        onClick={toggleTheme}
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                            gap: '12px',
+                            padding: '10px',
+                            background: isHighTech ? 'rgba(0,242,255,0.05)' : '#f1f5f9',
+                            border: isHighTech ? '1px solid rgba(0,242,255,0.1)' : '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            color: isHighTech ? '#00F2FF' : '#334155',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontWeight: '800',
+                            transition: 'all 0.2s',
+                            letterSpacing: '0.5px'
+                        }}
+                    >
+                        {isHighTech ? <Palmtree size={18} /> : <Cpu size={18} />}
+                        {!sidebarCollapsed && (
+                            <span>{isHighTech ? 'SWITCH TO EXECUTIVE' : 'SWITCH TO HIGH-TECH'}</span>
+                        )}
+                    </button>
+                </div>
 
                 {/* ══════ ADMIN PROFILE — The Architect ══════ */}
                 <div style={{
                     padding: sidebarCollapsed ? '12px 8px' : '14px 16px',
-                    borderTop: '1px solid rgba(255,255,255,0.04)',
-                    flexShrink: 0
+                    borderTop: isHighTech ? '1px solid rgba(255,255,255,0.04)' : '1px solid #f1f5f9',
+                    flexShrink: 0,
+                    backgroundColor: isHighTech ? 'transparent' : '#f8fafc'
                 }}>
                     {!sidebarCollapsed ? (
                         <div style={{
@@ -567,9 +728,9 @@ const Layout = () => {
                 {/* Header - Slim for Mission Control */}
                 <header style={{
                     height: '48px',
-                    background: 'linear-gradient(90deg, rgba(14,14,18,0.95), rgba(18,18,22,0.9))',
-                    backdropFilter: 'blur(12px)',
-                    borderBottom: '1px solid rgba(255,255,255,0.04)',
+                    background: headerBg,
+                    backdropFilter: isHighTech ? 'blur(12px)' : 'none',
+                    borderBottom: isHighTech ? '1px solid rgba(255,255,255,0.04)' : '1px solid #e2e8f0',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -614,11 +775,12 @@ const Layout = () => {
                 <main style={{
                     flex: 1,
                     overflowY: 'auto',
-                    backgroundColor: '#121212',
+                    backgroundColor: mainBg,
                     padding: '0',
                     position: 'relative',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    color: textColor
                 }}>
                     <div style={{ flex: 1 }}>
                         <Outlet />

@@ -12,6 +12,7 @@ import DocumentationStatus from './pages/DocumentationStatus';
 import RedListLeaderboard from './pages/RedListLeaderboard';
 import StrategicRoadmap from './pages/StrategicRoadmap';
 import MasterForm from './pages/MasterForm';
+import AccidentManagement from './pages/AccidentManagement';
 
 import { SafeEquipProvider } from './context/SafeEquipContext';
 import PWAUpdatePrompt from './components/PWAUpdatePrompt';
@@ -32,6 +33,7 @@ function App() {
             <Route path="documentation-status" element={<DocumentationStatus />} />
             <Route path="red-list-leaderboard" element={<RedListLeaderboard />} />
             <Route path="master-form" element={<MasterForm />} />
+            <Route path="accident-management" element={<AccidentManagement />} />
           </Route>
 
           {/* Fallback */}

@@ -8,6 +8,7 @@ import {
     Target, Users, Zap, Circle, X, PlayCircle, Shield, Activity,
     AlertTriangle, Radio, Eye
 } from 'lucide-react';
+import { useSafeEquip } from '../context/SafeEquipContext';
 
 // ═══════════════════════════════════════════════
 // DATA ENGINE — synced with Training page (2,976 total)
@@ -231,6 +232,8 @@ const PulsingDot = ({ cx, cy, color }: { cx?: number, cy?: number, color: string
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════
 const SafetyAwareness = () => {
+    const { TOTAL_POPULATION } = useSafeEquip();
+    const TOTAL_POP = TOTAL_POPULATION;
     const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hoveredCell, setHoveredCell] = useState<{
