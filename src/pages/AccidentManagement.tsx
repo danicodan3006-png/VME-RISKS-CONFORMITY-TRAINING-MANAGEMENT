@@ -11,58 +11,58 @@ import { useSafeEquip } from '../context/SafeEquipContext';
 // --- Mock Action Data ---
 const ACTIONS_DATA = [
     {
-        id: 'ACT-001',
-        date: '2026-02-18',
-        dept: 'Mining (Mexco)',
-        description: 'Tire failure on Haul Truck H-04 during haulage.',
-        rootCause: 'Excessive heat buildup and sharp rock puncture.',
-        correctiveAction: 'Implement tire pressure monitoring system (TPMS) alerts.',
-        owner: 'B. Mutamba',
-        dueDate: '2026-03-05',
-        status: 'Pending'
+        id: 'ACC-01',
+        date: '2026-02-08',
+        dept: 'HSE / CAC',
+        description: 'Dog unit brake failure',
+        rootCause: 'Inadequate inspection and maintenance of braking system',
+        correctiveAction: 'Reinforce preventive maintenance inspections, review brake system SOPs, retrain mechanics on brake inspection and functional testing',
+        owner: 'Maintenance Team',
+        dueDate: '2026-02-28',
+        status: 'Ongoing'
     },
     {
-        id: 'ACT-002',
-        date: '2026-02-15',
-        dept: 'Plant',
-        description: 'Conveyor belt slip detected at secondary crusher.',
-        rootCause: 'Worn lagging on drive pulley.',
-        correctiveAction: 'Re-lag drive pulley and adjust tensioner.',
-        owner: 'C. Kalenga',
-        dueDate: '2026-02-22',
-        status: 'Overdue'
-    },
-    {
-        id: 'ACT-003',
-        date: '2026-02-10',
-        dept: 'HSE',
-        description: 'PPE non-compliance observed during audit.',
-        rootCause: 'Lack of proper high-visibility vests for contractors.',
-        correctiveAction: 'Order and distribute 200 high-vis vests to all contractors.',
-        owner: 'S. Mwamba',
-        dueDate: '2026-02-20',
+        id: 'ACC-02',
+        date: '2026-01-14',
+        dept: 'TKM / Civil Services',
+        description: 'Truck contact in HV parking area',
+        rootCause: 'Poor lighting, inappropriate parking, lack of physical barriers',
+        correctiveAction: 'Improve lighting in HV parking, install solid barriers, enforce parking standards, review driver competency',
+        owner: 'Facility Management',
+        dueDate: '2026-02-15',
         status: 'Closed'
     },
     {
-        id: 'ACT-004',
-        date: '2026-02-19',
-        dept: 'Logistics',
-        description: 'Minor oil spill at refueling station.',
-        rootCause: 'Nozzle handle failure to shut off automatically.',
-        correctiveAction: 'Replace all refueling nozzles with auto-shutoff models.',
-        owner: 'J. Ilunga',
-        dueDate: '2026-03-10',
-        status: 'Pending'
+        id: 'ACC-03',
+        date: '2026-02-17',
+        dept: 'TKM / Civil Services',
+        description: 'Boom truck knocked a light pole',
+        rootCause: 'Poor judgement and risk awareness by driver',
+        correctiveAction: 'Suspend driver permit pending reassessment, conduct defensive driving refresher training, reinforce supervision',
+        owner: 'HSE Dept',
+        dueDate: '2026-03-05',
+        status: 'Closed'
     },
     {
-        id: 'ACT-005',
-        date: '2026-01-20',
-        dept: 'Mining',
-        description: 'Brake system overheat on Excavator EX-02.',
-        rootCause: 'Continuous operation beyond standard thermal limits.',
-        correctiveAction: 'Install secondary auxiliary cooling fan system.',
-        owner: 'M. Tshimanga',
-        dueDate: '2026-02-15',
+        id: 'ACC-04',
+        date: '2026-01-07',
+        dept: 'Transport Services',
+        description: 'Bus rollaway incident – vehicle struck a tree',
+        rootCause: 'Failure to apply immobilisation procedure (park brake and wheel chocks)',
+        correctiveAction: 'Permit suspension, reinforce vehicle immobilisation SOPs, mandatory wheel chock use, toolbox talks on safe parking',
+        owner: 'Transport Ops',
+        dueDate: '2026-01-25',
+        status: 'Ongoing'
+    },
+    {
+        id: 'ACC-05',
+        date: '2026-01-03',
+        dept: 'Transport Services',
+        description: 'Transportation bus veered off road',
+        rootCause: 'Driver fatigue',
+        correctiveAction: 'Driver fatigue management sensitisation, review shift scheduling, reinforce fitness-for-work checks',
+        owner: 'Logistics Safety',
+        dueDate: '2026-01-20',
         status: 'Closed'
     }
 ];
@@ -284,10 +284,9 @@ const AccidentManagement = () => {
                             <tr>
                                 <th style={{ width: '100px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>DATE</th>
                                 <th style={{ width: '160px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>DEPARTMENT/CONTRACTOR</th>
-                                <th style={{ width: '30%', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>INCIDENT DESCRIPTION</th>
-                                <th style={{ width: '35%', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>CORRECTIVE ACTION DESCRIPTION</th>
-                                <th style={{ width: '150px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>ROOT CAUSE</th>
-                                <th style={{ width: '120px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>OWNER</th>
+                                <th style={{ width: '32%', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>INCIDENT DESCRIPTION</th>
+                                <th style={{ width: '38%', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>CORRECTIVE ACTION DESCRIPTION</th>
+                                <th style={{ width: '200px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>ROOT CAUSE</th>
                                 <th style={{ width: '110px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>DUE DATE</th>
                                 <th style={{ width: '100px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>STATUS</th>
                             </tr>
@@ -336,8 +335,7 @@ const AccidentManagement = () => {
                                     >
                                         {row.correctiveAction}
                                     </td>
-                                    <td style={{ padding: '14px 16px', fontSize: '11px', color: '#fca5a5', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.rootCause}</td>
-                                    <td style={{ padding: '14px 16px', fontSize: '11px', color: '#cbd5e1', fontWeight: '600' }}>{row.owner}</td>
+                                    <td style={{ padding: '14px 16px', fontSize: '11px', color: '#fca5a5', minWidth: '150px' }}>{row.rootCause}</td>
                                     <td style={{ padding: '14px 16px', fontSize: '11px', color: row.status === 'Overdue' ? '#ef4444' : '#94a3b8', fontFamily: '"Roboto Mono", monospace' }}>{row.dueDate}</td>
                                     <td style={{ padding: '14px 16px' }}><StatusBadge status={row.status} /></td>
                                 </tr>
@@ -421,11 +419,7 @@ const AccidentManagement = () => {
                                     <p style={{ fontSize: '14px', color: '#86efac', margin: '4px 0 0 0', lineHeight: 1.5, fontWeight: '700' }}>{selectedAction.correctiveAction}</p>
                                 </div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', borderTop: '1px solid #2a2a2a', paddingTop: '16px' }}>
-                                <div>
-                                    <label style={{ fontSize: '9px', color: '#475569', fontWeight: '800', letterSpacing: '1px' }}>ASSIGNED OWNER</label>
-                                    <p style={{ fontSize: '13px', color: 'white', fontWeight: '700', margin: '4px 0 0 0' }}>{selectedAction.owner}</p>
-                                </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', borderTop: '1px solid #2a2a2a', paddingTop: '16px' }}>
                                 <div>
                                     <label style={{ fontSize: '9px', color: '#475569', fontWeight: '800', letterSpacing: '1px' }}>DUE DATE</label>
                                     <p style={{ fontSize: '13px', color: 'white', fontWeight: '700', margin: '4px 0 0 0', fontFamily: '"Roboto Mono", monospace' }}>{selectedAction.dueDate}</p>

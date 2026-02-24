@@ -16,12 +16,12 @@ export interface SafeEquipEntry {
 export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     {
         id: 'SEC-001',
-        timestamp: '2026-02-17T10:00:00Z',
-        department: 'Transport',
-        incidents: 2,
+        timestamp: '2026-02-08T10:00:00Z',
+        department: 'HSE', // Accident 1
+        incidents: 1,
         training_theory: 12,
         training_practice: 10,
-        company_name: 'Solvay',
+        company_name: 'CAC',
         vehicles_total: 50,
         vehicles_compliant: 45,
         red_list_status: true,
@@ -30,11 +30,11 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     {
         id: 'SEC-002',
         timestamp: '2026-02-17T11:30:00Z',
-        department: 'Civil Svcs',
+        department: 'Civil Svcs', // Accident 3
         incidents: 1,
         training_theory: 8,
         training_practice: 8,
-        company_name: 'Mexco',
+        company_name: 'TKM',
         vehicles_total: 30,
         vehicles_compliant: 28,
         red_list_status: true,
@@ -42,12 +42,12 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     },
     {
         id: 'SEC-003',
-        timestamp: '2026-01-25T12:00:00Z',
-        department: 'Mining',
-        incidents: 2,
+        timestamp: '2026-01-14T12:00:00Z',
+        department: 'Civil Svcs', // Accident 2
+        incidents: 1,
         training_theory: 25,
         training_practice: 20,
-        company_name: 'ITM',
+        company_name: 'TKM',
         vehicles_total: 100,
         vehicles_compliant: 85,
         red_list_status: true,
@@ -55,12 +55,12 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     },
     {
         id: 'SEC-004',
-        timestamp: '2026-02-20T13:45:00Z',
-        department: 'Lean Prod',
-        incidents: 0,
+        timestamp: '2026-01-07T13:45:00Z',
+        department: 'Transport', // Accident 4
+        incidents: 1,
         training_theory: 15,
         training_practice: 12,
-        company_name: 'Neema',
+        company_name: 'MMG',
         vehicles_total: 20,
         vehicles_compliant: 20,
         red_list_status: true,
@@ -68,12 +68,12 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     },
     {
         id: 'SEC-005',
-        timestamp: '2026-02-22T09:00:00Z',
-        department: 'Commercial',
-        incidents: 0,
+        timestamp: '2026-01-03T09:00:00Z',
+        department: 'Transport', // Accident 5
+        incidents: 1,
         training_theory: 5,
         training_practice: 5,
-        company_name: 'Synergie',
+        company_name: 'MMG',
         vehicles_total: 15,
         vehicles_compliant: 14,
         red_list_status: true,

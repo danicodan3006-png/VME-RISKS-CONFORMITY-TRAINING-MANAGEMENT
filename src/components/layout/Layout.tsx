@@ -13,9 +13,7 @@ import {
     LogOut,
     Rocket,
     BadgeCheck,
-    AlertTriangle,
-    Palmtree,
-    Cpu
+    AlertTriangle
 } from 'lucide-react';
 import { useSafeEquip } from '../../context/SafeEquipContext';
 import LandingPage from '../../pages/LandingPage';
@@ -282,7 +280,7 @@ const MiniCalendar = () => {
 // MAIN LAYOUT
 // ═══════════════════════════════════════════════
 const Layout = () => {
-    const { logout, isAuthenticated, theme, toggleTheme } = useSafeEquip();
+    const { logout, isAuthenticated, theme } = useSafeEquip();
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const location = useLocation();
 
@@ -517,13 +515,6 @@ const Layout = () => {
                         collapsed={sidebarCollapsed}
                     />
                     <SidebarItem
-                        to="/dashboard/master-form"
-                        icon={Database}
-                        label="Master Data Entry"
-                        active={location.pathname === '/dashboard/master-form'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
                         to="/dashboard/accident-management"
                         icon={AlertTriangle}
                         label="Accident Management"
@@ -535,33 +526,32 @@ const Layout = () => {
                     {!sidebarCollapsed && <MiniCalendar />}
                 </nav>
 
-                {/* ══════ THEME SWITCHER — The Paradigm Shift ══════ */}
+                {/* ══════ MASTER DATA ENTRY — The Source ══════ */}
                 <div style={{ padding: sidebarCollapsed ? '8px' : '0 16px 12px', marginTop: 'auto' }}>
-                    <button
-                        onClick={toggleTheme}
+                    <Link
+                        to="/dashboard/master-form"
                         style={{
                             width: '100%',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                             gap: '12px',
-                            padding: '10px',
-                            background: isHighTech ? 'rgba(0,242,255,0.05)' : '#f1f5f9',
-                            border: isHighTech ? '1px solid rgba(0,242,255,0.1)' : '1px solid #e2e8f0',
-                            borderRadius: '8px',
+                            padding: '12px',
+                            background: isHighTech ? 'rgba(0,242,255,0.1)' : '#f1f5f9',
+                            border: isHighTech ? '1px solid rgba(0,242,255,0.3)' : '1px solid #e2e8f0',
+                            borderRadius: '12px',
                             color: isHighTech ? '#00F2FF' : '#334155',
-                            cursor: 'pointer',
+                            textDecoration: 'none',
                             fontSize: '11px',
-                            fontWeight: '800',
+                            fontWeight: '900',
                             transition: 'all 0.2s',
-                            letterSpacing: '0.5px'
+                            letterSpacing: '1px',
+                            boxShadow: isHighTech ? '0 0 15px rgba(0,242,255,0.1)' : 'none'
                         }}
                     >
-                        {isHighTech ? <Palmtree size={18} /> : <Cpu size={18} />}
-                        {!sidebarCollapsed && (
-                            <span>{isHighTech ? 'SWITCH TO EXECUTIVE' : 'SWITCH TO HIGH-TECH'}</span>
-                        )}
-                    </button>
+                        <Database size={18} />
+                        {!sidebarCollapsed && <span>MASTER DATA ENTRY</span>}
+                    </Link>
                 </div>
 
                 {/* ══════ ADMIN PROFILE — The Architect ══════ */}
