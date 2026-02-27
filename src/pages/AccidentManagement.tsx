@@ -47,14 +47,14 @@ const ACTIONS_DATA = [
     },
     {
         id: 'ACC-01',
-        date: '2026-01-15',
-        dept: 'MEXCO',
-        description: 'Loader 08 vs Bollards',
-        rootCause: 'Operator Error / Poor Judgement',
-        correctiveAction: 'Reinforce defensive driving, install high-visibility bollards, review loader operating procedures',
+        date: '2026-02-08',
+        dept: 'Civil Services',
+        description: 'Truck contact in HV parking',
+        rootCause: 'Poor judgement by driver, lack of lighting & inappropriate parking',
+        correctiveAction: 'Suspend driver permit & redesign parking appropriately',
         eventManagement: 'Controlled',
         owner: 'Maintenance Team',
-        dueDate: '2026-01-30',
+        dueDate: '2026-03-08',
         status: 'Closed'
     },
     {

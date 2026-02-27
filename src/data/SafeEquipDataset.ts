@@ -16,12 +16,12 @@ export interface SafeEquipEntry {
 export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     {
         id: 'SEC-001',
-        timestamp: '2026-01-15T10:00:00Z',
-        department: 'MEXCO', // Accident 1
+        timestamp: '2026-02-08T10:00:00Z',
+        department: 'Civil Services', // Accident 1 (Replaced)
         incidents: 1,
         training_theory: 12,
         training_practice: 10,
-        company_name: 'CAC',
+        company_name: 'MMG',
         vehicles_total: 50,
         vehicles_compliant: 45,
         red_list_status: true,
