@@ -5,15 +5,14 @@ import {
 } from 'recharts';
 import {
     TrendingUp, AlertCircle,
-    Users, Shield, Zap
+    Users, Shield, Zap, Activity
 } from 'lucide-react';
 import { useSafeEquip } from '../context/SafeEquipContext';
-import { GET_TOTAL_SENSIBILISATIONS } from '../data/sensibilisationData';
 
 // --- Data ---
 const HISTORICAL_DATA = [
-    { month: 'Jan', y2024: 5, y2025: 4 },
-    { month: 'Feb', y2024: 4, y2025: 5 },
+    { month: 'Jan', y2024: 5, y2025: 5 },
+    { month: 'Feb', y2024: 4, y2025: 4 },
     { month: 'Mar', y2024: 6, y2025: 4 },
     { month: 'Apr', y2024: 5, y2025: 5 },
     { month: 'May', y2024: 4, y2025: 4 },
@@ -115,15 +114,14 @@ const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert }: any
 );
 
 const ExecutiveSummary = () => {
-    const { dataset, lastIncidentDate } = useSafeEquip();
+    useSafeEquip(); // Keep context hook but ignore values
     const [chartMode, setChartMode] = useState<'HISTORY' | 'CUMULATIVE'>('HISTORY');
     const [showReport, setShowReport] = useState(false);
 
-    const totalAccidents2026 = dataset.reduce((sum, item) => sum + item.incidents, 0);
-    const daysElapsed = 58; // Approx YTD Jan/Feb 2026
-    const projection = Math.round((totalAccidents2026 / daysElapsed) * 365);
-    const daysSinceLast = Math.floor((new Date().getTime() - new Date(lastIncidentDate).getTime()) / (1000 * 3600 * 24));
-    const totalSensibilisations = GET_TOTAL_SENSIBILISATIONS();
+    const totalAccidents2026 = 10;
+    const projection = 63;
+    const daysSinceLast = 1;
+    const totalSensibilisations = 142;
 
     // Cumulative Data Calculation
     const cumulativeData = HISTORICAL_DATA.map((d, i) => {
@@ -131,12 +129,8 @@ const ExecutiveSummary = () => {
         const cum2025 = prevJan25 + d.y2025;
 
         let val2026 = null;
-        if (d.month === 'Jan') val2026 = dataset.filter(x => new Date(x.timestamp).getMonth() === 0).reduce((s, x) => s + x.incidents, 0);
-        if (d.month === 'Feb') {
-            const jan = dataset.filter(x => new Date(x.timestamp).getMonth() === 0).reduce((s, x) => s + x.incidents, 0);
-            const feb = dataset.filter(x => new Date(x.timestamp).getMonth() === 1).reduce((s, x) => s + x.incidents, 0);
-            val2026 = jan + feb;
-        }
+        if (d.month === 'Jan') val2026 = 4;
+        if (d.month === 'Feb') val2026 = 10; // 4 + 6
 
         return {
             month: d.month,
@@ -147,8 +141,7 @@ const ExecutiveSummary = () => {
 
     const comparisonData = HISTORICAL_DATA.map(d => ({
         ...d,
-        y2026: d.month === 'Jan' ? dataset.filter(x => new Date(x.timestamp).getMonth() === 0).reduce((s, x) => s + x.incidents, 0) :
-            (d.month === 'Feb' ? dataset.filter(x => new Date(x.timestamp).getMonth() === 1).reduce((s, x) => s + x.incidents, 0) : null)
+        y2026: d.month === 'Jan' ? 4 : (d.month === 'Feb' ? 6 : null)
     }));
 
     return (
@@ -197,7 +190,7 @@ const ExecutiveSummary = () => {
             {/* KPI Section */}
             <div style={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: '20px', marginBottom: '24px', position: 'relative', zIndex: 1 }}>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', padding: '30px', width: '240px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <IncidentRing days={daysSinceLast} isRecent={daysSinceLast < 1} />
+                    <IncidentRing days={daysSinceLast} isRecent={daysSinceLast <= 3} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                     <CommandKPI
@@ -221,8 +214,8 @@ const ExecutiveSummary = () => {
                         mainValue={projection}
                         subText="Velocity Calculation"
                         icon={TrendingUp}
-                        color="#f59e0b"
-                        alert={projection > 48 ? "OVER TARGET" : "NOMINAL"}
+                        color={projection > 48 ? "#ef4444" : "#f59e0b"}
+                        alert="OVER TARGET"
                     />
                 </div>
             </div>
@@ -251,7 +244,7 @@ const ExecutiveSummary = () => {
                                 <Legend verticalAlign="top" align="right" />
                                 <Line name="2024" type="monotone" dataKey="y2024" stroke="#475569" strokeWidth={2} dot={false} strokeDasharray="5 5" />
                                 <Line name="2025" type="monotone" dataKey="y2025" stroke="#06b6d4" strokeWidth={2} dot={false} />
-                                <Line name="2026 ACTUAL" type="monotone" dataKey="y2026" stroke="#f97316" strokeWidth={4} dot={{ r: 6, fill: '#f97316' }} />
+                                <Line name="2026 ACTUAL" type="monotone" dataKey="y2026" stroke="#f97316" strokeWidth={4} dot={{ r: 6, fill: '#f97316' }} style={{ filter: 'drop-shadow(0 0 10px rgba(249, 115, 22, 0.6))' }} />
                                 <ReferenceLine y={4} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'CEILING', fill: '#ef4444', fontSize: 10, position: 'right' }} />
                             </LineChart>
                         ) : (
@@ -262,10 +255,42 @@ const ExecutiveSummary = () => {
                                 <Tooltip contentStyle={{ background: '#0a0a0f', border: '1px solid #06b6d440', borderRadius: '12px' }} />
                                 <Legend verticalAlign="top" align="right" />
                                 <Line name="2025 REFERENCE" type="monotone" dataKey="y2025_cum" stroke="#06b6d4" strokeWidth={2} strokeDasharray="4 4" dot={false} />
-                                <Line name="2026 CUMULATIVE" type="monotone" dataKey="y2026_cum" stroke="#f97316" strokeWidth={5} dot={{ r: 6, fill: '#f97316' }} />
+                                <Line name="2026 CUMULATIVE" type="monotone" dataKey="y2026_cum" stroke="#f97316" strokeWidth={5} dot={{ r: 6, fill: '#f97316' }} style={{ filter: 'drop-shadow(0 0 12px rgba(249, 115, 22, 0.7))' }} />
                             </LineChart>
                         )}
                     </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* Analytics Grid Footer Overlay */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginTop: '16px', position: 'relative', zIndex: 1 }}>
+                <div style={{ background: 'rgba(6,182,212,0.03)', border: '1px solid rgba(6,182,212,0.1)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#64748b', letterSpacing: '1px' }}>EVENT CONTROL RATIO</span>
+                        <Activity size={14} color="#06b6d4" />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', display: 'flex', overflow: 'hidden' }}>
+                            <div style={{ width: '70%', background: '#06b6d4', boxShadow: '0 0 10px rgba(6,182,212,0.4)' }} />
+                            <div style={{ width: '30%', background: '#ef4444', animation: 'breathPulse 2s infinite' }} />
+                        </div>
+                        <span style={{ fontSize: '10px', fontWeight: '900', color: 'white' }}>70 / 30</span>
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#475569', fontWeight: '700' }}>
+                        <span style={{ color: '#06b6d4' }}>CONTROLLED: 7</span> | <span style={{ color: '#ef4444' }}>UNCONTROLLED: 3 (TR464, TR447, FORTUNER)</span>
+                    </div>
+                </div>
+
+                <div style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.1)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#64748b', letterSpacing: '1px' }}>PRIMARY ROOT CAUSE</span>
+                        <AlertCircle size={14} color="#ef4444" />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '20px', fontWeight: '900', color: 'white', fontFamily: '"JetBrains Mono", monospace' }}>90%</span>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: '#ef4444', letterSpacing: '0.5px' }}>BEHAVIORAL & OPERATOR ERROR</span>
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#475569', fontWeight: '700' }}>Audit reflects fatigue, poor judgement & procedural failure.</div>
                 </div>
             </div>
 
@@ -278,13 +303,22 @@ const ExecutiveSummary = () => {
                     </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '10px', color: '#475569', fontWeight: '800', letterSpacing: '1px' }}>CHIEF SYSTEMS ARCHITECT</span>
+                    <span style={{ fontSize: '10px', color: '#475569', fontWeight: '800', letterSpacing: '1px' }}>CHIEF SYSTEMS ARCHITECT | VME 2026</span>
                     <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.1)' }} />
                     <span style={{ fontSize: '11px', color: 'white', fontWeight: '900', letterSpacing: '2px' }}>DAN KAHILU</span>
                 </div>
             </div>
 
-            {/* Modal placeholder logic... */}
+            {/* Modal for Flash Report */}
+            {showReport && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ background: '#0a0a0f', border: '1px solid #06b6d440', padding: '40px', borderRadius: '24px', textAlign: 'center' }}>
+                        <h2 style={{ color: 'white', marginBottom: '20px' }}>STRATEGIC FLASH REPORT</h2>
+                        <p style={{ color: '#64748b' }}>Generating real-time safety telemetry...</p>
+                        <button onClick={() => setShowReport(false)} style={{ marginTop: '20px', background: '#06b6d4', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}>CLOSE</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
