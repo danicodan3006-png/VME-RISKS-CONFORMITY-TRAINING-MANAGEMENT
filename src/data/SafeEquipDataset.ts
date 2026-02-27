@@ -68,8 +68,8 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
     },
     {
         id: 'SEC-005',
-        timestamp: '2026-02-05T09:00:00Z',
-        department: 'Transport services', // Accident 5
+        timestamp: '2026-01-05T09:00:00Z',
+        department: 'Transport Services', // Accident 5 (Replaced - Fatigue Focus)
         incidents: 1,
         training_theory: 5,
         training_practice: 5,
@@ -77,7 +77,7 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
         vehicles_total: 15,
         vehicles_compliant: 14,
         red_list_status: true,
-        risk_level: 3
+        risk_level: 4
     },
     {
         id: 'SEC-006',

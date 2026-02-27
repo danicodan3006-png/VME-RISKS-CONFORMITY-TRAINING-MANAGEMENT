@@ -95,14 +95,14 @@ const ACTIONS_DATA = [
     },
     {
         id: 'ACC-05',
-        date: '2026-02-05',
+        date: '2026-01-05',
         dept: 'Transport Services',
-        description: 'Solar Pole contact during truck reversing',
-        rootCause: 'Failure to use spotter',
-        correctiveAction: 'Mandatory spotter training, install rear-view cameras on all TR trucks',
+        description: 'Transportation bus veered off road',
+        rootCause: 'Fatigue management failure',
+        correctiveAction: 'Suspend driver permit & implement fatigue management refresher',
         eventManagement: 'Controlled',
         owner: 'Logistics Safety',
-        dueDate: '2026-02-15',
+        dueDate: '2026-03-30',
         status: 'Closed'
     },
     {
