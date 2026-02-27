@@ -1,8 +1,5 @@
 import {
-    Calendar, Shield, Database, AlertTriangle,
-    CheckCircle2, Clock, PlayCircle, Target,
-    Lightbulb, Rocket, Users, FileText,
-    ArrowRight, ChevronRight, Eye, Info
+    Shield, Users, FileText
 } from 'lucide-react';
 
 export const STRATEGIC_ACTIONS = [

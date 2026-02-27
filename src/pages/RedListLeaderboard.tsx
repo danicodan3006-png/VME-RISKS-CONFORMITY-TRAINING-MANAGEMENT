@@ -5,7 +5,6 @@ import {
     UserCheck, Shield, ShieldCheck, Scale
 } from 'lucide-react';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar } from 'recharts';
-import { useSafeEquip } from '../context/SafeEquipContext';
 
 // --- Data Engine: Merit Hub Champions ---
 const EXCELLENCE_OPERATORS = [

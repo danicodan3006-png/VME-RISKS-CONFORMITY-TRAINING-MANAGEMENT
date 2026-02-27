@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import {
-    Calendar, Shield, Database, AlertTriangle,
-    CheckCircle2, Clock, PlayCircle, Target,
-    Lightbulb, Rocket, Users, FileText,
-    ArrowRight, ChevronRight, Eye, Info
+    Shield, Clock, Target,
+    Lightbulb, Users, ArrowRight
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import {
@@ -76,7 +74,7 @@ const ActionGrid = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {STRATEGIC_ACTIONS.map((item) => (
+                        {STRATEGIC_ACTIONS.map((item: any) => (
                             <tr
                                 key={item.id}
                                 onMouseEnter={(e) => {
@@ -165,7 +163,7 @@ const MindsetView = () => (
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '30px', width: '100%', maxWidth: '1100px', position: 'relative' }}>
-            {MINDSET_FLOW.map((step, i) => (
+            {MINDSET_FLOW.map((step: any, i: number) => (
                 <React.Fragment key={i}>
                     <div style={{
                         flex: 1,

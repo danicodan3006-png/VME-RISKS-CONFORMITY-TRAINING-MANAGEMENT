@@ -1,15 +1,11 @@
-import { useState, useEffect } from 'react';
 import {
-    Truck, Shield, AlertTriangle, Activity, Gauge, Wrench,
-    CheckCircle, XCircle, Users, Camera, Eye, Zap, Search,
-    ChevronRight, Filter, Settings, ShieldAlert, BadgeInfo
+    Truck, AlertTriangle, Activity, Gauge, Zap, Search,
+    Filter, Settings, ShieldAlert, BadgeInfo
 } from 'lucide-react';
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, Cell, RadarChart, PolarGrid,
+    ResponsiveContainer, RadarChart, PolarGrid,
     PolarAngleAxis, Radar, Legend
 } from 'recharts';
-import { useSafeEquip } from '../context/SafeEquipContext';
 
 // --- Static Data ---
 const AUDIT_LOG = [
@@ -64,7 +60,6 @@ const MiniKPI = ({ label, val, sub, icon: Icon, color }: any) => (
 );
 
 const FleetCompliance = () => {
-    const { dataset } = useSafeEquip();
 
     // Derived states
     const complianceRate = 88.5;

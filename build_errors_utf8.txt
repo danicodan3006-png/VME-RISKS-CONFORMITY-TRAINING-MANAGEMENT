@@ -1,0 +1,46 @@
+﻿
+> vme2026@0.0.0 build
+> tsc -b && vite build
+
+src/data/roadmapData.ts(2,5): error TS6133: 'Calendar' is declared but its value is never read.
+src/data/roadmapData.ts(2,23): error TS6133: 'Database' is declared but its value is never read.
+src/data/roadmapData.ts(2,33): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/data/roadmapData.ts(3,5): error TS6133: 'CheckCircle2' is declared but its value is never read.
+src/data/roadmapData.ts(3,19): error TS6133: 'Clock' is declared but its value is never read.
+src/data/roadmapData.ts(3,26): error TS6133: 'PlayCircle' is declared but its value is never read.
+src/data/roadmapData.ts(3,38): error TS6133: 'Target' is declared but its value is never read.
+src/data/roadmapData.ts(4,5): error TS6133: 'Lightbulb' is declared but its value is never read.
+src/data/roadmapData.ts(4,16): error TS6133: 'Rocket' is declared but its value is never read.
+src/data/roadmapData.ts(5,5): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/data/roadmapData.ts(5,17): error TS6133: 'ChevronRight' is declared but its value is never read.
+src/data/roadmapData.ts(5,31): error TS6133: 'Eye' is declared but its value is never read.
+src/data/roadmapData.ts(5,36): error TS6133: 'Info' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(1,1): error TS6192: All imports in import declaration are unused.
+src/pages/FleetCompliance.tsx(3,12): error TS6133: 'Shield' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(3,52): error TS6133: 'Wrench' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(4,5): error TS6133: 'CheckCircle' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(4,18): error TS6133: 'XCircle' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(4,27): error TS6133: 'Users' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(4,34): error TS6133: 'Camera' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(4,42): error TS6133: 'Eye' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(5,5): error TS6133: 'ChevronRight' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(8,5): error TS6133: 'BarChart' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(8,15): error TS6133: 'Bar' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(8,20): error TS6133: 'XAxis' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(8,27): error TS6133: 'YAxis' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(8,34): error TS6133: 'CartesianGrid' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(8,49): error TS6133: 'Tooltip' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(9,26): error TS6133: 'Cell' is declared but its value is never read.
+src/pages/FleetCompliance.tsx(67,11): error TS6133: 'dataset' is declared but its value is never read.
+src/pages/LandingPage.tsx(2,1): error TS6192: All imports in import declaration are unused.
+src/pages/RedListLeaderboard.tsx(8,1): error TS6133: 'useSafeEquip' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(3,5): error TS6133: 'Calendar' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(3,23): error TS6133: 'Database' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(3,33): error TS6133: 'AlertTriangle' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(4,5): error TS6133: 'CheckCircle2' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(4,26): error TS6133: 'PlayCircle' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(5,16): error TS6133: 'Rocket' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(5,31): error TS6133: 'FileText' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(6,17): error TS6133: 'ChevronRight' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(6,31): error TS6133: 'Eye' is declared but its value is never read.
+src/pages/StrategicRoadmap.tsx(6,36): error TS6133: 'Info' is declared but its value is never read.

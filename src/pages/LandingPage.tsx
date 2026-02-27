@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Shield, Lock } from 'lucide-react';
 import { useSafeEquip } from '../context/SafeEquipContext';
 
 // ═══════════════════════════════════════════════════════
