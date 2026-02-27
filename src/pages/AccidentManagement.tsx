@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import {
-    CheckCircle,
     Clock,
     Shield,
     Search
@@ -12,57 +11,86 @@ import { useSafeEquip } from '../context/SafeEquipContext';
 const ACTIONS_DATA = [
     {
         id: 'ACC-01',
-        date: '2026-02-08',
-        dept: 'HSE / CAC',
-        description: 'Dog unit brake failure',
-        rootCause: 'Inadequate inspection and maintenance of braking system',
-        correctiveAction: 'Reinforce preventive maintenance inspections, review brake system SOPs, retrain mechanics on brake inspection and functional testing',
+        date: '2026-01-15',
+        dept: 'MEXCO',
+        description: 'Loader 08 vs Bollards',
+        rootCause: 'Operator Error / Poor Judgement',
+        correctiveAction: 'Reinforce defensive driving, install high-visibility bollards, review loader operating procedures',
+        eventManagement: 'Controlled',
         owner: 'Maintenance Team',
-        dueDate: '2026-02-28',
-        status: 'Ongoing'
+        dueDate: '2026-01-30',
+        status: 'Closed'
     },
     {
         id: 'ACC-02',
         date: '2026-01-14',
-        dept: 'TKM / Civil Services',
-        description: 'Truck contact in HV parking area',
-        rootCause: 'Poor lighting, inappropriate parking, lack of physical barriers',
-        correctiveAction: 'Improve lighting in HV parking, install solid barriers, enforce parking standards, review driver competency',
+        dept: 'ORICA',
+        description: 'MMU02 Yard incident',
+        rootCause: 'Inadequate site coordination',
+        correctiveAction: 'Review yard traffic management plan, reinforce site safety rules for contractors',
+        eventManagement: 'Controlled',
         owner: 'Facility Management',
-        dueDate: '2026-02-15',
+        dueDate: '2026-01-25',
         status: 'Closed'
     },
     {
         id: 'ACC-03',
-        date: '2026-02-17',
-        dept: 'TKM / Civil Services',
-        description: 'Boom truck knocked a light pole',
-        rootCause: 'Poor judgement and risk awareness by driver',
-        correctiveAction: 'Suspend driver permit pending reassessment, conduct defensive driving refresher training, reinforce supervision',
-        owner: 'HSE Dept',
-        dueDate: '2026-03-05',
-        status: 'Closed'
+        date: '2026-01-17',
+        dept: 'Transport Admin',
+        description: 'Bus TR464 incident',
+        rootCause: 'Mechanical failure / Brake system',
+        correctiveAction: 'Immediate fleet inspection, review maintenance schedule for all buses',
+        eventManagement: 'Uncontrolled',
+        owner: 'Transport Ops',
+        dueDate: '2026-01-20',
+        status: 'Ongoing'
     },
     {
         id: 'ACC-04',
-        date: '2026-01-07',
-        dept: 'Transport Services',
-        description: 'Bus rollaway incident – vehicle struck a tree',
-        rootCause: 'Failure to apply immobilisation procedure (park brake and wheel chocks)',
-        correctiveAction: 'Permit suspension, reinforce vehicle immobilisation SOPs, mandatory wheel chock use, toolbox talks on safe parking',
+        date: '2026-01-18',
+        dept: 'Transport Admin',
+        description: 'Bus TR447 incident',
+        rootCause: 'Brake failure / Inadequate maintenance',
+        correctiveAction: 'Suspend TR447, full audit of transport contractor maintenance logs',
+        eventManagement: 'Uncontrolled',
         owner: 'Transport Ops',
         dueDate: '2026-01-25',
         status: 'Ongoing'
     },
     {
         id: 'ACC-05',
-        date: '2026-01-03',
+        date: '2026-02-05',
         dept: 'Transport Services',
-        description: 'Transportation bus veered off road',
-        rootCause: 'Driver fatigue',
-        correctiveAction: 'Driver fatigue management sensitisation, review shift scheduling, reinforce fitness-for-work checks',
+        description: 'Solar Pole contact during truck reversing',
+        rootCause: 'Failure to use spotter',
+        correctiveAction: 'Mandatory spotter training, install rear-view cameras on all TR trucks',
+        eventManagement: 'Controlled',
         owner: 'Logistics Safety',
-        dueDate: '2026-01-20',
+        dueDate: '2026-02-15',
+        status: 'Closed'
+    },
+    {
+        id: 'ACC-06',
+        date: '2026-02-08',
+        dept: 'HSE / CAC',
+        description: 'Dog unit brake failure',
+        rootCause: 'Inadequate inspection and maintenance',
+        correctiveAction: 'Reinforce preventive maintenance inspections, review brake system SOPs',
+        eventManagement: 'Controlled',
+        owner: 'Maintenance Team',
+        dueDate: '2026-02-28',
+        status: 'Ongoing'
+    },
+    {
+        id: 'ACC-07',
+        date: '2026-02-17',
+        dept: 'Civil Services / TKM',
+        description: 'Boom Truck contact with light pole',
+        rootCause: 'Poor judgement by operator',
+        correctiveAction: 'Suspend driver permit pending reassessment, defensive driving refresher',
+        eventManagement: 'Controlled',
+        owner: 'HSE Dept',
+        dueDate: '2026-03-05',
         status: 'Closed'
     }
 ];
@@ -150,7 +178,6 @@ const AccidentManagement = () => {
 
     const totalIncidentsYTD = dataset.reduce((sum, d) => sum + d.incidents, 0);
     const openActions = ACTIONS_DATA.filter(a => a.status !== 'Closed').length;
-    const closureRate = ((ACTIONS_DATA.filter(a => a.status === 'Closed').length / ACTIONS_DATA.length) * 100).toFixed(1);
 
     return (
         <div style={{
@@ -242,12 +269,12 @@ const AccidentManagement = () => {
                     isHighTech={isHighTech}
                 />
                 <KPICard
-                    title="Closure Rate"
-                    value={`${closureRate}%`}
-                    subtext="Target: > 95%"
-                    icon={CheckCircle}
-                    color="#22c55e"
-                    glowColor="#22c55e"
+                    title="Primary Root Cause"
+                    value="60%"
+                    subtext="Behavioral & Operator Error"
+                    icon={Shield}
+                    color="#ef4444"
+                    glowColor="#ef4444"
                     isHighTech={isHighTech}
                 />
             </div>
@@ -288,6 +315,7 @@ const AccidentManagement = () => {
                                 <th style={{ width: '38%', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>CORRECTIVE ACTION DESCRIPTION</th>
                                 <th style={{ width: '200px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>ROOT CAUSE</th>
                                 <th style={{ width: '110px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>DUE DATE</th>
+                                <th style={{ width: '150px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>EVENT MANAGEMENT</th>
                                 <th style={{ width: '100px', padding: '12px 16px', fontSize: '9px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', borderBottom: isHighTech ? '1px solid #2a2a2a' : '1px solid #e2e8f0' }}>STATUS</th>
                             </tr>
                         </thead>
@@ -337,6 +365,23 @@ const AccidentManagement = () => {
                                     </td>
                                     <td style={{ padding: '14px 16px', fontSize: '11px', color: '#fca5a5', minWidth: '150px' }}>{row.rootCause}</td>
                                     <td style={{ padding: '14px 16px', fontSize: '11px', color: row.status === 'Overdue' ? '#ef4444' : '#94a3b8', fontFamily: '"Roboto Mono", monospace' }}>{row.dueDate}</td>
+                                    <td style={{ padding: '14px 16px' }}>
+                                        <span style={{
+                                            padding: '4px 10px',
+                                            borderRadius: '6px',
+                                            fontSize: '9px',
+                                            fontWeight: '900',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px',
+                                            color: row.eventManagement === 'Controlled' ? '#00F2FF' : '#ef4444',
+                                            backgroundColor: row.eventManagement === 'Controlled' ? 'rgba(0, 242, 255, 0.1)' : 'rgba(239, 68, 68, 0.15)',
+                                            border: `1px solid ${row.eventManagement === 'Controlled' ? '#00F2FF30' : '#ef444430'}`,
+                                            animation: row.eventManagement === 'Uncontrolled' ? 'pulseRed 2s infinite' : 'none',
+                                            display: 'inline-block'
+                                        }}>
+                                            {row.eventManagement}
+                                        </span>
+                                    </td>
                                     <td style={{ padding: '14px 16px' }}><StatusBadge status={row.status} /></td>
                                 </tr>
                             ))}

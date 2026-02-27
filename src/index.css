@@ -3,11 +3,12 @@
   --bg-color: #121212;
   --surface-color: #1E1E1E;
   --surface-hover: #2D2D2D;
-  --primary-color: #d32f2f;
-  /* MMG Red */
-  --secondary-color: #ffd700;
+  --primary-color: #00f2ff;
+  /* Blade Cyan */
+  --secondary-color: #3b82f6;
+  /* Deep Blue */
+  --accent-color: #ffd700;
   /* VME Gold */
-  --accent-blue: #3b82f6;
 
   --text-primary: #ffffff;
   --text-secondary: #94a3b8;

@@ -2,18 +2,15 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
-    Menu,
     GraduationCap,
-    Truck,
-    Shield,
-    FileText,
     Trophy,
     Activity,
     Database,
     LogOut,
     Rocket,
     BadgeCheck,
-    AlertTriangle
+    AlertTriangle,
+    Truck
 } from 'lucide-react';
 import { useSafeEquip } from '../../context/SafeEquipContext';
 import LandingPage from '../../pages/LandingPage';
@@ -229,8 +226,8 @@ const MiniCalendar = () => {
                 gap: '2px',
                 marginBottom: '4px'
             }}>
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
-                    <div key={d} style={{ textAlign: 'center', fontSize: '7px', fontWeight: '800', color: '#334155' }}>{d}</div>
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                    <div key={`${d}-${i}`} style={{ textAlign: 'center', fontSize: '7px', fontWeight: '800', color: '#334155' }}>{d}</div>
                 ))}
             </div>
 
@@ -281,7 +278,7 @@ const MiniCalendar = () => {
 // ═══════════════════════════════════════════════
 const Layout = () => {
     const { logout, isAuthenticated, theme } = useSafeEquip();
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [sidebarCollapsed] = useState(false); // Fixed expanded state for "Initial Blade" design
     const location = useLocation();
 
     const isHighTech = theme === 'high-tech';
@@ -409,36 +406,6 @@ const Layout = () => {
                             </div>
                         </>
                     )}
-
-                    {/* Collapse Toggle */}
-                    <button
-                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        style={{
-                            position: 'absolute',
-                            top: '8px',
-                            right: '8px',
-                            padding: '6px',
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid rgba(255,255,255,0.06)',
-                            borderRadius: '6px',
-                            color: '#64748b',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.borderColor = 'rgba(0,242,255,0.3)';
-                            e.currentTarget.style.color = '#00F2FF';
-                        }}
-                        onMouseLeave={e => {
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                            e.currentTarget.style.color = '#64748b';
-                        }}
-                    >
-                        <Menu size={14} />
-                    </button>
                 </div>
 
                 {/* ══════ NAVIGATION — The Control Stack ══════ */}
@@ -466,59 +433,45 @@ const Layout = () => {
                     overflow: 'hidden'
                 }}>
                     <SidebarItem
-                        to="/dashboard/strategic-roadmap"
-                        icon={Rocket}
-                        label="Strategic Roadmap"
-                        active={location.pathname === '/dashboard/strategic-roadmap'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
                         to="/dashboard/executive-summary"
                         icon={Activity}
-                        label="Executive Summary"
+                        label="EXECUTIVE SUMMARY"
                         active={location.pathname === '/dashboard/executive-summary'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
-                        to="/dashboard/training-stats"
-                        icon={GraduationCap}
-                        label="Training & VOC Stats"
-                        active={location.pathname === '/dashboard/training-stats'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
-                        to="/dashboard/safety-awareness"
-                        icon={Shield}
-                        label="Safety Awareness"
-                        active={location.pathname === '/dashboard/safety-awareness'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
-                        to="/dashboard/fleet-compliance"
-                        icon={Truck}
-                        label="Fleet Compliance"
-                        active={location.pathname === '/dashboard/fleet-compliance'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
-                        to="/dashboard/documentation-status"
-                        icon={FileText}
-                        label="Documentation Status"
-                        active={location.pathname === '/dashboard/documentation-status'}
-                        collapsed={sidebarCollapsed}
-                    />
-                    <SidebarItem
-                        to="/dashboard/red-list-leaderboard"
-                        icon={Trophy}
-                        label="Red List & L1-L5"
-                        active={location.pathname === '/dashboard/red-list-leaderboard'}
                         collapsed={sidebarCollapsed}
                     />
                     <SidebarItem
                         to="/dashboard/accident-management"
                         icon={AlertTriangle}
-                        label="Accident Management"
+                        label="ACCIDENT MANAGEMENT"
                         active={location.pathname === '/dashboard/accident-management'}
+                        collapsed={sidebarCollapsed}
+                    />
+                    <SidebarItem
+                        to="/dashboard/red-list-leaderboard"
+                        icon={Trophy}
+                        label="OPERATIONAL DISCIPLINE"
+                        active={location.pathname === '/dashboard/red-list-leaderboard'}
+                        collapsed={sidebarCollapsed}
+                    />
+                    <SidebarItem
+                        to="/dashboard/training-stats"
+                        icon={GraduationCap}
+                        label="WORKFORCE AWARENESS HUB"
+                        active={location.pathname === '/dashboard/training-stats'}
+                        collapsed={sidebarCollapsed}
+                    />
+                    <SidebarItem
+                        to="/dashboard/strategic-roadmap"
+                        icon={Rocket}
+                        label="STRATEGIC ROADMAP"
+                        active={location.pathname === '/dashboard/strategic-roadmap'}
+                        collapsed={sidebarCollapsed}
+                    />
+                    <SidebarItem
+                        to="/dashboard/fleet-compliance"
+                        icon={Truck}
+                        label="FLEET COMPLIANCE"
+                        active={location.pathname === '/dashboard/fleet-compliance'}
                         collapsed={sidebarCollapsed}
                     />
 
@@ -778,16 +731,30 @@ const Layout = () => {
 
                     {/* Branding Footer */}
                     <footer style={{
-                        padding: '10px 24px',
-                        borderTop: '1px solid rgba(255,255,255,0.03)',
-                        textAlign: 'right',
-                        fontSize: '9px',
-                        color: '#334155',
-                        fontWeight: '700',
-                        letterSpacing: '1.5px',
-                        backgroundColor: '#121212'
+                        padding: '12px 24px',
+                        borderTop: isHighTech ? '1px solid rgba(0,242,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: isHighTech ? 'rgba(10,10,14,0.8)' : '#ffffff',
+                        backdropFilter: 'blur(10px)',
+                        zIndex: 10
                     }}>
-                        INSPIRED BY SAFEEQUIP TECHNOLOGY | VME 2026 CORE ENGINE
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <MMGLogo size={24} />
+                            <div style={{ height: '16px', width: '1px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                            <span style={{ fontSize: '9px', fontWeight: '900', color: '#64748b', letterSpacing: '1px' }}>
+                                CORPORATE CLEARANCE: <span style={{ color: '#00F2FF' }}>AUTHORIZED</span>
+                            </span>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '11px', fontWeight: '900', color: 'white', letterSpacing: '2px', marginBottom: '2px' }}>
+                                DAN KAHILU
+                            </div>
+                            <div style={{ fontSize: '8px', fontWeight: '800', color: '#00F2FF', letterSpacing: '1.5px' }}>
+                                CHIEF SYSTEMS ARCHITECT | VME 2026
+                            </div>
+                        </div>
                     </footer>
                 </main>
             </div>
