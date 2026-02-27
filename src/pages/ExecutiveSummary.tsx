@@ -117,6 +117,7 @@ const CommandKPI = ({ title, mainValue, subText, icon: Icon, color, alert }: any
 const ExecutiveSummary = () => {
     const { dataset, lastIncidentDate } = useSafeEquip();
     const [chartMode, setChartMode] = useState<'HISTORY' | 'CUMULATIVE'>('HISTORY');
+    const [showReport, setShowReport] = useState(false);
 
     const totalAccidents2026 = dataset.reduce((sum, item) => sum + item.incidents, 0);
     const daysElapsed = 58; // Approx YTD Jan/Feb 2026
@@ -205,7 +206,7 @@ const ExecutiveSummary = () => {
                         subText="Total Audited Accidents"
                         icon={AlertCircle}
                         color="#ef4444"
-                        alert="7 RECORDS"
+                        alert="10 RECORDS"
                     />
                     <CommandKPI
                         title="SAFETY AWARENESS"

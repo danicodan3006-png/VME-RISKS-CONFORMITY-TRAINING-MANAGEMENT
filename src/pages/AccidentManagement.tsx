@@ -10,6 +10,42 @@ import { useSafeEquip } from '../context/SafeEquipContext';
 // --- Mock Action Data ---
 const ACTIONS_DATA = [
     {
+        id: 'ACC-08',
+        date: '2026-02-26',
+        dept: 'Transport Services',
+        description: 'LV Fortuner crashed by external vehicle',
+        rootCause: 'Unknown',
+        correctiveAction: 'Defensive driving training',
+        eventManagement: 'Uncontrolled',
+        owner: 'Transport Ops',
+        dueDate: '2026-02-27',
+        status: 'Closed'
+    },
+    {
+        id: 'ACC-09',
+        date: '2026-02-25',
+        dept: 'Transport Services',
+        description: 'Bus crashed external vehicle on back',
+        rootCause: 'Poor judgement by operator',
+        correctiveAction: 'Suspend driver permit pending review',
+        eventManagement: 'Controlled',
+        owner: 'Transport Ops',
+        dueDate: '2026-03-25',
+        status: 'Ongoing'
+    },
+    {
+        id: 'ACC-10',
+        date: '2026-02-24',
+        dept: 'HSE / CAC',
+        description: 'Security LV turned over in trench',
+        rootCause: 'Poor judgement by operator',
+        correctiveAction: 'Suspend driver permit, verify site induction',
+        eventManagement: 'Controlled',
+        owner: 'HSE Dept',
+        dueDate: '2026-03-25',
+        status: 'Ongoing'
+    },
+    {
         id: 'ACC-01',
         date: '2026-01-15',
         dept: 'MEXCO',
@@ -26,7 +62,7 @@ const ACTIONS_DATA = [
         date: '2026-01-14',
         dept: 'ORICA',
         description: 'MMU02 Yard incident',
-        rootCause: 'Inadequate site coordination',
+        rootCause: 'Operator Error / Inadequate coordination',
         correctiveAction: 'Review yard traffic management plan, reinforce site safety rules for contractors',
         eventManagement: 'Controlled',
         owner: 'Facility Management',
@@ -200,6 +236,10 @@ const AccidentManagement = () => {
                     0%, 100% { box-shadow: 0 0 5px #f59e0b20; }
                     50% { box-shadow: 0 0 15px #f59e0b50; }
                 }
+                @keyframes pulseRedBorder {
+                    0%, 100% { box-shadow: 0 0 0px #ef444400; border-color: #ef4444; }
+                    50% { box-shadow: 0 0 15px #ef444480; border-color: #ef4444; }
+                }
                 .action-row:hover {
                     background-color: rgba(255,255,255,0.03) !important;
                     cursor: pointer;
@@ -320,71 +360,78 @@ const AccidentManagement = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {ACTIONS_DATA.map((row, i) => (
-                                <tr
-                                    key={row.id}
-                                    className="action-row"
-                                    onClick={() => setSelectedAction(row)}
-                                    style={{
-                                        borderBottom: '1px solid #1a1a1f',
-                                        backgroundColor: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    <td style={{ padding: '14px 16px', fontSize: '11px', color: '#94a3b8', fontFamily: '"Roboto Mono", monospace' }}>{row.date}</td>
-                                    <td style={{ padding: '14px 16px', fontSize: '12px', fontWeight: '700', color: isHighTech ? 'white' : '#1e293b' }}>{row.dept}</td>
-                                    <td
-                                        onMouseEnter={(e) => row.description.length > 100 && setHoveredCell({ text: row.description, x: e.clientX, y: e.clientY })}
-                                        onMouseLeave={() => setHoveredCell(null)}
-                                        style={{
-                                            padding: '14px 16px',
-                                            fontSize: '13px',
-                                            fontWeight: '700',
-                                            color: isHighTech ? 'white' : '#1e293b',
-                                            lineHeight: '1.4',
-                                            whiteSpace: 'normal',
-                                            wordBreak: 'break-word'
-                                        }}
-                                    >
-                                        {row.description}
-                                    </td>
-                                    <td
-                                        onMouseEnter={(e) => row.correctiveAction.length > 100 && setHoveredCell({ text: row.correctiveAction, x: e.clientX, y: e.clientY })}
-                                        onMouseLeave={() => setHoveredCell(null)}
-                                        style={{
-                                            padding: '14px 16px',
-                                            fontSize: '13px',
-                                            fontWeight: '700',
-                                            color: '#86efac',
-                                            lineHeight: '1.4',
-                                            whiteSpace: 'normal',
-                                            wordBreak: 'break-word'
-                                        }}
-                                    >
-                                        {row.correctiveAction}
-                                    </td>
-                                    <td style={{ padding: '14px 16px', fontSize: '11px', color: '#fca5a5', minWidth: '150px' }}>{row.rootCause}</td>
-                                    <td style={{ padding: '14px 16px', fontSize: '11px', color: row.status === 'Overdue' ? '#ef4444' : '#94a3b8', fontFamily: '"Roboto Mono", monospace' }}>{row.dueDate}</td>
-                                    <td style={{ padding: '14px 16px' }}>
-                                        <span style={{
-                                            padding: '4px 10px',
-                                            borderRadius: '6px',
-                                            fontSize: '9px',
-                                            fontWeight: '900',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '1px',
-                                            color: row.eventManagement === 'Controlled' ? '#00F2FF' : '#ef4444',
-                                            backgroundColor: row.eventManagement === 'Controlled' ? 'rgba(0, 242, 255, 0.1)' : 'rgba(239, 68, 68, 0.15)',
-                                            border: `1px solid ${row.eventManagement === 'Controlled' ? '#00F2FF30' : '#ef444430'}`,
-                                            animation: row.eventManagement === 'Uncontrolled' ? 'pulseRed 2s infinite' : 'none',
-                                            display: 'inline-block'
-                                        }}>
-                                            {row.eventManagement}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '14px 16px' }}><StatusBadge status={row.status} /></td>
-                                </tr>
-                            ))}
+                            {[...ACTIONS_DATA]
+                                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                .map((row, i) => {
+                                    const isUncontrolledFeb26 = row.date === '2026-02-26' && row.eventManagement === 'Uncontrolled';
+                                    return (
+                                        <tr
+                                            key={row.id}
+                                            className="action-row"
+                                            onClick={() => setSelectedAction(row)}
+                                            style={{
+                                                borderBottom: '1px solid #1a1a1f',
+                                                backgroundColor: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)',
+                                                border: isUncontrolledFeb26 ? '2px solid #ef4444' : 'none',
+                                                animation: isUncontrolledFeb26 ? 'pulseRedBorder 2s infinite' : 'none',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            <td style={{ padding: '14px 16px', fontSize: '11px', color: '#94a3b8', fontFamily: '"Roboto Mono", monospace' }}>{row.date}</td>
+                                            <td style={{ padding: '14px 16px', fontSize: '12px', fontWeight: '700', color: isHighTech ? 'white' : '#1e293b' }}>{row.dept}</td>
+                                            <td
+                                                onMouseEnter={(e) => row.description.length > 100 && setHoveredCell({ text: row.description, x: e.clientX, y: e.clientY })}
+                                                onMouseLeave={() => setHoveredCell(null)}
+                                                style={{
+                                                    padding: '14px 16px',
+                                                    fontSize: '13px',
+                                                    fontWeight: '700',
+                                                    color: isHighTech ? 'white' : '#1e293b',
+                                                    lineHeight: '1.4',
+                                                    whiteSpace: 'normal',
+                                                    wordBreak: 'break-word'
+                                                }}
+                                            >
+                                                {row.description}
+                                            </td>
+                                            <td
+                                                onMouseEnter={(e) => row.correctiveAction.length > 100 && setHoveredCell({ text: row.correctiveAction, x: e.clientX, y: e.clientY })}
+                                                onMouseLeave={() => setHoveredCell(null)}
+                                                style={{
+                                                    padding: '14px 16px',
+                                                    fontSize: '13px',
+                                                    fontWeight: '700',
+                                                    color: '#86efac',
+                                                    lineHeight: '1.4',
+                                                    whiteSpace: 'normal',
+                                                    wordBreak: 'break-word'
+                                                }}
+                                            >
+                                                {row.correctiveAction}
+                                            </td>
+                                            <td style={{ padding: '14px 16px', fontSize: '11px', color: '#fca5a5', minWidth: '150px' }}>{row.rootCause}</td>
+                                            <td style={{ padding: '14px 16px', fontSize: '11px', color: row.status === 'Overdue' ? '#ef4444' : '#94a3b8', fontFamily: '"Roboto Mono", monospace' }}>{row.dueDate}</td>
+                                            <td style={{ padding: '14px 16px' }}>
+                                                <span style={{
+                                                    padding: '4px 10px',
+                                                    borderRadius: '6px',
+                                                    fontSize: '9px',
+                                                    fontWeight: '900',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px',
+                                                    color: row.eventManagement === 'Controlled' ? '#00F2FF' : '#ef4444',
+                                                    backgroundColor: row.eventManagement === 'Controlled' ? 'rgba(0, 242, 255, 0.1)' : 'rgba(239, 68, 68, 0.15)',
+                                                    border: `1px solid ${row.eventManagement === 'Controlled' ? '#00F2FF30' : '#ef444430'}`,
+                                                    animation: row.eventManagement === 'Uncontrolled' ? 'pulseRed 2s infinite' : 'none',
+                                                    display: 'inline-block'
+                                                }}>
+                                                    {row.eventManagement}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '14px 16px' }}><StatusBadge status={row.status} /></td>
+                                        </tr>
+                                    );
+                                })}
                         </tbody>
                     </table>
                 </div>

@@ -104,5 +104,44 @@ export const SafeEquip_Dynamic_Dataset: SafeEquipEntry[] = [
         vehicles_compliant: 38,
         red_list_status: true,
         risk_level: 3
+    },
+    {
+        id: 'SEC-008',
+        timestamp: '2026-02-24T09:00:00Z',
+        department: 'HSE', // Accident 10
+        incidents: 1,
+        training_theory: 10,
+        training_practice: 10,
+        company_name: 'MMG',
+        vehicles_total: 12,
+        vehicles_compliant: 11,
+        red_list_status: true,
+        risk_level: 4
+    },
+    {
+        id: 'SEC-009',
+        timestamp: '2026-02-25T09:00:00Z',
+        department: 'Transport Services', // Accident 9
+        incidents: 1,
+        training_theory: 5,
+        training_practice: 5,
+        company_name: 'TKM',
+        vehicles_total: 24,
+        vehicles_compliant: 20,
+        red_list_status: true,
+        risk_level: 4
+    },
+    {
+        id: 'SEC-010',
+        timestamp: '2026-02-26T09:00:00Z',
+        department: 'Transport Services', // Accident 8
+        incidents: 1,
+        training_theory: 0,
+        training_practice: 0,
+        company_name: 'MMG',
+        vehicles_total: 15,
+        vehicles_compliant: 15,
+        red_list_status: true,
+        risk_level: 5
     }
 ];
