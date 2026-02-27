@@ -3,7 +3,8 @@ import { useState } from 'react';
 import {
     Clock,
     Shield,
-    Search
+    Search,
+    Activity
 } from 'lucide-react';
 import { useSafeEquip } from '../context/SafeEquipContext';
 
@@ -130,6 +131,44 @@ const ACTIONS_DATA = [
         status: 'Closed'
     }
 ];
+
+// --- Event Control Ratio Widget ---
+const EventControlRatio = ({ isHighTech }: { isHighTech: boolean }) => (
+    <div style={{
+        backgroundColor: isHighTech ? 'rgba(30,30,35,0.6)' : '#ffffff',
+        border: isHighTech ? '1px solid #00F2FF30' : '1px solid #e2e8f0',
+        borderRadius: '12px',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        backdropFilter: isHighTech ? 'blur(12px)' : 'none',
+        boxShadow: isHighTech ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 6px -1px rgba(0,0,0,0.1)',
+        position: 'relative',
+        overflow: 'hidden'
+    }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '10px', fontWeight: '800', color: '#64748b', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Event Control Ratio</span>
+            <Activity size={16} color="#00F2FF" />
+        </div>
+
+        <div style={{ position: 'relative', marginTop: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '10px', fontWeight: '700' }}>
+                <span style={{ color: '#00F2FF' }}>CONTROLLED (7)</span>
+                <span style={{ color: '#ef4444' }}>UNCONTROLLED (3)</span>
+            </div>
+            <div style={{ height: '8px', width: '100%', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.05)', display: 'flex', overflow: 'hidden' }}>
+                <div style={{ width: '70%', height: '100%', backgroundColor: '#00F2FF', boxShadow: '0 0 10px rgba(0, 242, 255, 0.3)' }} />
+                <div style={{ width: '30%', height: '100%', backgroundColor: '#ef4444', boxShadow: '0 0 15px rgba(239, 68, 68, 0.5)', animation: 'pulseRed 2s infinite' }} />
+            </div>
+        </div>
+
+        <p style={{ fontSize: '9px', color: '#475569', lineHeight: '1.4', margin: 0, fontWeight: '600' }}>
+            <span style={{ color: '#00F2FF' }}>70% Controlled</span>: Barriers held. <br />
+            <span style={{ color: '#ef4444' }}>30% Uncontrolled</span>: Critical failure risk.
+        </p>
+    </div>
+);
 
 // --- KPI Card Component ---
 const KPICard = ({ title, value, subtext, icon: Icon, color, glowColor, isHighTech }: any) => (
@@ -289,7 +328,7 @@ const AccidentManagement = () => {
             </div>
 
             {/* KPI Section */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr', gap: '16px' }}>
                 <KPICard
                     title="Total Incidents (YTD)"
                     value={totalIncidentsYTD}
@@ -310,13 +349,14 @@ const AccidentManagement = () => {
                 />
                 <KPICard
                     title="Primary Root Cause"
-                    value="60%"
+                    value="90%"
                     subtext="Behavioral & Operator Error"
-                    icon={Shield}
+                    icon={Activity}
                     color="#ef4444"
                     glowColor="#ef4444"
                     isHighTech={isHighTech}
                 />
+                <EventControlRatio isHighTech={isHighTech} />
             </div>
 
             {/* Main Action Tracker Table */}
