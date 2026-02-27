@@ -7,7 +7,7 @@ export interface SensibilisationEntry {
 
 export const SENSIBILISATION_DATA: SensibilisationEntry[] = [
     { month: 'Jan', count: 65, target: 80 },
-    { month: 'Feb', count: 77, target: 80 },
+    { month: 'Feb', count: 199, target: 80 },
     { month: 'Mar', count: 0, target: 80 },
     { month: 'Apr', count: 0, target: 80 },
     { month: 'May', count: 0, target: 80 },

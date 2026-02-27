@@ -14,8 +14,8 @@ import { useSafeEquip } from '../context/SafeEquipContext';
 // DATA ENGINE — synced with Training page (2,976 total)
 // ═══════════════════════════════════════════════
 const departmentalData = [
-    { name: 'Mining', sensitized: 112, total: 1398 },
-    { name: 'Transport', sensitized: 67, total: 195 },
+    { name: 'Mining', sensitized: 132, total: 1398 },
+    { name: 'Transport', sensitized: 98, total: 195 },
     { name: 'SSHEC', sensitized: 34, total: 157 },
     { name: 'Exploration', sensitized: 0, total: 57 },
     { name: 'Supply Chain', sensitized: 0, total: 69 },

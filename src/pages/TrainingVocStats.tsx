@@ -1,23 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-    BookOpen, GraduationCap, Users, AlertTriangle,
-    Zap, TrendingUp, Shield, BarChart3, LineChart as LineIcon,
-    PieChart, Target, Heart, Eye, Bell, ShieldCheck
+    BookOpen, GraduationCap, Users,
+    TrendingUp, Shield,
+    Target, Bell, ShieldCheck
 } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, LineChart, Line, AreaChart, Area,
-    Cell, ComposedChart
+    ResponsiveContainer, Cell, ComposedChart, Area, Line
 } from 'recharts';
 import { useSafeEquip } from '../context/SafeEquipContext';
 import { SENSIBILISATION_DATA, GET_TOTAL_SENSIBILISATIONS } from '../data/sensibilisationData';
 
 // --- Static Data Definitions ---
 const DEPT_DATA = [
-    { name: 'Mining (Mexco)', theory: 161, employees: 1398, redListed: 45 },
+    { name: 'Mining (Mexco)', theory: 213, employees: 1398, redListed: 45 },
     { name: 'HSE', theory: 4, employees: 157, redListed: 6 },
     { name: 'Plant', theory: 2, employees: 167, redListed: 8 },
-    { name: 'Transport', theory: 2, employees: 195, redListed: 9 },
+    { name: 'Transport', theory: 25, employees: 195, redListed: 9 },
     { name: 'Civil Svcs', theory: 0, employees: 227, redListed: 12 },
     { name: 'Lean Prod', theory: 0, employees: 167, redListed: 7 },
     { name: 'Sulphite', theory: 0, employees: 167, redListed: 8 },
@@ -83,7 +82,7 @@ const TrainingVocStats = () => {
     const [activeTab, setActiveTab] = useState<'VOC' | 'SAFETY'>('VOC');
 
     const totalSensibilisations = GET_TOTAL_SENSIBILISATIONS();
-    const coveragePct = (169 / TOTAL_POPULATION) * 100;
+    const coveragePct = (244 / TOTAL_POPULATION) * 100;
 
     return (
         <div style={{
@@ -120,7 +119,7 @@ const TrainingVocStats = () => {
                             <ShieldCheck size={20} color="#06b6d4" />
                             <h3 style={{ fontSize: '12px', fontWeight: '900', letterSpacing: '1px' }}>CERTIFICATION GATEKEEPER</h3>
                         </div>
-                        <CertificationFunnel totalTarget={TOTAL_POPULATION} totalTheory={169} totalPractice={0} />
+                        <CertificationFunnel totalTarget={TOTAL_POPULATION} totalTheory={244} totalPractice={5} />
                         <div style={{ marginTop: 'auto', padding: '20px', background: 'rgba(6,182,212,0.05)', borderRadius: '12px', border: '1px solid rgba(6,182,212,0.2)' }}>
                             <div style={{ fontSize: '9px', fontWeight: '900', color: '#06b6d4', marginBottom: '8px' }}>GLOBAL TRAINING COVERAGE</div>
                             <div style={{ fontSize: '28px', fontWeight: '900', color: 'white' }}>{coveragePct.toFixed(1)}%</div>

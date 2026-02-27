@@ -121,7 +121,7 @@ const ExecutiveSummary = () => {
     const totalAccidents2026 = 10;
     const projection = 63;
     const daysSinceLast = 1;
-    const totalSensibilisations = 142;
+    const totalSensibilisations = 264;
 
     // Cumulative Data Calculation
     const cumulativeData = HISTORICAL_DATA.map((d, i) => {
